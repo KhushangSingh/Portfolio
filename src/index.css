@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 1. FORCE THE FONT FAMILY GLOBALLY */
+@layer base {
+  html {
+    font-family: "Bricolage Grotesque", sans-serif;
+  }
+}
+
+/* Default background */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: black;
+}
+
+/* Liquid Button Animation */
+@keyframes liquid-shimmer {
+  0% { transform: translateX(-150%) skewX(-12deg); }
+  100% { transform: translateX(150%) skewX(-12deg); }
+}
+
+.animate-liquid {
+  animation: liquid-shimmer 3s infinite linear;
+}
