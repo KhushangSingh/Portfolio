@@ -149,8 +149,8 @@ export const devData = {
       longDesc: "WrapURL streamlines digital resource sharing by transforming lengthy links into concise, memorable URLs. Engineered a 'Custom Alias' feature for personal branding and designed an intuitive dashboard for link generation and history tracking. The backend architecture prioritizes performance with rapid redirection and unique alias validation.",
       features: ["Custom Aliases", "Link History Dashboard", "Rapid Redirection"],
       tags: ["MERN Stack", "UI/UX Design", "Redis"],
-      image: "public/images/WrapUrlProject/WU-CoverPage1.png",
-      gallery: ["public/images/WrapUrlProject/WU-CoverPage1.png"],
+      image: "/images/WrapUrlProject/WU-CoverPage1.png",
+      gallery: ["/images/WrapUrlProject/WU-CoverPage1.png"],
       github: "",
       live: ""
     },
