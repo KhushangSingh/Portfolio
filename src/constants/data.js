@@ -133,11 +133,7 @@ export const devData = {
       features: ["Request & Approval Workflow", "Skill-based Matching", "Applicant Verification", "Team Management"],
       tags: ["MERN Stack", "Collaboration", "UI/UX Design"],
       image: "/images/SquadSyncProject/SS-CoverPage.png",
-      gallery: ["/images/SquadSyncProject/SS-FindSquadsPage.png", 
-        "/images/SquadSyncProject/SS-MySquadsPage.png",
-        "/images/SquadSyncProject/SS-JoinedSquadsPage.png", 
-        "/images/SquadSyncProject/SS-SquadCreate.png", 
-        "/images/SquadSyncProject/SS-UserProfile.png"],
+      gallery: ["/images/SquadSyncProject/SS-CaseStudy.png",],
       github: "",
       live: ""
     },
