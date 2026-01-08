@@ -283,13 +283,7 @@ export const designData = {
           desc: "Collaboration platform connecting students based on competency with a 'Request & Approval' workflow.",
           tools: "Figma",
           timeline: "2 Weeks",
-          gallery: [
-              "/images/SquadSyncProject/SS-FindSquadsPage.png",
-              "/images/SquadSyncProject/SS-MySquadsPage.png",
-              "/images/SquadSyncProject/SS-JoinedSquadsPage.png",
-              "/images/SquadSyncProject/SS-SquadCreate.png",
-              "/images/SquadSyncProject/SS-UserProfile.png"
-          ]
+          gallery: ["/images/SquadSyncProject/SS-CaseStudy.png" ]
         },
       ]
     },
