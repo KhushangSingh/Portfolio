@@ -127,19 +127,9 @@ const ProjectModal = ({ project, onClose }) => {
           </button>
   
           <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-              
-              {/* Header Image - Limited Height + Gradient */}
-              <div className="relative h-[60vh] w-full shrink-0">
-                {project.image && (
-                    <>
-                        <img src={project.image} alt={project.title || "Project"} className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-transparent to-transparent" />
-                    </>
-                )}
-             </div>
 
              {/* Full Width Gallery Section with Gap */}
-             <div className="pt-12 pb-20 bg-[#0A0A0A]">
+             <div className="pb-20 bg-[#0A0A0A]">
                  {project.gallery && project.gallery.length > 0 ? (
                      <div className="w-full space-y-4">
                          {project.gallery.map((img, index) => (
