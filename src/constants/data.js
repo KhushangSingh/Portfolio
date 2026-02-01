@@ -139,6 +139,34 @@ export const devData = {
     },
     {
       id: 3,
+      title: "Ledgerly",
+      role: "Sole Developer • Feb 2026",
+      desc: "A centralized digital library designed for curating and managing high-utility professional resources.",
+      longDesc: "Ledgerly is a comprehensive 'LinkHub' built to eliminate the chaos of scattered bookmarks. It provides a structured environment where developers and designers can discover domain-specific tools—ranging from Generative AI to UI kits—and maintain secure, personalized repositories for instant access. The platform focuses on high-speed retrieval and a clean, clutter-free user experience.",
+      features: [
+        "Personalized Resource Repositories",
+        "Domain-Specific Categorization (AI, UI/UX, DevTools)",
+        "Real-time Database Integration",
+        "Secure User Authentication",
+        "Quick-Save API for rapid resource logging",
+        "Dynamic 'Stacks' for custom link grouping"
+      ],
+      tags: ["MongoDB", "Express.js", "React", "Node.js", "Framer Motion", "Tailwind CSS"],
+      image: "images/LedgerlyProject/Ledgerly-LandingPage.png",
+      gallery: [
+        "images/LedgerlyProject/Ledgerly-LandingPage.png",
+        "images/LedgerlyProject/Ledgerly-LinkHub-GridView.png",
+        "images/LedgerlyProject/Ledgerly-Categories-GirdView.png",
+        "images/LedgerlyProject/Ledgerly-Community.png",
+        "images/LedgerlyProject/Ledgerly-Tools.png",
+        "images/LedgerlyProject/Ledgerly-Vault.png",
+        "images/LedgerlyProject/Ledgerly-Profile.png",
+      ],
+      github: "https://github.com/KhushangSingh/Ledgerly",
+      live: "https://ledgerly-ks.vercel.app/"
+    },
+    {
+      id: 4,
       title: "WrapURL",
       role: "Sole Developer • Sept 2024",
       desc: "Custom URL management platform transforming standard links into concise, customizable URLs for enhanced branding and ease of use.",
@@ -151,7 +179,7 @@ export const devData = {
       live: ""
     },
     {
-      id: 4,
+      id: 5,
       title: "Face Recognition Based Attendance System",
       role: "UI/UX & Front-End • 2024",
       desc: "Automated attendance system using Face Recognition.",
@@ -163,19 +191,6 @@ export const devData = {
       github: "",
       live: ""
     },
-    {
-      id: 5,
-      title: "Ledgerly",
-      role: "Sole Developer • In Development",
-      desc: "An upcoming centralized hub designed to curate and manage essential digital resources.",
-      longDesc: "Currently in active development, Ledgerly aims to solve the problem of scattered digital tools. The vision is to build a comprehensive 'LinkHub' where developers and designers can discover links and names of domain-specific resources—from Generative AI to UI kits—while maintaining their own secure, personalized repositories for easy access.",
-      features: [],
-      tags: [],
-      image: "/images/UnderDevelopment.png",
-      gallery: ["/images/UnderDevelopment.png"],
-      github: "",
-      live: ""
-    }
   ],
 
   extracurricular: [
@@ -284,6 +299,28 @@ export const designData = {
           tools: "Figma",
           timeline: "2 Weeks",
           gallery: ["/images/SquadSyncProject/SS-CaseStudy.png" ]
+        },
+        {
+          id: 3,
+          title: "Ledgerly",
+          subCat: "Web Design",
+          role: "UI/UX Designer & Full Stack Dev",
+          desc: "A centralized digital library designed for curating and managing high-utility professional resources.",
+          longDesc: "Ledgerly is a comprehensive 'LinkHub' built to eliminate the chaos of scattered bookmarks. It provides a structured environment where developers and designers can discover domain-specific tools—ranging from Generative AI to UI kits—and maintain secure, personalized repositories for instant access. The platform focuses on high-speed retrieval and a clean, clutter-free user experience.",
+          tools: "Figma",
+          timeline: "2 Weeks",
+          github: "https://github.com/KhushangSingh/Ledgerly",
+          live: "https://ledgerly-ks.vercel.app/",
+          image: "images/LedgerlyProject/Ledgerly-LandingPage.png",
+          gallery: [
+            "images/LedgerlyProject/Ledgerly-LandingPage.png",
+            "images/LedgerlyProject/Ledgerly-LinkHub-GridView.png",
+            "images/LedgerlyProject/Ledgerly-Categories-GirdView.png",
+            "images/LedgerlyProject/Ledgerly-Community.png",
+            "images/LedgerlyProject/Ledgerly-Tools.png",
+            "images/LedgerlyProject/Ledgerly-Vault.png",
+            "images/LedgerlyProject/Ledgerly-Profile.png",
+          ]
         },
       ]
     },
