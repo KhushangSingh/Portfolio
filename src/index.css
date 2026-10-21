@@ -1,0 +1,193 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 1. FORCE THE FONT FAMILY GLOBALLY */
+@layer base {
+  html {
+    font-family: "Bricolage Grotesque", sans-serif;
+  }
+}
+
+/* Default background */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: black;
+}
+
+/* 2. TRANSPARENT VERTICAL SCROLLBAR TRACK & PATH */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(140, 140, 140, 0.35);
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(140, 140, 140, 0.6);
+}
+
+/* Firefox scrollbar styling: subtle thumb with completely transparent track */
+html, body, * {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(140, 140, 140, 0.35) transparent !important;
+}
+
+/* 3. CIRCULAR LIGHT EXPANSION WAVE (From Top-Left Bulb to Bottom-Right Corner in 1.4s) */
+::view-transition,
+::view-transition-group(*),
+::view-transition-image-pair(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  pointer-events: none !important;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 2;
+  animation: expand-light-wave 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes expand-light-wave {
+  from {
+    clip-path: circle(0px at var(--bulb-x, 115px) var(--bulb-y, 46px));
+  }
+  to {
+    clip-path: circle(var(--bulb-radius, 2500px) at var(--bulb-x, 115px) var(--bulb-y, 46px));
+  }
+}
+
+html.is-theme-transitioning *:not(#studio, #studio *),
+html.is-theme-transitioning {
+  transition: none !important;
+}
+
+/* Liquid Button Animation */
+@keyframes liquid-shimmer {
+  0% { transform: translateX(-150%) skewX(-12deg); }
+  100% { transform: translateX(150%) skewX(-12deg); }
+}
+
+.animate-liquid {
+  animation: liquid-shimmer 3s infinite linear;
+}
+
+/* 4. LENIS SMOOTH SCROLLING STYLES */
+html.lenis, html.lenis-smooth {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* 5. THEME-ADAPTIVE HIGH-CONTRAST BESPOKE CURSORS
+   Prevents crosshairs and pointers from blending into light or dark backgrounds */
+
+/* DARK THEME: Pure White precision crosshair with dark outer stroke & orange pip */
+html.dark,
+html.dark body,
+html.dark .cursor-crosshair,
+.dark .cursor-crosshair {
+  cursor: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 2V8M12 16V22M2 12H8M16 12H22' stroke='black' stroke-width='3.5' stroke-linecap='round'/%3E%3Cpath d='M12 2V8M12 16V22M2 12H8M16 12H22' stroke='white' stroke-width='1.5' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='12' r='2' fill='%23ff4d00' stroke='black' stroke-width='0.5'/%3E%3C/svg%3E") 12 12, crosshair;
+}
+
+html.dark a,
+html.dark button,
+html.dark [role="button"],
+html.dark .cursor-pointer,
+.dark .cursor-pointer {
+  cursor: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 2L10.5 19.5L13.5 13L20 10L4 2Z' fill='white' stroke='black' stroke-width='2' stroke-linejoin='round'/%3E%3Ccircle cx='15' cy='14' r='1.5' fill='%23ff4d00'/%3E%3C/svg%3E") 4 2, pointer;
+}
+
+/* LIGHT THEME: Obsidian/Near-Black precision crosshair with white halo & orange pip */
+html.light,
+html.light body,
+html.light .cursor-crosshair,
+.light .cursor-crosshair,
+html:not(.dark),
+html:not(.dark) body,
+html:not(.dark) .cursor-crosshair {
+  cursor: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 2V8M12 16V22M2 12H8M16 12H22' stroke='white' stroke-width='3.5' stroke-linecap='round'/%3E%3Cpath d='M12 2V8M12 16V22M2 12H8M16 12H22' stroke='%23111111' stroke-width='1.5' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='12' r='2' fill='%23ff4d00' stroke='white' stroke-width='0.5'/%3E%3C/svg%3E") 12 12, crosshair;
+}
+
+html.light a,
+html.light button,
+html.light [role="button"],
+html.light .cursor-pointer,
+.light .cursor-pointer,
+html:not(.dark) a,
+html:not(.dark) button,
+html:not(.dark) [role="button"],
+html:not(.dark) .cursor-pointer {
+  cursor: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 2L10.5 19.5L13.5 13L20 10L4 2Z' fill='%23111111' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3Ccircle cx='15' cy='14' r='1.5' fill='%23ff4d00'/%3E%3C/svg%3E") 4 2, pointer;
+}
+
+/* Draggable & active states remain explicit */
+.cursor-grab {
+  cursor: grab !important;
+}
+
+.cursor-grabbing {
+  cursor: grabbing !important;
+}
+
+input, textarea {
+  cursor: text !important;
+}
+
+/* 6. SOCIAL PLATFORM HOVER CURSOR
+   Immediately suppresses the default/SVG arrow pointer on all social links and child nodes,
+   guaranteeing a direct, instantaneous transition from the precision crosshair (custom plus sign)
+   to the bespoke social platform vector logo badge with zero intermediate arrow cursor flash. */
+[data-social],
+[data-social] *,
+[data-cursor-social],
+[data-cursor-social] *,
+a[data-social],
+a[data-social] *,
+a[href*="behance"],
+a[href*="behance"] *,
+a[href*="dribbble"],
+a[href*="dribbble"] *,
+a[href*="medium"],
+a[href*="medium"] *,
+a[href*="linkedin"],
+a[href*="linkedin"] *,
+a[href*="github"],
+a[href*="github"] *,
+a[href*="twitter"],
+a[href*="twitter"] *,
+a[href*="x.com"],
+a[href*="x.com"] *,
+a[href*="instagram"],
+a[href*="instagram"] * {
+  cursor: none !important;
+}
