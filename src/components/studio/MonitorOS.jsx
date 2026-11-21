@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import BrandMark from '../BrandMark';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  X, Minus, Square, Terminal, Code2, Sparkles, Music2, 
-  Gamepad2, Box, MessageSquare, BookOpen, Trophy, 
-  ExternalLink, Play, Pause, SkipForward, Volume2, 
-  Layers, CheckCircle2, ChevronRight, Send, Search,
-  Flame, Wifi, Battery, Clock, Compass, Power
-} from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 
 export default function MonitorOS({ onCloseZone }) {
@@ -112,20 +106,20 @@ export default function MonitorOS({ onCloseZone }) {
 
   // Day App Definitions
   const dayApps = [
-    { id: 'figma', name: 'Figma', icon: Layers, color: '#F24E1E', label: 'Design Tokens' },
-    { id: 'vscode', name: 'VS Code', icon: Code2, color: '#007ACC', label: 'React Engine' },
-    { id: 'gemini', name: 'Gemini AI', icon: Sparkles, color: '#8E75FF', label: 'Spatial AI' },
-    { id: 'illustrator', name: 'Illustrator', icon: Compass, color: '#FF9A00', label: 'Vector Studio' },
-    { id: 'spotify', name: 'Spotify', icon: Music2, color: '#1DB954', label: 'Lo-Fi Chill' },
+    { id: 'figma', name: 'Figma', brand: 'figma', color: '#F24E1E', label: 'Design Tokens' },
+    { id: 'vscode', name: 'VS Code', brand: 'vscode', color: '#007ACC', label: 'React Engine' },
+    { id: 'gemini', name: 'Gemini AI', brand: 'gemini', color: '#8E75FF', label: 'Spatial AI' },
+    { id: 'illustrator', name: 'Adobe Illustrator', dockLabel: 'Illustrator', color: '#FF9A00', label: 'Vector Studio' },
+    { id: 'spotify', name: 'Spotify', brand: 'spotify', color: '#1DB954', label: 'Lo-Fi Chill' },
   ];
 
   // Night App Definitions
   const nightApps = [
-    { id: 'steam', name: 'Steam Rig', icon: Gamepad2, color: '#1B2838', label: 'Cyberpunk / 144 FPS' },
-    { id: 'blender', name: 'Blender 3D', icon: Box, color: '#EA7600', label: 'Viewport Shading' },
-    { id: 'discord', name: 'Discord', icon: MessageSquare, color: '#5865F2', label: '#dev-guild' },
-    { id: 'otakucircle', name: 'OtakuCircle', icon: BookOpen, color: '#FF5E1A', label: 'Manga Vault' },
-    { id: 'sports', name: 'NBA & Vball', icon: Trophy, color: '#1D428A', label: 'Live Court Feeds' },
+    { id: 'steam', name: 'Steam Rig', brand: 'steam', color: '#1B2838', label: 'Cyberpunk / 144 FPS' },
+    { id: 'blender', name: 'Blender 3D', brand: 'blender', color: '#EA7600', label: 'Viewport Shading' },
+    { id: 'discord', name: 'Discord', brand: 'discord', color: '#5865F2', label: '#dev-guild' },
+    { id: 'otakucircle', name: 'OtakuCircle', brand: 'otakucircle', color: '#FF5E1A', label: 'Manga Vault' },
+    { id: 'sports', name: 'NBA & Vball', dockLabel: 'Sports', color: '#1D428A', label: 'Live Court Feeds' },
   ];
 
   const currentDockApps = isDark ? nightApps : dayApps;
@@ -180,16 +174,9 @@ export default function MonitorOS({ onCloseZone }) {
 
         {/* Right: Network, Battery, Clock, and POWER OFF BUTTON */}
         <div className="flex items-center gap-3 sm:gap-4">
-          <div className="flex items-center gap-1.5 opacity-80">
-            <Wifi className="w-3.5 h-3.5 text-[#ff5e1a]" />
-            <span className="hidden sm:inline">1.2 Gbps</span>
-          </div>
-          <div className="flex items-center gap-1.5 opacity-80">
-            <Battery className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="hidden sm:inline">100%</span>
-          </div>
+          <span className="hidden opacity-80 sm:inline">Network 1.2 Gbps</span>
+          <span className="hidden opacity-80 sm:inline">Battery 100%</span>
           <div className="flex items-center gap-1.5 font-bold">
-            <Clock className="w-3.5 h-3.5 text-[#ff5e1a]" />
             <span>{time}</span>
           </div>
 
@@ -199,7 +186,6 @@ export default function MonitorOS({ onCloseZone }) {
             className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-red-500/15 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/30 hover:border-transparent transition-all font-mono text-[11px] font-bold cursor-pointer group shadow-xs active:scale-95 ml-1"
             title="Power off monitor and exit to Studio"
           >
-            <Power className="w-3.5 h-3.5 group-hover:rotate-90 transition-transform duration-300" />
             <span>Power Off</span>
           </button>
         </div>
@@ -311,7 +297,6 @@ export default function MonitorOS({ onCloseZone }) {
                                   : 'opacity-60 hover:opacity-100'
                               }`}
                             >
-                              <Code2 className="w-3 h-3" />
                               <span>{tab}</span>
                             </button>
                           ))}
@@ -383,7 +368,6 @@ export default function MonitorOS({ onCloseZone }) {
                             type="submit"
                             className="px-4 py-2 rounded-lg bg-[#ff5e1a] text-white font-bold font-mono text-xs flex items-center gap-1.5 hover:brightness-110"
                           >
-                            <Send className="w-3 h-3" />
                             <span>Ask</span>
                           </button>
                         </form>
@@ -418,7 +402,7 @@ export default function MonitorOS({ onCloseZone }) {
                       <div className="h-full flex flex-col justify-between p-2">
                         <div className="flex items-center gap-4">
                           <div className="w-20 h-20 rounded-lg bg-gradient-to-br from-[#1DB954] to-black flex items-center justify-center text-white shadow-lg">
-                            <Music2 className="w-10 h-10" />
+                            <BrandMark brand="spotify" className="w-10 h-10" />
                           </div>
                           <div className="flex flex-col">
                             <span className="text-[#1DB954] font-mono text-[10px] font-bold uppercase tracking-wider">NOW PLAYING · FLOW STATE</span>
@@ -437,9 +421,9 @@ export default function MonitorOS({ onCloseZone }) {
                           <div className="flex items-center justify-center gap-4">
                             <button 
                               onClick={() => setIsPlayingSpotify(!isPlayingSpotify)}
-                              className="w-8 h-8 rounded-full bg-[#1DB954] text-black flex items-center justify-center font-bold hover:scale-105 transition-transform"
+                              className="min-h-8 px-3 rounded-lg text-xs bg-[#1DB954] text-black flex items-center justify-center font-bold hover:scale-105 transition-transform"
                             >
-                              {isPlayingSpotify ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current ml-0.5" />}
+                              {isPlayingSpotify ? 'Pause' : 'Play'}
                             </button>
                             <span className="font-mono text-[10px] text-gray-400">320kbps Lossless Audio</span>
                           </div>
@@ -489,7 +473,7 @@ export default function MonitorOS({ onCloseZone }) {
                         </div>
                         <div className="flex-1 rounded-lg bg-black/50 border border-white/10 flex flex-col items-center justify-center p-3 relative overflow-hidden">
                           <div className="text-center space-y-1">
-                            <Box className="w-12 h-12 mx-auto text-[#EA7600] animate-spin" style={{ animationDuration: '14s' }} />
+                            <BrandMark brand="blender" className="w-12 h-12 mx-auto" />
                             <div className="font-mono text-xs text-white font-bold">Viewport Shading: Metallic Roughness 0.12</div>
                             <div className="font-mono text-[10px] text-gray-400">Anisotropic reflections mapped to vinyl turntable spindle</div>
                           </div>
@@ -583,7 +567,6 @@ export default function MonitorOS({ onCloseZone }) {
             : 'bg-white/85 border-black/15 shadow-black/10'
         }`}>
           {currentDockApps.map((app) => {
-            const Icon = app.icon;
             const isOpen = openApps.includes(app.id);
             const isActive = activeApp === app.id;
 
@@ -595,12 +578,13 @@ export default function MonitorOS({ onCloseZone }) {
                 onClick={() => handleLaunchApp(app.id)}
                 className="relative group p-1.5 sm:p-2 rounded-xl flex flex-col items-center outline-none cursor-pointer"
                 title={app.name}
+                aria-label={app.name}
               >
                 <div 
-                  className="w-7 h-7 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center text-white shadow-md transition-all"
-                  style={{ backgroundColor: app.color }}
+                  className="min-w-7 h-7 px-1.5 sm:min-w-9 sm:h-9 rounded-xl flex items-center justify-center shadow-md transition-all"
+                  style={{ backgroundColor: app.brand ? '#f5f5f5' : app.color, color: '#fff' }}
                 >
-                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                  {app.brand ? <BrandMark brand={app.brand} className="w-4 h-4 sm:w-5 sm:h-5" /> : <span className="text-[9px] font-bold">{app.dockLabel}</span>}
                 </div>
 
                 {/* Active dot indicator under app */}
@@ -629,7 +613,7 @@ export default function MonitorOS({ onCloseZone }) {
             title="Power Off monitor and exit to Studio"
           >
             <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center bg-red-500/15 group-hover:bg-red-500 text-red-500 group-hover:text-white transition-all shadow-md">
-              <Power className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="text-[10px] font-bold">Off</span>
             </div>
             <span className="w-1 h-1 rounded-full mt-1 opacity-0" />
             <div className={`absolute -top-7 px-2 py-0.5 rounded text-[9px] font-mono font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-md ${

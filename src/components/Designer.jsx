@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Sparkles, Layers, X, ExternalLink, ArrowDownLeft, Copyright, ArrowUpRight, ArrowUp } from 'lucide-react';
 import { designData } from '../constants/data';
+import BrandMark from './BrandMark';
 import { useTheme } from '../context/ThemeContext';
 import SelectedWorksShowcase from './SelectedWorksShowcase';
 import MoodBoardSection from './MoodBoardSection';
@@ -82,7 +82,7 @@ const CertModal = ({ cert, onClose }) => {
                       isDark ? 'bg-black/50 hover:bg-white/10 text-white border-white/10' : 'bg-black/5 hover:bg-black/10 text-neutral-800 border-black/10'
                     }`}
                 >
-                    <X size={20} />
+                    <span className="px-2 text-xs font-semibold">Close</span>
                 </button>
 
                 {cert.image && (
@@ -112,7 +112,7 @@ const CertModal = ({ cert, onClose }) => {
                         {cert.date && <span className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>Issued: {cert.date}</span>}
                         {cert.credentialLink && (
                             <a href={cert.credentialLink} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-[#ff4d00] hover:underline font-bold text-sm uppercase tracking-wider">
-                                Verify Credential <ExternalLink size={16} />
+                                Verify Credential
                             </a>
                         )}
                     </div>
@@ -123,62 +123,83 @@ const CertModal = ({ cert, onClose }) => {
 };
 
 // --- PROJECT DETAIL MODAL ---
+const projectToolBrands = {
+  Figma: 'figma',
+  React: 'react',
+  'Tailwind CSS': 'tailwind',
+  'Framer Motion': 'motion',
+  'Next.js': 'nextjs',
+  Storybook: 'storybook',
+  Express: 'express',
+};
+
 const ProjectModal = ({ project, onClose }) => {
-    const { isDark } = useTheme();
-    if (!project) return null;
-  
-    useEffect(() => {
-      document.body.style.overflow = 'hidden';
-      return () => { document.body.style.overflow = 'unset'; };
-    }, []);
-  
-    return (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center">
-        <motion.div 
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          onClick={onClose}
-          className={`absolute inset-0 ${isDark ? 'bg-black/90' : 'bg-black/60'} backdrop-blur-xl cursor-pointer`}
-        />
-  
-        <motion.div 
-          variants={modalVariants}
-          initial="hidden" animate="visible" exit="exit"
-          className={`w-full h-full relative z-10 flex flex-col overflow-hidden ${
-            isDark ? 'bg-[#0A0A0A]' : 'bg-[#FAFAFA]'
-          }`}
-        >
-          <button 
-            onClick={onClose} 
-            className={`absolute top-6 right-6 z-30 p-2 rounded-full transition-colors border ${
-              isDark ? 'bg-black/50 hover:bg-white/10 text-white border-white/10' : 'bg-white/80 hover:bg-white text-neutral-800 border-black/10 shadow-sm'
-            }`}
-          >
-            <X size={20} />
-          </button>
-  
-          <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-             {/* Full Width Gallery Section with Gap */}
-             <div className={`pb-20 ${isDark ? 'bg-[#0A0A0A]' : 'bg-[#FAFAFA]'}`}>
-                 {project.gallery && project.gallery.length > 0 ? (
-                     <div className="w-full space-y-4">
-                         {project.gallery.map((img, index) => (
-                             <div key={index} className="w-full">
-                                 <img 
-                                     src={img} 
-                                     alt={`${project.title} gallery ${index + 1}`} 
-                                     className="w-full h-auto object-cover block" 
-                                 />
-                             </div>
-                         ))}
-                     </div>
-                 ) : (
-                     <div className="text-center py-10 text-gray-500">No additional images available.</div>
-                 )}
-             </div>
+  const { isDark } = useTheme();
+
+  useEffect(() => {
+    if (!project) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = previousOverflow; };
+  }, [project]);
+
+  if (!project) return null;
+
+  const gallery = project.gallery?.length ? project.gallery : [project.image].filter(Boolean);
+  const tools = project.tools?.split(', ') ?? [];
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center">
+      <motion.div
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="absolute inset-0 bg-black/80 backdrop-blur-xl"
+      />
+      <motion.div
+        role="dialog" aria-modal="true" aria-labelledby="project-detail-title"
+        onKeyDown={(event) => { if (event.key === 'Escape') onClose(); }}
+        variants={modalVariants} initial="hidden" animate="visible" exit="exit"
+        style={{ '--project-accent': project.accent, '--project-base': isDark ? '#0a0a0a' : '#fafafa' }}
+        className={'relative z-10 h-full w-full overflow-y-auto [background-color:color-mix(in_srgb,var(--project-accent,transparent)_6%,var(--project-base))] ' + (isDark ? 'text-white' : 'text-neutral-900')}
+        data-lenis-prevent
+      >
+        <div className="mx-auto max-w-6xl px-5 py-8 sm:px-10 sm:py-12">
+          <header className="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-4 gap-y-2 border-s-4 ps-4 [border-color:var(--project-accent,currentColor)]">
+            <h2 id="project-detail-title" className="text-3xl font-bold tracking-tight sm:text-5xl">{project.title}</h2>
+            <button type="button" autoFocus onClick={onClose} className="min-h-10 rounded-md border border-current px-3 text-sm font-semibold hover:underline">Back</button>
+            {project.role && <p className="col-span-full text-sm text-neutral-500 dark:text-neutral-400">{project.role}</p>}
+          </header>
+          <div className="grid gap-5">
+            {gallery.map((asset, index) => {
+              const source = '/' + asset.replace(/^\/+/, '');
+              const isDocument = source.toLowerCase().endsWith('.pdf');
+              return (
+                <a key={asset} href={source} target="_blank" rel="noreferrer"
+                  className={isDocument ? 'w-fit rounded-md border border-current px-4 py-3 text-sm font-semibold hover:underline' : 'block overflow-hidden rounded-lg border border-black/10 dark:border-white/10'}
+                >
+                  {isDocument ? 'Read the research report (PDF)' : (
+                    <img src={source} alt={project.title + ' preview ' + (index + 1)} className="block aspect-[16/10] w-full object-contain" loading={index ? 'lazy' : 'eager'} />
+                  )}
+                </a>
+              );
+            })}
           </div>
-        </motion.div>
-      </div>
-    );
+          {(tools.length > 0 || project.live || project.github) && (
+            <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm">
+              {tools.map((tool) => (
+                <span key={tool} className="inline-flex items-center gap-1.5">
+                  {projectToolBrands[tool] && <BrandMark brand={projectToolBrands[tool]} className="h-5 w-5 rounded-sm bg-neutral-100 p-0.5" />}
+                  {tool}
+                </span>
+              ))}
+              {project.live && <a href={project.live} className="font-semibold underline underline-offset-4 [text-decoration-color:var(--project-accent,currentColor)]" target="_blank" rel="noreferrer">Open {project.title}</a>}
+              {project.github && <a href={project.github} className="font-semibold underline underline-offset-4 [text-decoration-color:var(--project-accent,currentColor)]" target="_blank" rel="noreferrer">View on GitHub</a>}
+            </div>
+          )}
+        </div>
+      </motion.div>
+    </div>
+  );
 };
 
 // --- VERTICAL PROCESS STEPPER ---
@@ -613,7 +634,6 @@ const InfoSection = ({ onCertClick }) => {
                                                 className="group inline-flex items-center gap-2 text-[#ff5e1a] hover:text-[#ff783b] transition-colors cursor-pointer"
                                             >
                                                 <span className="text-sm font-bold uppercase tracking-widest border-b pb-0.5 border-[#ff5e1a]/70 group-hover:border-[#ff5e1a] transition-colors">Download Resume</span>
-                                                <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                                             </a>
                                         </motion.div>
                                     )}
@@ -694,7 +714,7 @@ const Footer = () => {
           isDark ? 'bg-black text-white border-white/10' : 'bg-[#EAEAE5] text-neutral-900 border-black/10'
         }`}>
             <div className="max-w-[1400px] w-full mx-auto flex-1 flex flex-col justify-between">
-                {/* 1. TOP ROW: "Let's Create." with Right-side Arrow Circle & Hanging Spider-Man */}
+                {/* 1. TOP ROW: "Let's Create." with LinkedIn control & Hanging Spider-Man */}
                 <div className="mb-2 sm:mb-3 lg:mb-4 relative">
                     <div className="pl-4 sm:pl-8 md:pl-14 lg:pl-20">
                         <motion.h2 
@@ -730,7 +750,7 @@ const Footer = () => {
                                 data-cursor="CONNECT"
                                 className="relative z-10 w-24 h-24 lg:w-28 lg:h-28 rounded-full bg-[#ff4d00] flex items-center justify-center text-black transition-all duration-500 hover:scale-110 shadow-[0_0_25px_rgba(255,77,0,0.45)] cursor-pointer"
                             >
-                                <ArrowUpRight size={38} className="group-hover:rotate-45 transition-transform duration-500 scale-90 group-hover:scale-110" />
+                                <span className="text-sm font-bold">LinkedIn</span>
                             </a>
 
                             {/* Spiderman hanging upside down stuck to the circle */}
@@ -777,7 +797,6 @@ const Footer = () => {
                                         title="View condensed portfolio summary & visual resume"
                                     >
                                         <span>Visual Summary</span>
-                                        <ArrowRight size={13} />
                                     </Link>
 
                                     <a
@@ -792,7 +811,6 @@ const Footer = () => {
                                         title="Download PDF resume"
                                     >
                                         <span>Resume</span>
-                                        <ArrowUpRight size={13} />
                                     </a>
                                 </div>
                             </>
@@ -842,8 +860,8 @@ const Footer = () => {
                             <li><a href="#" onClick={(e) => { e.preventDefault(); scrollToTop(); }} className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>Home</a></li>
                             <li><a href="#projects" className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>Projects</a></li>
                             <li><a href="#about" className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>About</a></li>
-                            <li><Link to="/summary" className="inline-block w-fit text-xs sm:text-sm text-[#ff5e1a] font-medium hover:underline">Visual Summary ↗</Link></li>
-                            <li><a href={resumeUrl} target="_blank" rel="noreferrer" className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>Resume (PDF) ↗</a></li>
+                            <li><Link to="/summary" className="inline-block w-fit text-xs sm:text-sm text-[#ff5e1a] font-medium hover:underline">Visual Summary</Link></li>
+                            <li><a href={resumeUrl} target="_blank" rel="noreferrer" className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>Resume (PDF)</a></li>
                         </ul>
                     </motion.div>
                 </div>
@@ -851,7 +869,7 @@ const Footer = () => {
                 {/* 3. BOTTOM ROW: Sentence-case Copyright & Back to Top */}
                 <div className="pt-4 sm:pt-6 pb-2 border-t border-black/10 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div className="flex items-center gap-1.5 text-xs normal-case text-neutral-500 dark:text-neutral-400">
-                        <Copyright size={13} />
+                        <span>&copy;</span>
                         <span>2026 Khushang Singh. Designed and developed with care.</span>
                     </div>
 
@@ -865,7 +883,6 @@ const Footer = () => {
                         }`}
                     >
                         <span>Back to Top</span>
-                        <ArrowUp size={13} />
                     </button>
                 </div>
             </div>
@@ -978,7 +995,6 @@ const Designer = () => {
                   className="group relative inline-flex items-center gap-3 px-7 py-3.5 rounded-full text-xs sm:text-sm font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] shadow-lg hover:shadow-[#ff5e1a]/25 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
                 >
                   <span>View All Projects</span>
-                  <ArrowRight size={16} className="transform group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
             </div>
@@ -999,7 +1015,6 @@ const Designer = () => {
                 className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider border border-black/10 dark:border-white/10 hover:border-[#ff5e1a] text-neutral-600 dark:text-neutral-300 hover:text-[#ff5e1a] transition-colors cursor-pointer"
               >
                 <span>Collapse</span>
-                <X size={14} />
               </button>
             </div>
 
@@ -1110,7 +1125,6 @@ const Designer = () => {
                                     <div className={`backdrop-blur-md border px-3 py-1 flex items-center gap-2 ${
                                       isDark ? 'bg-black/50 border-white/10 text-gray-300' : 'bg-white/90 border-black/10 text-neutral-800 shadow-sm'
                                     }`}>
-                                        <Layers size={10} className="text-[#ff4d00]" />
                                         <span className="text-[9px] font-sans uppercase tracking-widest font-bold">{project.subCat}</span>
                                     </div>
                                 </div>
@@ -1134,10 +1148,10 @@ const Designer = () => {
                                         </p>
                                     )}
                                 </div>
-                                <div className={`w-12 h-12 rounded-full border flex items-center justify-center bg-transparent group-hover:bg-[#ff4d00] group-hover:border-[#ff4d00] transition-all duration-300 ${
+                                <div className={`min-h-10 shrink-0 px-3 rounded-lg border flex items-center justify-center bg-transparent group-hover:bg-[#ff4d00] group-hover:border-[#ff4d00] transition-all duration-300 ${
                                   isDark ? 'border-white/10' : 'border-black/10'
                                 }`}>
-                                    <ArrowRight size={20} className="text-[#ff4d00] group-hover:text-white transform rotate-0 group-hover:-rotate-45 transition-all duration-300" />
+                                    <span className="text-xs font-semibold group-hover:text-white">View project</span>
                                 </div>
                             </div>
                         </motion.div>
@@ -1148,7 +1162,6 @@ const Designer = () => {
             {/* Empty State */}
             {filteredProjects.length === 0 && (
                 <div className="w-full py-40 flex flex-col items-center justify-center text-gray-400">
-                    <Sparkles size={64} className="mb-6 opacity-20 animate-pulse" />
                     <p className="uppercase tracking-[0.5em] text-xs font-bold opacity-40">Work in progress</p>
                 </div>
             )}

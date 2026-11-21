@@ -85,9 +85,10 @@ export const designData = {
         {
           id: 1,
           title: "OtakuCircle",
+          accent: "#e11d48",
           subCat: "Web Applications",
           role: "Product Designer & Full Stack Dev",
-          image: "/images/otakucircle_cover.jpg",
+          image: "/images/otakucircle/landing.webp",
           desc: "A social platform for anime enthusiasts to browse, review and track their journey with friends.",
           longDesc: "OtakuCircle bridges the gap between cataloging and social interaction. Designed an immersive obsidian dark UI with frosted glassmorphism, 2:3 aspect ratio poster dynamics and AI vibe-based recommendation architecture.",
           tools: "Figma, React, Tailwind CSS",
@@ -96,11 +97,12 @@ export const designData = {
           caseStudy: OTAKU_CIRCLE_CASE_STUDY,
           github: "",
           tags: ["Web Applications", "SaaS", "Product Design"],
-          gallery: ["/images/otakucircle_cover.jpg"]
+          gallery: ["/images/otakucircle/landing.webp"]
         },
         {
           id: 2,
           title: "SquadSync",
+          accent: "#ec4899",
           subCat: "Web Applications",
           role: "Product Designer & Full Stack Dev",
           image: "/images/squadsync_cover.jpg",
@@ -114,6 +116,7 @@ export const designData = {
         {
           id: 3,
           title: "Ledgerly",
+          accent: "#0055ff",
           subCat: "Web Applications",
           role: "Product Designer & Full Stack Dev",
           desc: "A centralized digital library designed for curating and managing high-utility professional resources.",
@@ -136,6 +139,7 @@ export const designData = {
         {
           id: 4,
           title: "ClanForge",
+          accent: "#ff6f00",
           subCat: "SaaS",
           role: "Product Designer & Frontend Engineer",
           desc: "End-to-end guild management and team analytics SaaS featuring role-based matchmaking and real-time activity metrics.",
@@ -169,6 +173,7 @@ export const designData = {
         {
           id: 102,
           title: "OtakuCircle Design System (OS-DS)",
+          accent: "#e11d48",
           subCat: "Component Libraries",
           role: "Design Engineer",
           image: "/images/UnderDevelopment.png",
@@ -184,6 +189,7 @@ export const designData = {
         {
           id: 103,
           title: "Ledgerly UI Architecture",
+          accent: "#0055ff",
           subCat: "Frontend Development",
           role: "Frontend & UX Engineer",
           image: "images/LedgerlyProject/Ledgerly-LandingPage.png",
@@ -209,6 +215,7 @@ export const designData = {
         {
           id: 201,
           title: "McDelivery Redesign",
+          accent: "#da291c",
           subCat: "Heuristic Evaluation",
           role: "UX Researcher",
           image: "/images/McDonaldsUXResearchCover.jpg",
@@ -224,6 +231,7 @@ export const designData = {
         {
           id: 202,
           title: "OtakuCircle Social & Discovery Flow",
+          accent: "#e11d48",
           subCat: "User Flows",
           role: "UX Researcher & Designer",
           image: "/images/UnderDevelopment.png",
@@ -246,6 +254,7 @@ export const designData = {
         {
           id: 301,
           title: "EV Club Website",
+          accent: "#84ff00",
           subCat: "Identity",
           role: "Visual Designer",
           image: "/images/EVClubWebCover.png",

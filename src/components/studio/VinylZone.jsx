@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Disc3, Play, Pause, Volume2, RotateCcw, Music, Sparkles } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useMusic } from '../../context/MusicContext';
 
@@ -91,7 +90,6 @@ export default function VinylZone({ onCloseZone }) {
       {/* Zone Header */}
       <div className="text-center mb-4 sm:mb-6 z-10">
         <div className="flex items-center justify-center gap-2 mb-1">
-          <Disc3 className="w-4 h-4 text-[#ff5e1a] animate-spin" style={{ animationDuration: isPlaying ? '3s' : '0s' }} />
           <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#ff5e1a]">
             ANALOG HI-FI DECK &amp; RECORD CRATE
           </span>
@@ -208,7 +206,6 @@ export default function VinylZone({ onCloseZone }) {
                   : 'bg-white/10 hover:bg-white/20 text-white'
               }`}
             >
-              {isPlaying ? <Pause className="w-3.5 h-3.5 fill-current" /> : <Play className="w-3.5 h-3.5 fill-current" />}
               <span>{isPlaying ? 'PAUSE' : 'START MOTOR'}</span>
             </button>
 
@@ -256,7 +253,6 @@ export default function VinylZone({ onCloseZone }) {
                 >
                   {/* Miniature 12" Vinyl Sleeve Cover */}
                   <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${rec.coverGradient} shadow-md flex items-center justify-center shrink-0 border border-white/20 relative overflow-hidden`}>
-                    <Disc3 className="w-7 h-7 text-white/90" />
                     {isSelected && (
                       <span className="absolute bottom-1 right-1 w-2 h-2 rounded-full bg-white shadow-sm" />
                     )}
@@ -284,7 +280,6 @@ export default function VinylZone({ onCloseZone }) {
           {/* Current track now playing card */}
           <div className="p-3 rounded-xl bg-[#ff5e1a]/10 border border-[#ff5e1a]/30 text-xs flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Music className="w-3.5 h-3.5 text-[#ff5e1a]" />
               <span className="font-mono text-[10px] text-white">
                 {isPlaying ? `Spinning: ${activeRecord.title}` : 'Turntable in standby'}
               </span>

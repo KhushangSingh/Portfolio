@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Coffee, Lightbulb, Sparkles, RefreshCw, Feather, BookMarked } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 
 export default function ThinkingCouchZone({ onCloseZone }) {
@@ -43,7 +42,6 @@ export default function ThinkingCouchZone({ onCloseZone }) {
       {/* Header Info */}
       <div className="text-center mb-4 sm:mb-6 z-10">
         <div className="flex items-center justify-center gap-2 mb-1">
-          <Coffee className="w-4 h-4 text-[#ff5e1a]" />
           <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#ff5e1a]">
             ANALOG IDEATION NOOK &amp; THINKING LOUNGE
           </span>
@@ -122,7 +120,6 @@ export default function ThinkingCouchZone({ onCloseZone }) {
           {/* Top Label */}
           <div className="flex items-center justify-between border-b border-neutral-300 pb-2 mb-3">
             <div className="flex items-center gap-2">
-              <Feather className="w-3.5 h-3.5 text-[#ff5e1a]" />
               <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-neutral-600">
                 MOLESKINE // STUDIO DIALOGUE
               </span>
@@ -161,7 +158,6 @@ export default function ThinkingCouchZone({ onCloseZone }) {
               onClick={handleNextPrompt}
               className="px-3.5 py-1.5 rounded-xl bg-neutral-900 text-white hover:bg-[#ff5e1a] transition-colors font-mono text-[10px] font-bold flex items-center gap-1.5 shadow"
             >
-              <RefreshCw className="w-3 h-3" />
               <span>Next Spark</span>
             </button>
           </div>

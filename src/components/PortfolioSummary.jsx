@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
+import BrandMark from './BrandMark';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowUpRight, Download, CheckCircle2, Mail, ExternalLink, ArrowUp } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { designData } from '../constants/data';
 import { OTAKU_CIRCLE_CASE_STUDY } from '../constants/otakuCircle';
@@ -15,6 +15,14 @@ import { CERTIFICATES_DATA } from '../constants/credentialsData';
  * - All portfolio details condensed with premium design and typography
  * - Direct links to download PDF resume and return to the interactive portfolio
  */
+const projectTagBrands = {
+  Figma: 'figma',
+  'Figma Systems': 'figma',
+  'React 19': 'react',
+  'React Architecture': 'react',
+  'Tailwind CSS': 'tailwind',
+};
+
 export default function PortfolioSummary() {
   const { isDark } = useTheme();
 
@@ -45,7 +53,6 @@ export default function PortfolioSummary() {
             to="/"
             className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400 hover:text-[#ff5e1a] dark:hover:text-[#ff5e1a] transition-colors"
           >
-            <ArrowLeft size={14} />
             <span>Interactive Portfolio</span>
           </Link>
 
@@ -57,7 +64,6 @@ export default function PortfolioSummary() {
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all duration-300 shadow-sm hover:scale-[1.02] active:scale-[0.98]"
             >
               <span>Download PDF</span>
-              <Download size={13} />
             </a>
           </div>
         </div>
@@ -69,9 +75,6 @@ export default function PortfolioSummary() {
         {/* HEADER / IDENTITY SECTION */}
         <section className="flex flex-col gap-6 border-b pb-12 sm:pb-16 border-black/10 dark:border-white/10">
           <div className="flex flex-col gap-2">
-            <span className="text-xs font-mono font-bold uppercase tracking-[0.22em] text-[#ff5e1a]">
-              Portfolio Summary · Visual Resume
-            </span>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.02]">
               Khushang Singh
             </h1>
@@ -100,7 +103,7 @@ export default function PortfolioSummary() {
             </a>
             <span>·</span>
             <a href={linkedInUrl} target="_blank" rel="noreferrer" className="hover:text-[#ff5e1a] transition-colors">
-              LinkedIn ↗
+              LinkedIn
             </a>
           </div>
         </section>
@@ -148,7 +151,6 @@ export default function PortfolioSummary() {
             </h2>
             <Link to="/" className="text-xs font-mono text-[#ff5e1a] hover:underline flex items-center gap-1">
               <span>View interactive showcase</span>
-              <ArrowUpRight size={13} />
             </Link>
           </div>
 
@@ -158,13 +160,13 @@ export default function PortfolioSummary() {
               isDark ? 'bg-[#101115] border-white/10' : 'bg-white border-black/10 shadow-xs'
             }`}>
               <div className="flex flex-col gap-2 max-w-2xl">
+                <h3 className="text-2xl font-bold tracking-tight">OtakuCircle</h3>
                 <div className="flex items-center gap-2">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
                     SaaS Platform
                   </span>
                   <span className="text-xs font-mono text-neutral-500">2024</span>
                 </div>
-                <h3 className="text-2xl font-bold tracking-tight">OtakuCircle</h3>
                 <p className="text-sm font-semibold text-neutral-600 dark:text-neutral-300">
                   Product Designer & Full Stack Developer
                 </p>
@@ -173,7 +175,8 @@ export default function PortfolioSummary() {
                 </p>
                 <div className="flex flex-wrap gap-2 pt-2">
                   {['Figma', 'React 19', 'Tailwind CSS', 'Design Tokens', 'SaaS Architecture'].map((tag, idx) => (
-                    <span key={idx} className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-neutral-100 dark:bg-white/5 border border-black/10 dark:border-white/10 text-neutral-700 dark:text-neutral-300">
+                    <span key={idx} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-mono bg-neutral-100 dark:bg-white/5 border border-black/10 dark:border-white/10 text-neutral-700 dark:text-neutral-300">
+                      {projectTagBrands[tag] && <BrandMark brand={projectTagBrands[tag]} className="h-3 w-3" />}
                       {tag}
                     </span>
                   ))}
@@ -185,7 +188,7 @@ export default function PortfolioSummary() {
 
               <div className="w-full md:w-56 shrink-0 aspect-[16/10] rounded-xl overflow-hidden border border-black/10 dark:border-white/10 bg-neutral-900 shadow-md">
                 <img
-                  src="/images/otakucircle_cover.jpg"
+                  src="/images/otakucircle/landing.webp"
                   alt="OtakuCircle Preview"
                   className="w-full h-full object-cover object-top"
                   loading="lazy"
@@ -198,13 +201,13 @@ export default function PortfolioSummary() {
               isDark ? 'bg-[#101115] border-white/10' : 'bg-white border-black/10 shadow-xs'
             }`}>
               <div className="flex flex-col gap-2 max-w-2xl">
+                <h3 className="text-2xl font-bold tracking-tight">SquadSync</h3>
                 <div className="flex items-center gap-2">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-pink-500/15 text-pink-600 dark:text-pink-400 border border-pink-500/30">
                     Product Suite
                   </span>
                   <span className="text-xs font-mono text-neutral-500">2024</span>
                 </div>
-                <h3 className="text-2xl font-bold tracking-tight">SquadSync</h3>
                 <p className="text-sm font-semibold text-neutral-600 dark:text-neutral-300">
                   Product Designer & Interaction Architect
                 </p>
@@ -213,7 +216,8 @@ export default function PortfolioSummary() {
                 </p>
                 <div className="flex flex-wrap gap-2 pt-2">
                   {['Product Design', 'Figma Systems', 'Applicant Dashboards', 'Workflow Logic'].map((tag, idx) => (
-                    <span key={idx} className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-neutral-100 dark:bg-white/5 border border-black/10 dark:border-white/10 text-neutral-700 dark:text-neutral-300">
+                    <span key={idx} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-mono bg-neutral-100 dark:bg-white/5 border border-black/10 dark:border-white/10 text-neutral-700 dark:text-neutral-300">
+                      {projectTagBrands[tag] && <BrandMark brand={projectTagBrands[tag]} className="h-3 w-3" />}
                       {tag}
                     </span>
                   ))}
@@ -235,13 +239,13 @@ export default function PortfolioSummary() {
               isDark ? 'bg-[#101115] border-white/10' : 'bg-white border-black/10 shadow-xs'
             }`}>
               <div className="flex flex-col gap-2 max-w-2xl">
+                <h3 className="text-2xl font-bold tracking-tight">Ledgerly</h3>
                 <div className="flex items-center gap-2">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-orange-500/15 text-orange-600 dark:text-orange-400 border border-orange-500/30">
                     Design Engineering
                   </span>
                   <span className="text-xs font-mono text-neutral-500">2024</span>
                 </div>
-                <h3 className="text-2xl font-bold tracking-tight">Ledgerly</h3>
                 <p className="text-sm font-semibold text-neutral-600 dark:text-neutral-300">
                   Design Engineer & Architect
                 </p>
@@ -250,7 +254,8 @@ export default function PortfolioSummary() {
                 </p>
                 <div className="flex flex-wrap gap-2 pt-2">
                   {['React Architecture', 'High-Speed Vaults', 'Tailwind CSS', 'Design Tokens'].map((tag, idx) => (
-                    <span key={idx} className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-neutral-100 dark:bg-white/5 border border-black/10 dark:border-white/10 text-neutral-700 dark:text-neutral-300">
+                    <span key={idx} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-mono bg-neutral-100 dark:bg-white/5 border border-black/10 dark:border-white/10 text-neutral-700 dark:text-neutral-300">
+                      {projectTagBrands[tag] && <BrandMark brand={projectTagBrands[tag]} className="h-3 w-3" />}
                       {tag}
                     </span>
                   ))}
@@ -311,7 +316,6 @@ export default function PortfolioSummary() {
                     className="text-[#ff5e1a] hover:underline inline-flex items-center gap-1"
                   >
                     <span>Verify</span>
-                    <ExternalLink size={12} />
                   </a>
                 </div>
               </div>
@@ -412,7 +416,6 @@ export default function PortfolioSummary() {
               href={`mailto:${email}`}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all shadow-md hover:scale-[1.02] active:scale-[0.98]"
             >
-              <Mail size={14} />
               <span>Get In Touch</span>
             </a>
 
@@ -421,7 +424,6 @@ export default function PortfolioSummary() {
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs font-mono font-bold uppercase tracking-wider border border-black/15 dark:border-white/15 hover:border-[#ff5e1a] text-neutral-800 dark:text-neutral-200 hover:text-[#ff5e1a] transition-all"
             >
               <span>Back to Portfolio</span>
-              <ArrowLeft size={14} />
             </Link>
           </div>
         </section>
@@ -442,7 +444,6 @@ export default function PortfolioSummary() {
             className="inline-flex items-center gap-1.5 hover:text-[#ff5e1a] transition-colors cursor-pointer font-mono font-bold uppercase text-[11px]"
           >
             <span>Back to Top</span>
-            <ArrowUp size={12} />
           </button>
         </div>
       </footer>

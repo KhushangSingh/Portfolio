@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Disc3 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useMusic } from '../context/MusicContext';
 import { designData } from '../constants/data';
@@ -478,14 +477,6 @@ const GlobalHeader = () => {
                   </AnimatePresence>
                 </div>
 
-                {/* Right side circle icon: Rotates smoothly when playing, completely static when stopped */}
-                <Disc3 
-                  size={16} 
-                  className={`text-[#ff5e1a] shrink-0 transition-transform ${
-                    isPlaying ? 'animate-spin' : ''
-                  }`}
-                  style={isPlaying ? { animationDuration: '2.8s' } : undefined}
-                />
               </motion.button>
             </motion.div>
           )}

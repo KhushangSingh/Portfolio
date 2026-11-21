@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowUpRight } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { designData } from '../constants/data';
 
@@ -9,19 +8,17 @@ const TOP_PROJECTS = [
   {
     id: 1,
     rawId: 1,
-    kicker: "PRODUCT DESIGN",
     title: "OtakuCircle",
     subtitle: "Community & Anime Discovery · Full Stack SaaS",
     desc: "A full social platform for anime enthusiasts to browse, review, and track their journey with friends. Designed an immersive obsidian dark UI with frosted glassmorphism, smart search by scenario, and AI vibe-based recommendation architecture.",
     tags: ["SaaS platform", "Social discovery", "Design tokens"],
     footerNote: "End-to-end flows, dark mode tokens & responsive web application",
-    image: "/images/otakucircle_cover.jpg",
+    image: "/images/otakucircle/landing.webp",
     accent: "#10b981"
   },
   {
     id: 2,
     rawId: 2,
-    kicker: "PRODUCT DESIGN",
     title: "SquadSync",
     subtitle: "Merit-Based Team Collaboration · Studio Suite",
     desc: "Collaboration platform connecting university students based on competency with a structured 'Request & Approval' workflow. Replaced chaotic social groups with skill-matching logic, project workspaces, and applicant review dashboards.",
@@ -33,7 +30,6 @@ const TOP_PROJECTS = [
   {
     id: 3,
     rawId: 3,
-    kicker: "DESIGN ENGINEERING",
     title: "Ledgerly",
     subtitle: "High-Speed Resource Library · Asset Vault",
     desc: "A centralized digital library built to eliminate the chaos of scattered bookmarks. Provides a structured environment where developers and designers can discover curated domain-specific tools and maintain personalized repositories for instant access.",
@@ -334,7 +330,7 @@ export { SelectedWorksShowcase as ReelRingShowcase };
    INDIVIDUAL HORIZONTAL PROJECT CARD COMPONENT
    Faithfully crafted to match the reference design:
    - Clean solid pure white card surface (100% opacity)
-   - Left side: Editorial hierarchy (Kicker, Title, Subtitle, Description, Tags, Footer)
+   - Left side: Project title, summary and metadata
    - Right side: High-precision hardware desktop monitor displaying the product UI
    ========================================================================= */
 function ProjectHorizontalCard({ project, isMobile, onOpenCaseStudy }) {
@@ -347,13 +343,6 @@ function ProjectHorizontalCard({ project, isMobile, onOpenCaseStudy }) {
         {/* LEFT COLUMN: EDITORIAL CONTENT PANE (~44% width) */}
         <div className="w-full md:w-[46%] lg:w-[44%] flex flex-col justify-between text-left z-10 py-1.5 sm:py-2">
           
-          {/* 1. Category Kicker */}
-          <div className="mb-1.5 sm:mb-2">
-            <span className="text-[10px] sm:text-[11px] font-mono tracking-[0.22em] uppercase font-bold text-neutral-500">
-              {project.kicker}
-            </span>
-          </div>
-
           {/* 2. Bold Project Title */}
           <h3 className="text-2xl sm:text-3xl md:text-3xl lg:text-[40px] font-bold tracking-tight leading-[1.04] text-neutral-900 mb-1 sm:mb-1.5">
             {project.title}
@@ -394,7 +383,6 @@ function ProjectHorizontalCard({ project, isMobile, onOpenCaseStudy }) {
               title="Open full interactive case study"
             >
               <span>Explore</span>
-              <ArrowUpRight size={13} className="text-[#ff5e1a]" />
             </button>
           </div>
 

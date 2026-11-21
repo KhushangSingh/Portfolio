@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Palette, X, ZoomIn, Eye, Sparkles, Pin } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 
 export default function ArtWallZone({ onCloseZone }) {
@@ -52,7 +51,6 @@ export default function ArtWallZone({ onCloseZone }) {
       {/* Header Info */}
       <div className="text-center mb-4 sm:mb-6 z-10">
         <div className="flex items-center justify-center gap-2 mb-1">
-          <Palette className="w-4 h-4 text-[#ff5e1a]" />
           <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#ff5e1a]">
             ANALOG PIN-BOARD &amp; ARTWORK GALLERY
           </span>
@@ -94,7 +92,6 @@ export default function ArtWallZone({ onCloseZone }) {
                 
                 {/* Hover overlay hint */}
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white font-mono text-xs font-bold">
-                  <ZoomIn className="w-4 h-4 text-[#ff5e1a]" />
                   <span>INSPECT</span>
                 </div>
               </div>
@@ -152,7 +149,7 @@ export default function ArtWallZone({ onCloseZone }) {
                 className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white transition-colors z-20"
                 title="Close Lightbox"
               >
-                <X className="w-4 h-4" />
+                <span className="px-1 text-xs font-semibold">Close</span>
               </button>
 
               {/* Modal Artwork Preview */}

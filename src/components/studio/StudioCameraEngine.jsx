@@ -1,9 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useAnimationControls } from 'framer-motion';
-import { 
-  ArrowLeft, Monitor, BookOpen, Disc3, Palette, 
-  Compass, Coffee, Maximize2, Sparkles, Navigation, X 
-} from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import MonitorOS from './MonitorOS';
 import BookshelfZone from './BookshelfZone';
@@ -26,7 +22,6 @@ const ZONES = [
     rotateX: 12,
     rotateY: -18,
     rotateZ: -3,
-    icon: Monitor,
     component: MonitorOS,
     width: '18%',
     height: '24%'
@@ -43,7 +38,6 @@ const ZONES = [
     rotateX: -14,
     rotateY: -16,
     rotateZ: 2,
-    icon: BookOpen,
     component: BookshelfZone,
     width: '24%',
     height: '14%'
@@ -60,7 +54,6 @@ const ZONES = [
     rotateX: 18,
     rotateY: 20,
     rotateZ: 3,
-    icon: Disc3,
     component: VinylZone,
     width: '20%',
     height: '22%'
@@ -77,7 +70,6 @@ const ZONES = [
     rotateX: 6,
     rotateY: 18,
     rotateZ: -2,
-    icon: Palette,
     component: ArtWallZone,
     width: '22%',
     height: '20%'
@@ -94,7 +86,6 @@ const ZONES = [
     rotateX: 8,
     rotateY: -4,
     rotateZ: 1,
-    icon: Compass,
     component: BayWindowZone,
     width: '28%',
     height: '28%'
@@ -111,7 +102,6 @@ const ZONES = [
     rotateX: 16,
     rotateY: -6,
     rotateZ: -2,
-    icon: Coffee,
     component: ThinkingCouchZone,
     width: '22%',
     height: '22%'
@@ -402,8 +392,6 @@ export default function StudioCameraEngine({ onZoneStateChange }) {
           <div className="absolute inset-0 z-20 pointer-events-auto">
             {ZONES.map((zone) => {
               const isHovered = hoveredZoneId === zone.id;
-              const Icon = zone.icon;
-
               return (
                 <div
                   key={zone.id}
@@ -436,13 +424,13 @@ export default function StudioCameraEngine({ onZoneStateChange }) {
                     )}
                   </div>
 
-                  {/* Tactile Center Anchor Pip */}
-                  <div className={`relative z-10 p-2 sm:p-2.5 rounded-full border shadow-2xl transition-all duration-300 flex items-center justify-center ${
+                  {/* Zone label */}
+                  <div className={`relative z-10 px-2.5 py-1.5 rounded-lg border shadow-2xl transition-all duration-300 flex items-center justify-center ${
                     isHovered
                       ? 'bg-[#ff5e1a] text-white border-white scale-125 shadow-[#ff5e1a]/80'
                       : 'bg-black/75 text-[#ff5e1a] border-[#ff5e1a]/50 hover:bg-[#ff5e1a] hover:text-white'
                   }`}>
-                    <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    <span className="font-mono text-[10px] font-bold">{zone.title}</span>
                   </div>
 
                   {/* Clean Single-Line Hover Cue */}
@@ -496,7 +484,7 @@ export default function StudioCameraEngine({ onZoneStateChange }) {
                 aria-label="Close"
                 title="Close (ESC)"
               >
-                <X className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                <span className="px-1 text-xs font-semibold">Close</span>
               </button>
             )}
 

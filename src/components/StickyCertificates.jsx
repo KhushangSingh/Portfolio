@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { CERTIFICATES_DATA } from '../constants/credentialsData';
-import { ArrowUpRight, ExternalLink, X } from 'lucide-react';
 
 const slideTransition = { duration: 0.72, ease: [0.42, 0, 0.32, 1] };
 const returnTransition = { duration: 0.82, ease: [0.42, 0, 0.24, 1] };
@@ -99,7 +98,6 @@ export const StickyCertificates = () => {
           />
 
           <span className="relative z-10 leading-none">Click card to shuffle deck</span>
-          <span className="relative z-10 text-xs">↳</span>
         </motion.div>
       </div>
 
@@ -195,7 +193,6 @@ export const StickyCertificates = () => {
                       title="View full certificate details"
                     >
                       <span>View</span>
-                      <ArrowUpRight size={13} />
                     </button>
                   </div>
 
@@ -249,7 +246,7 @@ export const StickyCertificates = () => {
                   aria-label="Close certificate preview"
                   className="absolute top-4 right-4 p-2 rounded-full bg-black/10 dark:bg-white/10 hover:bg-[#ff5e1a] hover:text-white transition-colors z-20 cursor-pointer"
                 >
-                  <X size={18} />
+                  <span className="px-2 text-xs font-semibold">Close</span>
                 </button>
 
                 {/* HORIZONTAL SPLIT STAGE: Left Image | Right Details */}
@@ -319,7 +316,6 @@ export const StickyCertificates = () => {
                         className="w-full py-2.5 px-4 rounded-xl font-mono text-xs font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all flex items-center justify-center gap-2 shadow-md hover:scale-[1.02] active:scale-[0.98]"
                       >
                         <span>Verify with {selectedCert.issuerShort}</span>
-                        <ExternalLink size={13} />
                       </a>
                     </div>
                   </motion.div>

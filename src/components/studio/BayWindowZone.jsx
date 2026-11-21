@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, ArrowLeft } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useLoading } from '../../context/LoadingContext';
 
@@ -498,9 +497,7 @@ export default function BayWindowZone({ onCloseZone }) {
                   : 'bg-white/95 text-[#ff5e1a] border-[#ff5e1a]/30 shadow-black/15'
               }`}
             >
-              <span className="text-xs text-[#ff5e1a] font-mono">←</span>
               <span className="relative z-10 leading-none">Pull curtains to exit</span>
-              <span className="text-xs text-[#ff5e1a] font-mono">→</span>
             </div>
           </motion.div>
         )}
@@ -527,12 +524,10 @@ export default function BayWindowZone({ onCloseZone }) {
           >
             {isPlayingMotion ? (
               <>
-                <Pause className="w-3.5 h-3.5 fill-white" />
                 <span>Pause Motion</span>
               </>
             ) : (
               <>
-                <Play className="w-3.5 h-3.5 fill-white" />
                 <span>Play Live Motion</span>
               </>
             )}
@@ -546,7 +541,6 @@ export default function BayWindowZone({ onCloseZone }) {
             className="px-3 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white/90 font-mono text-xs font-medium border border-white/15 transition-all flex items-center gap-1.5 cursor-pointer group"
             title="Close curtains and return to Studio (ESC)"
           >
-            <ArrowLeft className="w-3.5 h-3.5 text-[#ff5e1a] group-hover:-translate-x-0.5 transition-transform" />
             <span>Studio</span>
             <span className="text-[9px] px-1 py-0.5 rounded bg-white/10 text-gray-300 font-mono">ESC</span>
           </button>

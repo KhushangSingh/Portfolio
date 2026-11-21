@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence, useAnimationControls, useMotionValue, useSpring } from 'framer-motion';
-import { Disc3 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useMusic } from '../context/MusicContext';
 import { designData } from '../constants/data';

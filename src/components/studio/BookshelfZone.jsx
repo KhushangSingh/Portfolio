@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, X, Sparkles, Bookmark, ArrowLeft, ExternalLink } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 
 export default function BookshelfZone({ onCloseZone }) {
@@ -204,7 +203,6 @@ export default function BookshelfZone({ onCloseZone }) {
       {/* Header Info */}
       <div className="text-center mb-6 sm:mb-8 z-10">
         <div className="flex items-center justify-center gap-2 mb-1">
-          <BookOpen className="w-4 h-4 text-[#ff5e1a]" />
           <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#ff5e1a]">
             {isDark ? 'NIGHTTIME PHILOSOPHY & MANGA' : 'DAYTIME ENGINEERING & DESIGN'}
           </span>
@@ -329,7 +327,7 @@ export default function BookshelfZone({ onCloseZone }) {
                 className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white transition-colors"
                 title="Put back on shelf"
               >
-                <X className="w-4 h-4" />
+                <span className="px-1 text-xs font-semibold">Close</span>
               </button>
 
               {/* Book Header */}
@@ -338,7 +336,7 @@ export default function BookshelfZone({ onCloseZone }) {
                   className="w-14 h-20 rounded-md shadow-xl flex items-center justify-center text-center p-2 shrink-0 border border-white/20"
                   style={{ backgroundColor: selectedBook.spineColor }}
                 >
-                  <BookOpen className="w-6 h-6" style={{ color: selectedBook.accentColor }} />
+                  <span className="px-1 text-center text-[9px] font-semibold leading-tight" style={{ color: selectedBook.accentColor }}>{selectedBook.title}</span>
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
@@ -369,7 +367,6 @@ export default function BookshelfZone({ onCloseZone }) {
               {/* Khushang's Personal Takeaway */}
               <div>
                 <div className="font-mono text-[10px] text-[#ff5e1a] uppercase font-bold tracking-wider mb-1.5 flex items-center gap-1.5">
-                  <Bookmark className="w-3 h-3" />
                   <span>Khushang's Reader Notes</span>
                 </div>
                 <p className="text-gray-300 text-xs sm:text-sm leading-relaxed">
@@ -386,7 +383,6 @@ export default function BookshelfZone({ onCloseZone }) {
                   onClick={() => setSelectedBook(null)}
                   className="px-4 py-2 rounded-xl bg-[#ff5e1a] text-white font-mono text-xs font-bold hover:brightness-110 flex items-center gap-2"
                 >
-                  <ArrowLeft className="w-3.5 h-3.5" />
                   <span>Return to Shelf</span>
                 </button>
               </div>

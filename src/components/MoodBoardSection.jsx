@@ -1,8 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  RotateCcw
-} from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
 export default function MoodBoardSection() {
@@ -66,26 +63,19 @@ export default function MoodBoardSection() {
           className="flex items-center gap-2.5 self-end will-change-[transform,opacity,filter]"
         >
 
-          {/* Reset Board Icon Button */}
           <div className="relative group/reset flex items-center">
             <button
               onClick={handleReset}
               aria-label="Reset Board"
-              className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all duration-200 active:scale-95 ${
+              className={`min-h-9 px-3 text-xs font-semibold rounded-lg border flex items-center justify-center transition-all duration-200 active:scale-95 ${
                 isDark
                   ? 'border-white/15 bg-white/5 hover:bg-white/10 text-gray-200 hover:border-[#ff5e1a]/60 shadow-sm'
                   : 'border-black/15 bg-white hover:bg-neutral-100 text-neutral-800 hover:border-[#ff5e1a]/60 shadow-sm'
               }`}
             >
-              <RotateCcw size={14} className="text-[#ff5e1a] transition-transform duration-300 group-hover/reset:-rotate-90" />
+              Reset board
             </button>
-            <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover/reset:opacity-100 transition-opacity duration-200 z-50 whitespace-nowrap">
-              <div className={`px-2 py-0.5 rounded-md text-[10px] font-mono tracking-wide shadow-md border ${
-                isDark ? 'bg-[#18181b] border-white/15 text-white' : 'bg-white border-black/15 text-neutral-900'
-              }`}>
-                Reset Board
-              </div>
-            </div>
+
           </div>
         </motion.div>
       </div>
