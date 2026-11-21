@@ -21,9 +21,7 @@ export const CredentialsSection = () => {
           whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className={`flex flex-col md:flex-row md:items-end justify-between border-b pb-8 mb-14 will-change-[transform,opacity,filter] ${
-            isDark ? 'border-white/10' : 'border-black/10'
-          }`}
+          className="flex flex-col md:flex-row md:items-end justify-between pb-4 mb-10 will-change-[transform,opacity,filter]"
         >
           <div>
             <span className="font-mono text-xs uppercase tracking-widest text-[#ff5e1a] font-bold block mb-2">
@@ -35,11 +33,11 @@ export const CredentialsSection = () => {
           </div>
 
           <p className="font-mono text-xs text-gray-500 max-w-sm mt-4 md:mt-0 text-left md:text-right">
-            // PHYSICAL GYM BADGE CASE WITH TACTILE ENAMEL PINS & POST-IT VERIFIED CERTIFICATES
+            // PHYSICAL GYM BADGE CASE WITH TACTILE ENAMEL PINS & INTERACTIVE CREDENTIAL DECK
           </p>
         </motion.div>
 
-        {/* Split Stage: Left (Gym Badge Case) + Right (Sticky Note Credentials) */}
+        {/* Split Stage: Left (Gym Badge Case) + Right (Horizontal Credential Deck) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-start">
           {/* Left Column (60%): The Collector's Metal Badge Case */}
           <div className="lg:col-span-7 w-full flex flex-col">
@@ -54,7 +52,7 @@ export const CredentialsSection = () => {
             <GymBadgeCase />
           </div>
 
-          {/* Right Column (40%): The Sticky Note Credential Station */}
+          {/* Right Column (40%): The Interactive Horizontal Credential Deck */}
           <div className="lg:col-span-5 w-full flex flex-col">
             <div className="mb-4">
               <span className="font-mono text-xs uppercase font-bold text-gray-400 tracking-wider">

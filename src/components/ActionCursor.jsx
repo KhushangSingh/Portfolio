@@ -68,7 +68,7 @@ const SocialLogo = ({ platform, isDark }) => {
  * ActionCursor Component
  * Specialized Social Platform Logo Cursor:
  * - Automatically activates ONLY when hovering over social platform links.
- * - Transitions directly from the precision crosshair (plus sign) to the official vector logo badge with zero intermediate cursor flicker.
+ * - Transitions directly from the bespoke orange pointer triangle to the official vector logo badge with zero intermediate cursor flicker.
  * - Strictly disabled on draggable elements, cards, and touch devices where native cursors operate directly.
  */
 export const ActionCursor = () => {

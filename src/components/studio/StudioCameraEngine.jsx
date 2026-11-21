@@ -12,7 +12,7 @@ import ArtWallZone from './ArtWallZone';
 import BayWindowZone from './BayWindowZone';
 import ThinkingCouchZone from './ThinkingCouchZone';
 
-// 6 Interactive Physical Zones
+// 6 Interactive Physical Zones with Deep 3D Spatial Trajectories
 const ZONES = [
   {
     id: 'monitor',
@@ -22,9 +22,10 @@ const ZONES = [
     y: '48%',
     originX: '84%',
     originY: '48%',
-    scale: 3.2,
-    rotateX: 2,
-    rotateY: -4,
+    scale: 4.8,
+    rotateX: 12,
+    rotateY: -18,
+    rotateZ: -3,
     icon: Monitor,
     component: MonitorOS,
     width: '18%',
@@ -38,9 +39,10 @@ const ZONES = [
     y: '20%',
     originX: '82%',
     originY: '20%',
-    scale: 3.0,
-    rotateX: -6,
-    rotateY: -2,
+    scale: 4.6,
+    rotateX: -14,
+    rotateY: -16,
+    rotateZ: 2,
     icon: BookOpen,
     component: BookshelfZone,
     width: '24%',
@@ -54,9 +56,10 @@ const ZONES = [
     y: '58%',
     originX: '17%',
     originY: '58%',
-    scale: 3.1,
-    rotateX: 8,
-    rotateY: 5,
+    scale: 4.9,
+    rotateX: 18,
+    rotateY: 20,
+    rotateZ: 3,
     icon: Disc3,
     component: VinylZone,
     width: '20%',
@@ -70,9 +73,10 @@ const ZONES = [
     y: '32%',
     originX: '22%',
     originY: '32%',
-    scale: 2.8,
-    rotateX: 1,
-    rotateY: 4,
+    scale: 4.5,
+    rotateX: 6,
+    rotateY: 18,
+    rotateZ: -2,
     icon: Palette,
     component: ArtWallZone,
     width: '22%',
@@ -86,9 +90,10 @@ const ZONES = [
     y: '34%',
     originX: '52%',
     originY: '34%',
-    scale: 2.6,
-    rotateX: 2,
-    rotateY: 0,
+    scale: 4.2,
+    rotateX: 8,
+    rotateY: -4,
+    rotateZ: 1,
     icon: Compass,
     component: BayWindowZone,
     width: '28%',
@@ -102,9 +107,10 @@ const ZONES = [
     y: '65%',
     originX: '45%',
     originY: '65%',
-    scale: 2.5,
-    rotateX: 7,
-    rotateY: 0,
+    scale: 4.6,
+    rotateX: 16,
+    rotateY: -6,
+    rotateZ: -2,
     icon: Coffee,
     component: ThinkingCouchZone,
     width: '22%',
@@ -112,11 +118,13 @@ const ZONES = [
   }
 ];
 
-export default function StudioCameraEngine() {
+export default function StudioCameraEngine({ onZoneStateChange }) {
   const { isDark } = useTheme();
   const [activeZoneId, setActiveZoneId] = useState(null);
+  const [isOverlayVisible, setIsOverlayVisible] = useState(false);
   const [hoveredZoneId, setHoveredZoneId] = useState(null);
   const containerRef = useRef(null);
+  const diveTimeoutRef = useRef(null);
 
   // Cinematic rack-focus ease-in and ease-out blur envelope controls
   const blurControls = useAnimationControls();
@@ -152,20 +160,73 @@ export default function StudioCameraEngine() {
   const activeZone = ZONES.find((z) => z.id === activeZoneId) || null;
   const ActiveComponent = activeZone?.component;
 
+  // Zone dive trigger: dramatic camera zoom-in and 3D rotation first, then reveals closer look
+  const handleZoneClick = (zoneId) => {
+    if (activeZoneId) return;
+
+    // Pin scroll position directly to studio section so there is 0 top cut-off and 0 white space below
+    const studioEl = document.getElementById('studio');
+    if (studioEl) {
+      const rect = studioEl.getBoundingClientRect();
+      const targetScroll = Math.round(window.scrollY + rect.top);
+      if (Math.abs(rect.top) > 1) {
+        if (window.__lenis) {
+          window.__lenis.scrollTo(targetScroll, { immediate: true });
+        } else {
+          window.scrollTo({ top: targetScroll });
+        }
+      }
+    }
+
+    setActiveZoneId(zoneId);
+    if (onZoneStateChange) onZoneStateChange(true);
+    setIsOverlayVisible(false);
+
+    if (zoneId === 'monitor') {
+      window.dispatchEvent(new CustomEvent('monitor-view-open'));
+    } else {
+      window.dispatchEvent(new CustomEvent('studio-zone-open'));
+    }
+
+    // Let the 3D camera swooping zoom & rotation play out before displaying closer look
+    if (diveTimeoutRef.current) clearTimeout(diveTimeoutRef.current);
+    diveTimeoutRef.current = setTimeout(() => {
+      setIsOverlayVisible(true);
+    }, 750);
+  };
+
+  const handleStepBack = () => {
+    window.dispatchEvent(new CustomEvent('monitor-view-close'));
+    window.dispatchEvent(new CustomEvent('studio-zone-close'));
+    if (diveTimeoutRef.current) clearTimeout(diveTimeoutRef.current);
+    // Smoothly dissolve the closer look overlay first
+    setIsOverlayVisible(false);
+
+    // After overlay fades out, glide the camera smoothly back to overview position
+    setTimeout(() => {
+      setActiveZoneId(null);
+      if (onZoneStateChange) onZoneStateChange(false);
+    }, 280);
+  };
+
   // Escape key handler to smoothly step back
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && activeZoneId) {
-        setActiveZoneId(null);
+        handleStepBack();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [activeZoneId]);
 
-  const handleStepBack = () => {
-    setActiveZoneId(null);
-  };
+  // Clean up timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (diveTimeoutRef.current) clearTimeout(diveTimeoutRef.current);
+      if (onZoneStateChange) onZoneStateChange(false);
+    };
+  }, []);
 
   // Scroll lock: When any internal popup/zone is open, block all studio section & page scrolling
   useEffect(() => {
@@ -247,25 +308,26 @@ export default function StudioCameraEngine() {
       className={`relative w-full h-full overflow-hidden select-none flex items-center justify-center transition-colors duration-500 ${
         isDark ? 'bg-[#0A0A0A]' : 'bg-white'
       }`}
-      style={{ perspective: 1400 }}
+      style={{ perspective: 1050 }}
     >
       
       {/* ==============================================================
           3D SPATIAL CAMERA STAGE
-          Smoothly pans, rotates and zooms into the targeted physical zone
+          Deep cinematic 3D swoop, spatial rotation and high-scale zoom
           ============================================================== */}
       <motion.div
         animate={{
           scale: activeZone ? activeZone.scale : 1,
           rotateX: activeZone ? activeZone.rotateX : 0,
           rotateY: activeZone ? activeZone.rotateY : 0,
+          rotateZ: activeZone ? (activeZone.rotateZ || 0) : 0,
           transformOrigin: activeZone ? `${activeZone.originX} ${activeZone.originY}` : '50% 50%',
         }}
         transition={{
           type: 'spring',
-          damping: 26,
-          stiffness: 120,
-          mass: 0.9
+          damping: 24,
+          stiffness: 85,
+          mass: 1.05
         }}
         className="relative w-full h-full will-change-transform flex items-center justify-center overflow-hidden"
         style={{ transformStyle: 'preserve-3d' }}
@@ -345,7 +407,7 @@ export default function StudioCameraEngine() {
               return (
                 <div
                   key={zone.id}
-                  onClick={() => setActiveZoneId(zone.id)}
+                  onClick={() => handleZoneClick(zone.id)}
                   onMouseEnter={() => setHoveredZoneId(zone.id)}
                   onMouseLeave={() => setHoveredZoneId(null)}
                   style={{
@@ -410,24 +472,24 @@ export default function StudioCameraEngine() {
 
       {/* ==============================================================
           ACTIVE ZONE INTERACTIVE WORKSPACE OVERLAY
-          Dissolves in seamlessly when the camera completes its dive
+          Dissolves in seamlessly AFTER the 3D camera completes its deep dive
           ============================================================== */}
       <AnimatePresence>
-        {activeZone && (
+        {activeZone && isOverlayVisible && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.4, delay: 0.15 }}
+            initial={{ opacity: 0, scale: 0.94 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.96 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             onClick={(e) => {
               if (e.target === e.currentTarget) handleStepBack();
             }}
             className={`absolute inset-0 z-30 flex items-center justify-center bg-black/60 backdrop-blur-sm cursor-pointer ${
-              activeZone.id === 'window' ? 'p-0' : 'p-4'
+              activeZone.id === 'window' || activeZone.id === 'monitor' ? 'p-0' : 'p-4'
             }`}
           >
-            {/* Minimalist Top-Right Close Button (for modal popup zones; window zone provides its own architectural header close button) */}
-            {activeZone.id !== 'window' && (
+            {/* Minimalist Top-Right Close Button (for modal popup zones; window zone and monitor zone provide their own integrated controls) */}
+            {activeZone.id !== 'window' && activeZone.id !== 'monitor' && (
               <button
                 onClick={handleStepBack}
                 className="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 p-2.5 rounded-full bg-black/85 hover:bg-[#ff5e1a] text-white/80 hover:text-white border border-white/20 hover:border-transparent transition-all shadow-2xl cursor-pointer group"

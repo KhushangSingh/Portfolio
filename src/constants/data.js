@@ -1,8 +1,10 @@
+import { OTAKU_CIRCLE_CASE_STUDY, OTAKU_CIRCLE_LIVE } from './otakuCircle';
+
 export const designData = {
   hero: {
     titlePrefix: "Product Designer",
     titleSuffix: "UX Engineer",
-    bio: "I am a Product Designer who bridges the gap between user empathy and technical execution, specializing in scalable design systems and end-to-end application development.",
+    bio: "I am a Product Designer who bridges the gap between user empathy and technical execution, specializing in problem-driven UX solutions and end-to-end application development.",
     steps: [
       {
         id: "01",
@@ -43,8 +45,8 @@ export const designData = {
   },
 
   about: {
-    title: "About ME",
-    description: "Hey, glad you're here. If you're building a product that needs to feel **thoughtful**, **fast** and engineered with **real craft** rather than generic templates, this is where we connect.\n\nI don't just hand off static **Figma frames** {figma} and hope for the best. I build **scalable design systems**, obsess over **user friction** and write the **production React code** {react} that brings complex software to life.",
+    title: "About Me",
+    description: "Hey, glad you're here. If you're building a product that needs to feel **thoughtful**, **fast** and engineered with **real craft** rather than generic templates, this is where we connect.\n\nI don't just hand off static **Figma frames** and hope for the best. I build **scalable design systems**, obsess over **user friction** and write the **production React code** that brings complex software to life.",
     resumeUrl: "/images/designResume.pdf",
     portraitUrl: "/images/orange_geometric_portrait.svg",
     portraitPngUrl: "/images/orange_geometric_portrait.png",
@@ -90,18 +92,11 @@ export const designData = {
           longDesc: "OtakuCircle bridges the gap between cataloging and social interaction. Designed an immersive obsidian dark UI with frosted glassmorphism, 2:3 aspect ratio poster dynamics and AI vibe-based recommendation architecture.",
           tools: "Figma, React, Tailwind CSS",
           timeline: "4 Weeks",
-          live: "",
+          live: OTAKU_CIRCLE_LIVE,
+          caseStudy: OTAKU_CIRCLE_CASE_STUDY,
           github: "",
           tags: ["Web Applications", "SaaS", "Product Design"],
-          gallery: [
-            "/images/otakucircle_cover.jpg",
-            "/images/OtakuCircleProject/OC-LandingPage.png",
-            "/images/OtakuCircleProject/OC-TrendingNow.png",
-            "/images/OtakuCircleProject/OC-SmartSearch.png",
-            "/images/OtakuCircleProject/OC-ForYou.png",
-            "/images/OtakuCircleProject/OC-FriendsPage.png",
-            "/images/OtakuCircleProject/OC-UserProfile.png"
-          ]
+          gallery: ["/images/otakucircle_cover.jpg"]
         },
         {
           id: 2,

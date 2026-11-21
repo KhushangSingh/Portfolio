@@ -11,16 +11,24 @@ const GlobalHeader = () => {
   const { isPlaying, isPastHero, isPlayerFullyHidden, handleHeaderPlayClick } = useMusic();
   const [textIndex, setTextIndex] = useState(0);
   const [isStudioZoneOpen, setIsStudioZoneOpen] = useState(false);
+  const [isMonitorOpen, setIsMonitorOpen] = useState(false);
 
-  // Listen for studio zone open/close events to keep header & music button visible
+  // Listen for studio zone and monitor view open/close events
   useEffect(() => {
     const handleOpen = () => setIsStudioZoneOpen(true);
     const handleClose = () => setIsStudioZoneOpen(false);
+    const handleMonitorOpen = () => setIsMonitorOpen(true);
+    const handleMonitorClose = () => setIsMonitorOpen(false);
+
     window.addEventListener('studio-zone-open', handleOpen);
     window.addEventListener('studio-zone-close', handleClose);
+    window.addEventListener('monitor-view-open', handleMonitorOpen);
+    window.addEventListener('monitor-view-close', handleMonitorClose);
     return () => {
       window.removeEventListener('studio-zone-open', handleOpen);
       window.removeEventListener('studio-zone-close', handleClose);
+      window.removeEventListener('monitor-view-open', handleMonitorOpen);
+      window.removeEventListener('monitor-view-close', handleMonitorClose);
     };
   }, []);
 
@@ -182,19 +190,20 @@ const GlobalHeader = () => {
     return () => clearInterval(interval);
   }, [isPlaying]);
 
-  // Dark Mode Style
-  const darkGlassStyle = 'bg-white/5 border-white/10 hover:bg-white/10 text-white';
+  // Dark Mode Style (when bulb is off: 100% solid opaque obsidian pill so underlying content never bleeds through)
+  const darkGlassStyle = 'bg-[#0a0a0d] border-white/15 hover:border-white/25 text-white shadow-xl';
 
-  // Light Mode Glowing Bulb Style (warm radiant illumination, incandescent bulb glow, crystal clear typography)
-  const bulbGlowStyle = 'bg-gradient-to-b from-[#fffef5] via-[#fffbf0] to-[#fff4db] border-[#ffbe3b] shadow-[0_0_18px_rgba(255,185,50,0.65),0_0_38px_rgba(255,150,30,0.4),0_0_65px_rgba(255,130,10,0.2),inset_0_0_14px_rgba(255,225,120,0.7)] text-neutral-950 hover:brightness-105';
+  // Light Mode Glowing Bulb Style (warm radiant orange illumination, incandescent bulb glow, crystal clear typography)
+  const bulbGlowStyle = 'bg-gradient-to-b from-[#fffaf7] via-[#fff4ec] to-[#ffe9dc] border-[#ff5e1a]/80 shadow-[0_0_20px_rgba(255,94,26,0.55),0_0_38px_rgba(255,94,26,0.32),0_0_65px_rgba(255,94,26,0.18),inset_0_0_14px_rgba(255,120,59,0.3)] text-neutral-950 hover:brightness-105';
 
   const logoStyle = isDark ? darkGlassStyle : bulbGlowStyle;
 
+  // Music Button Style: 100% solid opaque pill in both themes with deep contrast so scrolling text never mixes
   const musicGlassStyle = isDark 
-    ? 'bg-white/5 border-white/10 hover:bg-white/10 text-white'
-    : 'bg-black/5 border-black/10 hover:bg-black/10 text-neutral-900 shadow-sm';
+    ? 'bg-[#0a0a0d] border-white/15 hover:border-white/25 text-white shadow-xl'
+    : 'bg-[#FAF9F5] border-black/12 hover:border-black/20 text-neutral-900 shadow-md';
 
-  const glassBase = "backdrop-blur-md border rounded-full transition-all duration-300 pointer-events-auto relative";
+  const glassBase = "backdrop-blur-xl border rounded-full transition-all duration-300 pointer-events-auto relative";
 
   // Current label for the music button
   const currentText = !isPlaying 
@@ -209,7 +218,9 @@ const GlobalHeader = () => {
   const textSlotWidth = isPlaying ? 'w-[86px] sm:w-[100px]' : 'w-[78px] sm:w-[92px]';
 
   return (
-    <header className="fixed top-0 left-0 w-full z-[10000] px-6 py-6 md:px-12 flex justify-between items-center pointer-events-none font-sans">
+    <header className={`fixed top-0 left-0 w-full z-[10000] px-6 py-6 md:px-12 flex justify-between items-center pointer-events-none font-sans transition-all duration-300 ${
+      isMonitorOpen ? 'opacity-0 pointer-events-none -translate-y-8' : 'opacity-100'
+    }`}>
       {/* 1. TOP LEFT: LOGO WITH ATTACHED LAMP PULL ROPE */}
       <motion.div 
         initial={{ opacity: 0, y: -16, filter: 'blur(8px)' }}
@@ -217,10 +228,10 @@ const GlobalHeader = () => {
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         className="relative inline-flex flex-col items-start pointer-events-auto"
       >
-        {/* Warm ambient light bloom when glowing like a bulb in light mode (extinguished when broken) */}
+        {/* Warm ambient orange light bloom when glowing like a bulb in light mode (extinguished when broken) */}
         {!isDark && !isBulbBroken && (
           <div 
-            className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-amber-400/30 via-yellow-300/35 to-orange-400/30 blur-md pointer-events-none -z-10 animate-pulse"
+            className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#ff5e1a]/35 via-[#ff783b]/40 to-[#ff4d00]/35 blur-md pointer-events-none -z-10 animate-pulse"
             style={{ animationDuration: '3.5s' }}
           />
         )}
@@ -244,7 +255,7 @@ const GlobalHeader = () => {
           } : undefined}
           className={`${glassBase} ${
             isBulbBroken 
-              ? 'bg-[#121212]/90 border-neutral-700/80 text-neutral-400 shadow-none px-5' 
+              ? 'bg-[#0a0a0d] border-neutral-700 text-neutral-400 shadow-xl px-5' 
               : `${logoStyle} px-5`
           } py-2.5 flex items-center gap-1.5 uppercase font-bold tracking-tighter leading-none select-none cursor-pointer hover:scale-105 active:scale-95 overflow-hidden`}
         >
@@ -339,7 +350,7 @@ const GlobalHeader = () => {
               initial={{ scale: 0.6, opacity: 1 }}
               animate={{ scale: 1.6, opacity: 0 }}
               transition={{ duration: 0.22, ease: "easeOut" }}
-              className="absolute w-28 h-16 rounded-full bg-gradient-to-r from-amber-200 via-white to-yellow-300 blur-sm pointer-events-none"
+              className="absolute w-28 h-16 rounded-full bg-gradient-to-r from-orange-200 via-white to-[#ff5e1a]/80 blur-sm pointer-events-none"
             />
 
             {/* 2. Shockwave expanding blast ring */}
@@ -347,7 +358,7 @@ const GlobalHeader = () => {
               initial={{ scale: 0.7, opacity: 0.95 }}
               animate={{ scale: 2.4, opacity: 0 }}
               transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute w-24 h-12 rounded-full border-2 border-amber-400/90 shadow-[0_0_15px_rgba(255,190,50,0.8)] pointer-events-none"
+              className="absolute w-24 h-12 rounded-full border-2 border-[#ff5e1a]/90 shadow-[0_0_15px_rgba(255,94,26,0.8)] pointer-events-none"
             />
 
             {/* 3. High-velocity electrical sparks */}
@@ -404,7 +415,7 @@ const GlobalHeader = () => {
                   height: `${shard.size * 1.3}px`,
                   clipPath: shard.clipPath
                 }}
-                className={`absolute bg-gradient-to-br from-white/95 via-amber-100/70 to-white/40 border border-white/80 shadow-[0_0_8px_rgba(255,255,255,0.8),0_0_16px_rgba(255,200,80,0.4)] backdrop-blur-sm pointer-events-none ${
+                className={`absolute bg-gradient-to-br from-white/95 via-orange-100/70 to-white/40 border border-white/80 shadow-[0_0_8px_rgba(255,255,255,0.8),0_0_16px_rgba(255,94,26,0.35)] backdrop-blur-sm pointer-events-none ${
                   shard.isHeroChunk ? 'z-50' : ''
                 }`}
               />
@@ -421,7 +432,7 @@ const GlobalHeader = () => {
       {/* 2. TOP RIGHT: PLAY MUSIC BUTTON (Revealed when past hero or in studio zone) */}
       <div className="pointer-events-auto min-h-[44px] flex items-center">
         <AnimatePresence mode="wait">
-          {((isPastHero && isPlayerFullyHidden) || isStudioZoneOpen) && (
+          {(isPastHero || isStudioZoneOpen) && (
             <motion.div
               key="header-play-music-button"
               initial={{ opacity: 0, scale: 0.95, x: 20, filter: 'blur(8px)' }}

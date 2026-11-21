@@ -547,14 +547,15 @@ export const GymBadgeCase = () => {
         
         {/* Soft Ambient Contact Shadow Under Case */}
         <div 
-          className="absolute -inset-4 rounded-3xl pointer-events-none -z-30 filter blur-2xl transition-all duration-500 opacity-60"
+          className="absolute inset-2 rounded-3xl pointer-events-none -z-30 filter blur-xl transition-all duration-500"
           style={{
             background: isDark
-              ? 'radial-gradient(ellipse at 50% 70%, rgba(234,88,12,0.25) 0%, rgba(0,0,0,0.85) 60%, transparent 80%)'
-              : 'radial-gradient(ellipse at 50% 70%, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.05) 50%, transparent 75%)',
+              ? 'radial-gradient(ellipse at 50% 60%, rgba(234,88,12,0.2) 0%, rgba(0,0,0,0.7) 50%, transparent 75%)'
+              : 'radial-gradient(ellipse at 50% 60%, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.02) 45%, transparent 70%)',
             transform: isCaseHovered
               ? 'translateZ(-40px) translateY(18px) scale(1.02)'
-              : 'translateZ(-40px) translateY(28px) translateX(-10px) rotateZ(32deg) scale(1.02)'
+              : 'translateZ(-40px) translateY(22px) scale(0.96)',
+            opacity: isDark ? 0.7 : 0.5
           }}
         />
 
@@ -583,12 +584,12 @@ export const GymBadgeCase = () => {
           }}
         >
           {/* ==========================================================
-              1. FRONT WALL (Extruded 3D Height facing viewer in anodized orange)
+              1. FRONT WALL (Extruded 3D Height facing viewer in anodized orange with rounded corners)
               - 38px height, rotated -90deg down
               - Features diagonal black rubber corner grips and dual chrome latches
               ========================================================== */}
           <div 
-            className="absolute left-0 right-0 h-[38px] bg-gradient-to-b from-[#FF8C42] via-[#EA580C] to-[#9A3412] border-t-[1.5px] border-white/60 border-b-2 border-black/90 shadow-[0_18px_32px_rgba(0,0,0,0.85)] flex items-center justify-between px-3 pointer-events-auto z-20 overflow-hidden"
+            className="absolute left-0 right-0 h-[38px] bg-gradient-to-b from-[#FF8C42] via-[#EA580C] to-[#9A3412] border-t-[1.5px] border-white/60 border-b-2 border-black/90 rounded-b-2xl flex items-center justify-between px-3 pointer-events-auto z-20 overflow-hidden"
             style={{
               bottom: 0,
               transformOrigin: 'bottom center',
@@ -598,7 +599,7 @@ export const GymBadgeCase = () => {
           >
             {/* Left Diagonal Black Protective Rubber Corner Grip */}
             <div 
-              className="absolute left-0 bottom-0 top-0 w-20 pointer-events-none"
+              className="absolute left-0 bottom-0 top-0 w-20 pointer-events-none rounded-bl-2xl overflow-hidden"
               style={{
                 background: 'linear-gradient(135deg, #111215 0%, #17181C 52%, transparent 53%)'
               }}
@@ -606,24 +607,24 @@ export const GymBadgeCase = () => {
 
             {/* Right Diagonal Black Protective Rubber Corner Grip */}
             <div 
-              className="absolute right-0 bottom-0 top-0 w-20 pointer-events-none"
+              className="absolute right-0 bottom-0 top-0 w-20 pointer-events-none rounded-br-2xl overflow-hidden"
               style={{
                 background: 'linear-gradient(225deg, #111215 0%, #17181C 52%, transparent 53%)'
               }}
             />
 
-            {/* Solid Black Rubber Corner Caps */}
-            <div className="absolute left-0 top-0 bottom-0 w-4 bg-[#0F1013] border-r border-black/80 z-10 pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-4 bg-[#0F1013] border-l border-black/80 z-10 pointer-events-none" />
+            {/* Solid Black Rubber Corner Caps with Rounded Base Corners */}
+            <div className="absolute left-0 top-0 bottom-0 w-4 bg-[#0F1013] border-r border-black/80 z-10 pointer-events-none rounded-bl-xl" />
+            <div className="absolute right-0 top-0 bottom-0 w-4 bg-[#0F1013] border-l border-black/80 z-10 pointer-events-none rounded-br-xl" />
 
             {/* Left Front Chrome Draw Latch (at 22% width) */}
             <div className="absolute left-[22%] -translate-x-1/2 -top-1 z-30">
               <FrontChromeLatch isOpen={isOpen} onToggle={toggleLid} />
             </div>
 
-            {/* Chassis Title Mark */}
+            {/* Chassis Title Mark (Compliant human typography without synthetic double slashes) */}
             <div className="mx-auto text-[7.5px] font-mono font-bold tracking-[0.25em] text-white/90 uppercase select-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] z-10">
-              TOOL BADGE CASE // ANODIZED ORANGE
+              TOOL BADGE CASE · ANODIZED ORANGE
             </div>
 
             {/* Right Front Chrome Draw Latch (at 78% width) */}
@@ -633,40 +634,40 @@ export const GymBadgeCase = () => {
           </div>
 
           {/* ==========================================================
-              2. LEFT SIDE WALL (Extruded 3D depth, cleanly meets Front Wall at corner)
+              2. LEFT SIDE WALL (Extruded 3D depth, rounded corners, zero protruding shadow smudges)
               ========================================================== */}
           <div 
-            className="absolute top-0 bottom-0 w-[38px] bg-gradient-to-r from-[#7C2D12] via-[#C2410C] to-[#EA580C] border-t border-white/40 border-l border-white/20 border-r border-black/80 shadow-[0_14px_28px_rgba(0,0,0,0.8)] z-10"
+            className="absolute top-0 bottom-0 w-[38px] bg-gradient-to-r from-[#7C2D12] via-[#C2410C] to-[#EA580C] border-t border-white/40 border-l border-white/20 border-r border-black/80 rounded-l-2xl z-10 overflow-hidden"
             style={{
               left: 0,
               transformOrigin: 'left center',
               transform: 'rotateY(-90deg)'
             }}
           >
-            <div className="absolute bottom-0 left-0 right-0 h-4 bg-[#0F1013] border-t border-black/80" />
-            <div className="absolute top-0 left-0 right-0 h-4 bg-[#0F1013] border-b border-black/80" />
+            <div className="absolute bottom-0 left-0 right-0 h-4 bg-[#0F1013] border-t border-black/80 rounded-bl-xl" />
+            <div className="absolute top-0 left-0 right-0 h-4 bg-[#0F1013] border-b border-black/80 rounded-tl-xl" />
           </div>
 
           {/* ==========================================================
-              3. RIGHT SIDE WALL (Extruded 3D depth, cleanly meets Front Wall at corner)
+              3. RIGHT SIDE WALL (Extruded 3D depth, rounded corners)
               ========================================================== */}
           <div 
-            className="absolute top-0 bottom-0 w-[38px] bg-gradient-to-l from-[#661E08] via-[#9A3412] to-[#EA580C] border-t border-white/30 border-r border-white/20 z-10"
+            className="absolute top-0 bottom-0 w-[38px] bg-gradient-to-l from-[#661E08] via-[#9A3412] to-[#EA580C] border-t border-white/30 border-r border-white/20 rounded-r-2xl z-10 overflow-hidden"
             style={{
               right: 0,
               transformOrigin: 'right center',
               transform: 'rotateY(90deg)'
             }}
           >
-            <div className="absolute bottom-0 left-0 right-0 h-4 bg-[#0F1013] border-t border-black/80" />
-            <div className="absolute top-0 left-0 right-0 h-4 bg-[#0F1013] border-b border-black/80" />
+            <div className="absolute bottom-0 left-0 right-0 h-4 bg-[#0F1013] border-t border-black/80 rounded-br-xl" />
+            <div className="absolute top-0 left-0 right-0 h-4 bg-[#0F1013] border-b border-black/80 rounded-tr-xl" />
           </div>
 
           {/* ==========================================================
-              4. BACK WALL (Connects Glass Lid via Heavy-Duty Chrome Hinges)
+              4. BACK WALL (Connects Glass Lid via Heavy-Duty Chrome Hinges with rounded top edge)
               ========================================================== */}
           <div 
-            className="absolute left-0 right-0 h-[38px] bg-gradient-to-t from-[#9A3412] to-[#FF8C42] border-t border-white/30 z-10"
+            className="absolute left-0 right-0 h-[38px] bg-gradient-to-t from-[#9A3412] to-[#FF8C42] border-t border-white/30 rounded-t-2xl z-10 overflow-hidden"
             style={{
               top: 0,
               transformOrigin: 'top center',
@@ -685,7 +686,7 @@ export const GymBadgeCase = () => {
               5. MAIN TRAY & RECESSED MATTE BLACK VELVET BADGE BED
               ========================================================== */}
           <div 
-            className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#FF8C42] via-[#EA580C] to-[#9A3412] border-[6px] border-[#EA580C] shadow-[0_30px_70px_-15px_rgba(0,0,0,0.95)]"
+            className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#FF8C42] via-[#EA580C] to-[#9A3412] border-[6px] border-[#EA580C] shadow-[0_14px_30px_-10px_rgba(0,0,0,0.15)] dark:shadow-[0_24px_50px_-15px_rgba(0,0,0,0.85)]"
             style={{
               transform: 'translateZ(0px)',
               transformStyle: 'preserve-3d'

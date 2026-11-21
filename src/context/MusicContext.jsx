@@ -8,13 +8,14 @@ export const MusicProvider = ({ children }) => {
   // Helper to detect if user has scrolled past the hero section
   const checkIsPastHero = () => {
     if (typeof window === 'undefined') return false;
+
     const heroEl = document.getElementById('hero-page');
     if (heroEl) {
       const rect = heroEl.getBoundingClientRect();
-      const threshold = Math.min(heroEl.offsetHeight * 0.45, 260);
-      return window.scrollY > threshold || rect.bottom < window.innerHeight * 0.5;
+      return rect.bottom <= 120;
     }
-    return window.scrollY > 180;
+
+    return window.scrollY > 300;
   };
 
   // Track scroll position relative to the hero section
@@ -44,23 +45,32 @@ export const MusicProvider = ({ children }) => {
     }
   };
 
-  // Scroll listener to detect when user scrolls past or returns to the hero section
+  // Scroll listener to detect when user scrolls past or returns to the hero section (RAF throttled)
   useEffect(() => {
-    const handleScroll = () => {
+    let ticking = false;
+    const checkPast = () => {
       const past = checkIsPastHero();
       setIsPastHero(past);
       if (!past) {
         setIsPlayerFullyHidden(false);
       }
+      ticking = false;
+    };
+
+    const handleScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(checkPast);
+      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
+    checkPast();
 
     // Re-verify after initial paint and browser scroll restoration
-    const t1 = setTimeout(handleScroll, 40);
-    const t2 = setTimeout(handleScroll, 150);
-    const t3 = setTimeout(handleScroll, 350);
+    const t1 = setTimeout(checkPast, 40);
+    const t2 = setTimeout(checkPast, 150);
+    const t3 = setTimeout(checkPast, 350);
 
     return () => {
       window.removeEventListener('scroll', handleScroll);

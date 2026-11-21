@@ -115,6 +115,14 @@ const HINGE_Y = 22;
 const getTuckedOffset = () => (typeof window !== 'undefined' && window.innerWidth < 640 ? 166 : 188);
 const HIDDEN_OFFSET = 260;
 
+// Slower, smooth and luxurious mechanical drawer glide for both push and pull motions
+const DRAWER_TRANSITION = {
+  type: 'spring',
+  stiffness: 95,
+  damping: 20,
+  mass: 1.05
+};
+
 export const VinylPlayer = () => {
   const { isDark } = useTheme();
   const { 
@@ -122,8 +130,6 @@ export const VinylPlayer = () => {
     setIsPlaying, 
     isPlayerOpen, 
     setIsPlayerOpen, 
-    isPastHero, 
-    setIsPlayerFullyHidden, 
     registerPlayerControls 
   } = useMusic();
   const [isDragging, setIsDragging] = useState(false);
@@ -145,9 +151,9 @@ export const VinylPlayer = () => {
   }, [smoothAngle]);
 
   const controls = useAnimationControls();
-  const prevPastHeroRef = useRef(isPastHero);
   const isOpenRef = useRef(isPlayerOpen);
   isOpenRef.current = isPlayerOpen;
+  const wasScrolledDownRef = useRef(false);
 
   // Drawer left bar hold-and-drag refs & state
   const isDraggingBarRef = useRef(false);
@@ -239,167 +245,69 @@ export const VinylPlayer = () => {
     });
   }, [isPlaying, startPlayback, stopPlayback, registerPlayerControls]);
 
-  // On mount: if refreshed/loaded in any other section other than hero, keep it hidden!
-  // ONLY if in hero section does it slide out smoothly.
+  // On mount inside hero section: start tucked, then smoothly slide open (gentle, relaxed pace)
   useEffect(() => {
-    // Helper to determine if user is currently inside the Hero section
-    const isInHeroSection = () => {
-      if (typeof window === 'undefined') return true;
-      const heroEl = document.getElementById('hero-page');
-      if (heroEl) {
-        const rect = heroEl.getBoundingClientRect();
-        const threshold = Math.min(heroEl.offsetHeight * 0.45, 260);
-        return window.scrollY <= threshold && rect.bottom >= window.innerHeight * 0.5;
-      }
-      return window.scrollY <= 180;
-    };
-
-    if (!isInHeroSection() || isPastHero) {
-      // Page is refreshed while in another section: KEEP COMPLETELY HIDDEN
-      controls.set({ x: HIDDEN_OFFSET, opacity: 0 });
-      setIsPlayerFullyHidden(true);
-      setIsPlayerOpen(false);
-      currentDrawerXRef.current = HIDDEN_OFFSET;
-      prevPastHeroRef.current = true;
-      return;
-    }
-
-    // Otherwise, we are in the hero section: start tucked into the right border
     controls.set({ x: getTuckedOffset(), opacity: 1 });
-    setIsPlayerFullyHidden(false);
     setIsPlayerOpen(false);
     currentDrawerXRef.current = getTuckedOffset();
-    prevPastHeroRef.current = false;
 
-    // Smoothly slide out from the right side after page load / refresh ONLY if still in hero section
+    // Smoothly slide out from the right side after initial mount
     const timer = setTimeout(() => {
-      // Re-verify that user has NOT scrolled away or browser has NOT restored scroll position
-      if (!isInHeroSection()) {
-        controls.set({ x: HIDDEN_OFFSET, opacity: 0 });
-        setIsPlayerFullyHidden(true);
-        setIsPlayerOpen(false);
-        currentDrawerXRef.current = HIDDEN_OFFSET;
-        prevPastHeroRef.current = true;
-        return;
-      }
-
       setIsPlayerOpen(true);
       currentDrawerXRef.current = 0;
       controls.start({
         x: 0,
         opacity: 1,
-        transition: {
-          type: 'spring',
-          stiffness: 140,
-          damping: 20,
-          mass: 0.9
-        }
+        transition: DRAWER_TRANSITION
       });
     }, 450);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [controls, setIsPlayerOpen]);
 
-  // Handle scroll transitions across the hero section boundary
+  // 1. When pulled out and hero is scrolled down: automatically pull back in (tuck into right edge)
+  // 2. When scrolled back up to top Hero section from below: automatically pull player out again
   useEffect(() => {
-    // 1. User scrolled down past hero section
-    if (isPastHero && !prevPastHeroRef.current) {
-      prevPastHeroRef.current = true;
-      let isCancelled = false;
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
 
-      const runExitSequence = async () => {
+      // Scrolling down from hero: tuck into right edge
+      if (scrollY > 35) {
+        wasScrolledDownRef.current = true;
         if (isOpenRef.current) {
-          // Condition 1: Player is open -> smoothly close it first into the right edge
-          await controls.start({
-            x: getTuckedOffset(),
-            opacity: 1,
-            transition: { type: 'spring', stiffness: 180, damping: 24 }
-          });
-
-          if (isCancelled) return;
           setIsPlayerOpen(false);
           currentDrawerXRef.current = getTuckedOffset();
-
-          // Brief pause before sliding completely off-screen
-          await new Promise((resolve) => setTimeout(resolve, 60));
-          if (isCancelled) return;
-
-          // Remove/hide it off screen
-          await controls.start({
-            x: HIDDEN_OFFSET,
-            opacity: 0,
-            transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] }
-          });
-        } else {
-          // Condition 2: Player is already closed -> smoothly hide it off screen
-          await controls.start({
-            x: HIDDEN_OFFSET,
-            opacity: 0,
-            transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] }
+          playDrawerLatchSound(false);
+          controls.start({
+            x: getTuckedOffset(),
+            opacity: 1,
+            transition: DRAWER_TRANSITION
           });
         }
+      } 
+      // Scrolling back up to top Hero section from below: pull out automatically
+      else if (scrollY <= 20 && wasScrolledDownRef.current) {
+        wasScrolledDownRef.current = false;
+        if (!isOpenRef.current) {
+          setIsPlayerOpen(true);
+          currentDrawerXRef.current = 0;
+          playDrawerLatchSound(true);
+          controls.start({
+            x: 0,
+            opacity: 1,
+            transition: DRAWER_TRANSITION
+          });
+        }
+      }
+    };
 
-        if (isCancelled) return;
-        currentDrawerXRef.current = HIDDEN_OFFSET;
-        // Condition 3: Now that player is completely removed, signal header Play Music button to appear
-        setIsPlayerFullyHidden(true);
-      };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [controls, playDrawerLatchSound, setIsPlayerOpen]);
 
-      runExitSequence();
-
-      return () => {
-        isCancelled = true;
-      };
-    }
-
-    // 2. User scrolled back up to the hero section: smoothly pull out completely just like fresh open
-    if (!isPastHero && prevPastHeroRef.current) {
-      prevPastHeroRef.current = false;
-      let isCancelled = false;
-
-      // Immediately hide the header button and reveal the vinyl player dock
-      setIsPlayerFullyHidden(false);
-
-      const runEnterSequence = async () => {
-        // Bring vinyl player smoothly into tucked dock position from off-screen
-        await controls.start({
-          x: getTuckedOffset(),
-          opacity: 1,
-          transition: { type: 'spring', stiffness: 180, damping: 24 }
-        });
-
-        if (isCancelled) return;
-
-        // Brief natural pause before pulling out, identical to fresh page entrance
-        await new Promise((resolve) => setTimeout(resolve, 120));
-        if (isCancelled) return;
-
-        // Smoothly pull completely out into open position
-        setIsPlayerOpen(true);
-        currentDrawerXRef.current = 0;
-        await controls.start({
-          x: 0,
-          opacity: 1,
-          transition: {
-            type: 'spring',
-            stiffness: 140,
-            damping: 20,
-            mass: 0.9
-          }
-        });
-      };
-
-      runEnterSequence();
-
-      return () => {
-        isCancelled = true;
-      };
-    }
-  }, [isPastHero, controls, setIsPlayerOpen, setIsPlayerFullyHidden]);
-
-  // Tab toggle handler (only active when in hero section)
+  // Tab toggle handler (luxurious, slower spring motion)
   const handleToggleTab = useCallback(() => {
-    if (isPastHero || isDraggingBarRef.current) return;
+    if (isDraggingBarRef.current) return;
     const nextOpen = !isOpenRef.current;
     setIsPlayerOpen(nextOpen);
     const targetX = nextOpen ? 0 : getTuckedOffset();
@@ -408,13 +316,12 @@ export const VinylPlayer = () => {
     controls.start({
       x: targetX,
       opacity: 1,
-      transition: { type: 'spring', stiffness: 180, damping: 24 }
+      transition: DRAWER_TRANSITION
     });
-  }, [isPastHero, playDrawerLatchSound, controls, setIsPlayerOpen]);
+  }, [playDrawerLatchSound, controls, setIsPlayerOpen]);
 
   // Hold & drag handler for the left visible edge bar (Primary interaction, with tap/click fallback)
   const handleBarPointerDown = (e) => {
-    if (isPastHero) return;
     e.preventDefault();
     e.stopPropagation();
 
@@ -499,12 +406,7 @@ export const VinylPlayer = () => {
       controls.start({
         x: targetX,
         opacity: 1,
-        transition: {
-          type: 'spring',
-          stiffness: 220,
-          damping: 24,
-          mass: 0.85
-        }
+        transition: DRAWER_TRANSITION
       });
     };
 
@@ -611,20 +513,19 @@ export const VinylPlayer = () => {
         )}
       </audio>
 
-      {/* Main Turntable Slide-in Dock on Right Border */}
+      {/* Main Turntable Slide-in Dock on Right Border (Physically positioned inside Hero Section) */}
       <motion.div
         animate={controls}
         initial={{ 
-          x: isPastHero ? HIDDEN_OFFSET : getTuckedOffset(), 
-          opacity: isPastHero ? 0 : 1 
+          x: getTuckedOffset(), 
+          opacity: 1 
         }}
         data-no-cursor="true"
-        className="fixed right-0 top-1/2 -translate-y-1/2 z-40 select-none flex items-center"
-        style={{ pointerEvents: isPastHero ? 'none' : 'auto' }}
+        className="absolute right-0 top-1/2 -translate-y-1/2 z-30 select-none flex items-center pointer-events-auto"
       >
         {/* Simple & Elegant Tooltip on Left Edge Hover (styled identically to Appearance Rope hover box) */}
         <AnimatePresence>
-          {isTabHovered && !isPastHero && !isBarDragging && (
+          {isTabHovered && !isBarDragging && (
             <motion.div
               initial={{ opacity: 0, x: 8, scale: 0.95 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}

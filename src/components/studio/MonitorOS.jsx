@@ -5,13 +5,14 @@ import {
   Gamepad2, Box, MessageSquare, BookOpen, Trophy, 
   ExternalLink, Play, Pause, SkipForward, Volume2, 
   Layers, CheckCircle2, ChevronRight, Send, Search,
-  Flame, Wifi, Battery, Clock, Compass
+  Flame, Wifi, Battery, Clock, Compass, Power
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 
 export default function MonitorOS({ onCloseZone }) {
   const { isDark } = useTheme();
   const [time, setTime] = useState(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+  const [isPoweringOff, setIsPoweringOff] = useState(false);
   
   // Day apps: figma, vscode, gemini, illustrator, spotify
   // Night apps: steam, blender, discord, otakucircle, sports
@@ -32,12 +33,40 @@ export default function MonitorOS({ onCloseZone }) {
   // Spotify player state
   const [isPlayingSpotify, setIsPlayingSpotify] = useState(true);
 
+  // Broadcast monitor view lifecycle to remove music button & name bulb in global header
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('monitor-view-open'));
+    return () => {
+      window.dispatchEvent(new CustomEvent('monitor-view-close'));
+    };
+  }, []);
+
   // Update clock every minute
   useEffect(() => {
     const timer = setInterval(() => {
       setTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
     }, 10000);
     return () => clearInterval(timer);
+  }, []);
+
+  // Graceful power off transition back to studio
+  const handlePowerOff = () => {
+    setIsPoweringOff(true);
+    window.dispatchEvent(new CustomEvent('monitor-view-close'));
+    setTimeout(() => {
+      if (onCloseZone) onCloseZone();
+    }, 280);
+  };
+
+  // Escape key powers off and exits cleanly
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        handlePowerOff();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   // When theme changes, switch default if current app belongs to opposite theme
@@ -102,102 +131,102 @@ export default function MonitorOS({ onCloseZone }) {
   const currentDockApps = isDark ? nightApps : dayApps;
 
   return (
-    <div className="relative w-full h-full flex flex-col items-center justify-center p-2 sm:p-6 overflow-hidden select-none">
-      
-      {/* ==============================================================
-          PHYSICAL ULTRAWIDE MONITOR HOUSING (21:9 Curved Display)
+    <div 
+      className="relative w-full h-full flex flex-col overflow-hidden select-none"
+      style={{
+        background: isDark
+          ? 'radial-gradient(ellipse at 50% 30%, #151828 0%, #0c0d14 60%, #06070a 100%)'
+          : 'radial-gradient(ellipse at 50% 20%, #f1ede6 0%, #e5dfd5 60%, #cfc7bc 100%)'
+      }}
+    >
+      {/* Subtle Background Grid Mesh */}
+      <div 
+        className="absolute inset-0 opacity-15 pointer-events-none"
+        style={{
+          backgroundImage: isDark
+            ? 'linear-gradient(rgba(255,94,26,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(0,240,255,0.15) 1px, transparent 1px)'
+            : 'linear-gradient(rgba(0,0,0,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.06) 1px, transparent 1px)',
+          backgroundSize: '36px 36px'
+        }}
+      />
+
+          {/* ==============================================================
+          TOP SYSTEM STATUS BAR (EDGE-TO-EDGE)
           ============================================================== */}
-      <div className="relative w-full max-w-[1080px] aspect-[21/10] sm:aspect-[21/9] rounded-2xl sm:rounded-3xl p-2 sm:p-3 bg-gradient-to-b from-[#2a2c36] via-[#1a1b22] to-[#0c0d12] border-2 sm:border-[3px] border-[#383b49] shadow-[0_35px_80px_rgba(0,0,0,0.95),inset_0_1px_2px_rgba(255,255,255,0.3)] flex flex-col overflow-hidden">
-        
-        {/* Subtle curved edge reflections */}
-        <div className="absolute top-0 inset-x-8 h-1 bg-gradient-to-r from-transparent via-white/30 to-transparent pointer-events-none" />
-        
-        {/* ==============================================================
-            ACTIVE ULTRAWIDE SCREEN DISPLAY
-            ============================================================== */}
-        <div 
-          className="relative w-full h-full rounded-xl sm:rounded-2xl overflow-hidden flex flex-col border border-black/80 shadow-[inset_0_0_20px_rgba(0,0,0,0.8)]"
-          style={{
-            background: isDark
-              ? 'radial-gradient(ellipse at 50% 30%, #151828 0%, #0c0d14 60%, #06070a 100%)'
-              : 'radial-gradient(ellipse at 50% 20%, #f1ede6 0%, #e5dfd5 60%, #cfc7bc 100%)'
-          }}
-        >
-          {/* Subtle Cyberpunk Grid / Wallpaper Graphic */}
-          <div 
-            className="absolute inset-0 opacity-15 pointer-events-none"
-            style={{
-              backgroundImage: isDark
-                ? 'linear-gradient(rgba(255,94,26,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(0,240,255,0.15) 1px, transparent 1px)'
-                : 'linear-gradient(rgba(0,0,0,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.06) 1px, transparent 1px)',
-              backgroundSize: '36px 36px'
-            }}
-          />
+      <div className={`w-full h-8 sm:h-9 px-3 sm:px-5 flex items-center justify-between text-[11px] sm:text-xs font-mono backdrop-blur-md border-b z-40 shrink-0 ${
+        isDark 
+          ? 'bg-black/60 border-white/10 text-white/80' 
+          : 'bg-white/70 border-black/10 text-neutral-800'
+      }`}>
+        <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-1.5 font-bold tracking-wider text-[#ff5e1a]">
+            <span className="w-2 h-2 rounded-full bg-[#ff5e1a] animate-pulse" />
+            <span>STUDIO OS</span>
+          </div>
+          <span className="opacity-30">/</span>
+          <span className="hidden sm:inline font-sans opacity-75">
+            {isDark ? 'Night Creativity & Gaming Rig' : 'Daylight Engineering & Design Suite'}
+          </span>
+        </div>
 
-          {/* Minimalist Wallpaper Watermark */}
-          <div className="absolute bottom-16 right-6 pointer-events-none opacity-20 text-right">
-            <div className={`font-mono font-bold text-xl sm:text-2xl tracking-tighter ${isDark ? 'text-white' : 'text-neutral-900'}`}>
-              {isDark ? 'NEON OBSIDIAN // 03:00' : 'DAYLIGHT CRAFT // 14:00'}
-            </div>
-            <div className="font-mono text-[9px] uppercase tracking-widest text-[#ff5e1a]">
-              Khushang Studio OS v2.4
-            </div>
+        {/* Center: Active Application Indicator */}
+        <div className="hidden md:flex items-center gap-2 text-[11px] font-sans font-medium px-3 py-0.5 rounded-full bg-black/10 dark:bg-white/10 border border-black/5 dark:border-white/10">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+          <span>Workspace:</span>
+          <span className="font-bold uppercase tracking-wider text-[#ff5e1a]">
+            {activeApp || 'Desktop'}
+          </span>
+        </div>
+
+        {/* Right: Network, Battery, Clock, and POWER OFF BUTTON */}
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-1.5 opacity-80">
+            <Wifi className="w-3.5 h-3.5 text-[#ff5e1a]" />
+            <span className="hidden sm:inline">1.2 Gbps</span>
+          </div>
+          <div className="flex items-center gap-1.5 opacity-80">
+            <Battery className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="hidden sm:inline">100%</span>
+          </div>
+          <div className="flex items-center gap-1.5 font-bold">
+            <Clock className="w-3.5 h-3.5 text-[#ff5e1a]" />
+            <span>{time}</span>
           </div>
 
-          {/* ==============================================================
-              TOP SYSTEM STATUS BAR
-              ============================================================== */}
-          <div className={`w-full h-7 sm:h-8 px-3 sm:px-4 flex items-center justify-between text-[10px] sm:text-xs font-mono backdrop-blur-md border-b z-30 ${
-            isDark 
-              ? 'bg-black/60 border-white/10 text-white/80' 
-              : 'bg-white/70 border-black/10 text-neutral-800'
-          }`}>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5 font-bold tracking-wider">
-                <span className="w-2 h-2 rounded-full bg-[#ff5e1a] animate-pulse" />
-                <span>STUDIO-OS</span>
-              </div>
-              <span className="opacity-30">/</span>
-              <span className="hidden sm:inline font-sans opacity-70">
-                {isDark ? '🌙 Night Creativity & Gaming Rig' : '☀️ Daylight Engineering & Design Suite'}
-              </span>
-            </div>
+          {/* DEDICATED POWER OFF / SHUT DOWN BUTTON */}
+          <button
+            onClick={handlePowerOff}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-red-500/15 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/30 hover:border-transparent transition-all font-mono text-[11px] font-bold cursor-pointer group shadow-xs active:scale-95 ml-1"
+            title="Power off monitor and exit to Studio"
+          >
+            <Power className="w-3.5 h-3.5 group-hover:rotate-90 transition-transform duration-300" />
+            <span>Power Off</span>
+          </button>
+        </div>
+      </div>
 
-            <div className="flex items-center gap-3 sm:gap-4">
-              <div className="flex items-center gap-1.5 opacity-80">
-                <Wifi className="w-3 h-3 text-[#ff5e1a]" />
-                <span className="hidden sm:inline">1.2 Gbps</span>
-              </div>
-              <div className="flex items-center gap-1.5 opacity-80">
-                <Battery className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="hidden sm:inline">100% AC</span>
-              </div>
-              <div className="flex items-center gap-1.5 font-bold">
-                <Clock className="w-3 h-3 text-[#ff5e1a]" />
-                <span>{time}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* ==============================================================
-              DESKTOP WINDOW WORKSPACE
-              ============================================================== */}
-          <div className="relative flex-1 p-2 sm:p-4 overflow-hidden flex items-center justify-center">
-            
-            <AnimatePresence mode="wait">
-              {activeApp && (
-                <motion.div
-                  key={activeApp}
-                  initial={{ opacity: 0, scale: 0.94, y: 12 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.96, y: 8 }}
-                  transition={{ type: 'spring', damping: 24, stiffness: 280 }}
-                  className={`relative w-full max-w-[880px] h-[92%] rounded-xl shadow-2xl border flex flex-col overflow-hidden backdrop-blur-xl ${
-                    isDark 
-                      ? 'bg-[#10121a]/95 border-white/15 text-white' 
-                      : 'bg-white/95 border-black/15 text-neutral-900 shadow-neutral-900/10'
-                  }`}
-                >
+      {/* ==============================================================
+          DESKTOP WINDOW WORKSPACE (EDGE-TO-EDGE FLUID STAGE)
+          ============================================================== */}
+      <div className="relative flex-1 w-full p-2 sm:p-4 md:p-6 overflow-hidden flex items-center justify-center">
+        
+        <AnimatePresence mode="wait">
+          {activeApp && (
+            <motion.div
+              key={activeApp}
+              initial={{ opacity: 0, scale: 0.96, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.97, y: 6 }}
+              transition={{ type: 'spring', damping: 26, stiffness: 290 }}
+              className={`relative w-full transition-all duration-300 ${
+                isMaximized 
+                  ? 'h-full max-w-none rounded-xl' 
+                  : 'max-w-[1240px] h-[92%] max-h-[820px] rounded-2xl'
+              } shadow-2xl border flex flex-col overflow-hidden backdrop-blur-xl ${
+                isDark 
+                  ? 'bg-[#10121a]/95 border-white/15 text-white' 
+                  : 'bg-white/95 border-black/15 text-neutral-900 shadow-neutral-900/10'
+              }`}>
                   {/* Window Chrome Titlebar */}
                   <div className={`h-8 sm:h-9 px-3 flex items-center justify-between border-b shrink-0 ${
                     isDark ? 'bg-white/[0.04] border-white/10' : 'bg-black/[0.03] border-black/10'
@@ -513,7 +542,7 @@ export default function MonitorOS({ onCloseZone }) {
                     {activeApp === 'sports' && (
                       <div className="h-full flex flex-col gap-2.5">
                         <div className="flex items-center justify-between border-b pb-1.5 border-white/10">
-                          <span className="font-mono font-bold text-[#1D428A]">LIVE SPORTS FEEDS // COURT HIGHLIGHTS</span>
+                          <span className="font-mono font-bold text-[#1D428A]">LIVE SPORTS FEEDS · COURT HIGHLIGHTS</span>
                           <span className="font-mono text-[10px] text-red-500 animate-pulse font-bold">● LIVE REC</span>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1">
@@ -545,60 +574,93 @@ export default function MonitorOS({ onCloseZone }) {
           </div>
 
           {/* ==============================================================
-              INTERACTIVE FLOATING BOTTOM DOCK
-              ============================================================== */}
-          <div className="w-full flex items-center justify-center pb-2 sm:pb-3 z-30">
-            <div className={`px-3 py-2 rounded-2xl flex items-center gap-2 sm:gap-3 backdrop-blur-xl border shadow-2xl transition-all ${
-              isDark 
-                ? 'bg-black/75 border-white/20 shadow-black' 
-                : 'bg-white/80 border-black/15 shadow-black/10'
-            }`}>
-              {currentDockApps.map((app) => {
-                const Icon = app.icon;
-                const isOpen = openApps.includes(app.id);
-                const isActive = activeApp === app.id;
+          INTERACTIVE FLOATING BOTTOM DOCK
+          ============================================================== */}
+      <div className="w-full flex items-center justify-center pb-2.5 sm:pb-3.5 z-40 shrink-0">
+        <div className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-2xl flex items-center gap-2 sm:gap-3 backdrop-blur-xl border shadow-2xl transition-all ${
+          isDark 
+            ? 'bg-black/75 border-white/20 shadow-black' 
+            : 'bg-white/85 border-black/15 shadow-black/10'
+        }`}>
+          {currentDockApps.map((app) => {
+            const Icon = app.icon;
+            const isOpen = openApps.includes(app.id);
+            const isActive = activeApp === app.id;
 
-                return (
-                  <motion.button
-                    key={app.id}
-                    whileHover={{ scale: 1.25, y: -6 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => handleLaunchApp(app.id)}
-                    className="relative group p-1.5 sm:p-2 rounded-xl flex flex-col items-center outline-none"
-                    title={app.name}
-                  >
-                    <div 
-                      className="w-7 h-7 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center text-white shadow-md transition-all"
-                      style={{ backgroundColor: app.color }}
-                    >
-                      <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
-                    </div>
+            return (
+              <motion.button
+                key={app.id}
+                whileHover={{ scale: 1.25, y: -5 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handleLaunchApp(app.id)}
+                className="relative group p-1.5 sm:p-2 rounded-xl flex flex-col items-center outline-none cursor-pointer"
+                title={app.name}
+              >
+                <div 
+                  className="w-7 h-7 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center text-white shadow-md transition-all"
+                  style={{ backgroundColor: app.color }}
+                >
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                </div>
 
-                    {/* Active dot indicator under app */}
-                    <span className={`w-1 h-1 rounded-full mt-1 transition-all ${
-                      isActive ? 'bg-[#ff5e1a] scale-125' : isOpen ? 'bg-white/70' : 'opacity-0'
-                    }`} />
+                {/* Active dot indicator under app */}
+                <span className={`w-1 h-1 rounded-full mt-1 transition-all ${
+                  isActive ? 'bg-[#ff5e1a] scale-125' : isOpen ? 'bg-white/70' : 'opacity-0'
+                }`} />
 
-                    {/* Hover tooltip label */}
-                    <div className={`absolute -top-7 px-2 py-0.5 rounded text-[9px] font-mono font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-md ${
-                      isDark ? 'bg-neutral-900 text-[#ff5e1a] border border-white/20' : 'bg-white text-neutral-900 border border-black/15'
-                    }`}>
-                      {app.name}
-                    </div>
-                  </motion.button>
-                );
-              })}
+                {/* Hover tooltip label */}
+                <div className={`absolute -top-7 px-2 py-0.5 rounded text-[9px] font-mono font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-md ${
+                  isDark ? 'bg-neutral-900 text-[#ff5e1a] border border-white/20' : 'bg-white text-neutral-900 border border-black/15'
+                }`}>
+                  {app.name}
+                </div>
+              </motion.button>
+            );
+          })}
+
+          <div className="w-px h-6 bg-black/15 dark:bg-white/15 mx-1" />
+
+          {/* Quick Power Off button in dock */}
+          <motion.button
+            whileHover={{ scale: 1.2, y: -4 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handlePowerOff}
+            className="relative group p-1.5 sm:p-2 rounded-xl flex flex-col items-center outline-none cursor-pointer text-red-500 hover:text-red-400"
+            title="Power Off monitor and exit to Studio"
+          >
+            <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center bg-red-500/15 group-hover:bg-red-500 text-red-500 group-hover:text-white transition-all shadow-md">
+              <Power className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-          </div>
-
+            <span className="w-1 h-1 rounded-full mt-1 opacity-0" />
+            <div className={`absolute -top-7 px-2 py-0.5 rounded text-[9px] font-mono font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-md ${
+              isDark ? 'bg-neutral-900 text-red-400 border border-white/20' : 'bg-white text-red-600 border border-black/15'
+            }`}>
+              Power Off
+            </div>
+          </motion.button>
         </div>
-
-        {/* Ultrawide Monitor Stand Lip */}
-        <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-48 h-3 rounded-b-xl bg-gradient-to-b from-[#1b1c24] to-[#0a0a0f] border-x border-b border-[#383b49] shadow-lg flex items-center justify-center pointer-events-none">
-          <span className="w-12 h-0.5 rounded-full bg-white/20" />
-        </div>
-
       </div>
+
+      {/* POWER OFF SHUTDOWN ANIMATION */}
+      <AnimatePresence>
+        {isPoweringOff && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.28 }}
+            className="absolute inset-0 z-50 bg-black flex flex-col items-center justify-center pointer-events-auto"
+          >
+            {/* CRT / OLED collapse flash */}
+            <motion.div
+              initial={{ scaleX: 1, scaleY: 1, opacity: 1 }}
+              animate={{ scaleX: [1, 1.4, 0.05, 0], scaleY: [1, 0.04, 0.04, 0], opacity: [1, 1, 0.8, 0] }}
+              transition={{ duration: 0.26, ease: 'easeInOut' }}
+              className="w-full h-1 bg-white shadow-[0_0_30px_white]"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );

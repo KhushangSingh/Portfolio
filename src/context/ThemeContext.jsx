@@ -5,9 +5,11 @@ const ThemeContext = createContext();
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('portfolio-theme');
-      if (saved === 'light' || saved === 'dark') return saved;
-      return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      try {
+        if (window.localStorage.getItem('portfolio-theme') === 'light') return 'light';
+      } catch {
+        // Keep the dark default if storage is unavailable.
+      }
     }
     return 'dark';
   });
@@ -165,7 +167,7 @@ export const ThemeProvider = ({ children }) => {
       document.documentElement.style.setProperty('--bulb-radius', `${Math.ceil(maxDist * 1.08)}px`);
     }
 
-    // Circular light wave transition expanding from top-left bulb to bottom-right corner in 1.4s
+    // Circular light wave transition expanding from top-left bulb across the viewport
     if (typeof document !== 'undefined' && document.startViewTransition) {
       document.documentElement.classList.add('is-theme-transitioning');
       
@@ -190,6 +192,34 @@ export const ThemeProvider = ({ children }) => {
         }
       });
       activeTransitionRef.current = transition;
+
+      // Hardware-accelerated GPU compositor animation directly via Web Animations API (120+ FPS)
+      if (transition.ready) {
+        transition.ready.then(() => {
+          const originX = Math.round(x);
+          const originY = Math.round(y);
+          const targetRadius = Math.ceil(maxDist * 1.08);
+
+          try {
+            document.documentElement.animate(
+              {
+                clipPath: [
+                  `circle(0px at ${originX}px ${originY}px)`,
+                  `circle(${targetRadius}px at ${originX}px ${originY}px)`
+                ]
+              },
+              {
+                duration: 650,
+                easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                pseudoElement: '::view-transition-new(root)',
+                fill: 'forwards'
+              }
+            );
+          } catch (e) {
+            // Graceful fallback to CSS keyframes if pseudoElement animation is not available
+          }
+        }).catch(() => {});
+      }
 
       transition.finished.finally(() => {
         if (activeTransitionRef.current === transition) activeTransitionRef.current = null;

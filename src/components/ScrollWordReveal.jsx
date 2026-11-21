@@ -168,6 +168,7 @@ const FALLBACK_HIGHLIGHTS = [
   'fast',
   'real craft',
   'Figma frames',
+  'problem-driven UX solutions',
   'scalable design systems',
   'user friction',
   'production React code',

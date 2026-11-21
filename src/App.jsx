@@ -1,13 +1,18 @@
-import React, { useEffect } from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
 import Designer from './components/Designer';
+import PortfolioSummary from './components/PortfolioSummary';
 import GlobalHeader from './components/GlobalHeader';
-import { VinylPlayer } from './components/VinylPlayer';
 import { ActionCursor } from './components/ActionCursor';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { MusicProvider } from './context/MusicContext';
+import { LoadingProvider } from './context/LoadingContext';
+import RubiksLoader from './components/RubiksLoader';
+import { OTAKU_CIRCLE_CASE_STUDY } from './constants/otakuCircle';
+
+const OtakuCircleCaseStudy = lazy(() => import('./components/otakucircle/OtakuCircleCaseStudy'));
 
 function AppContent() {
   const { isDark } = useTheme();
@@ -15,28 +20,20 @@ function AppContent() {
   // Initialize smooth momentum scrolling throughout the entire website via Lenis
   useEffect(() => {
     const lenis = new Lenis({
-      duration: 1.15,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      gestureOrientation: 'vertical',
+      duration: 0.85, // Crisp & agile: neither sluggish nor heavy, glides effortlessly
+      easing: (t) => 1 - Math.pow(1 - t, 3), // Smooth cubic ease-out: immediate acceleration, continuous liquid momentum, zero sudden breaks
+      wheelMultiplier: 1.15, // Effortless glide: natural finger travel without requiring excessive scroll effort
+      touchMultiplier: 1.0,
       smoothWheel: true,
-      touchMultiplier: 1.5,
-      infinite: false,
+      syncTouch: false, // Preserves 120Hz native hardware acceleration on touch devices
+      autoRaf: true, // Lenis internal high-precision timestamp delta RAF loop
     });
 
     window.__lenis = lenis;
 
-    let rafId;
-    function raf(time) {
-      lenis.raf(time);
-      rafId = requestAnimationFrame(raf);
-    }
-    rafId = requestAnimationFrame(raf);
-
     return () => {
-      cancelAnimationFrame(rafId);
-      lenis.destroy();
       delete window.__lenis;
+      lenis.destroy();
     };
   }, []);
 
@@ -54,13 +51,17 @@ function AppContent() {
       <main id="main-content">
         <Routes>
           <Route path="/" element={<Designer />} />
+          <Route path="/summary" element={<PortfolioSummary />} />
+          <Route path={OTAKU_CIRCLE_CASE_STUDY} element={(
+            <Suspense fallback={<p className="sr-only" role="status">Opening the OtakuCircle case study</p>}>
+              <OtakuCircleCaseStudy />
+            </Suspense>
+          )} />
+          <Route path="/overview" element={<Navigate to="/summary" replace />} />
           <Route path="/designer" element={<Navigate to="/" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
-
-      {/* Interactive Vinyl Music Disc Player */}
-      <VinylPlayer />
     </div>
   );
 }
@@ -69,9 +70,12 @@ function App() {
   return (
     <BrowserRouter>
       <ThemeProvider>
-        <MusicProvider>
-          <AppContent />
-        </MusicProvider>
+        <LoadingProvider>
+          <MusicProvider>
+            <RubiksLoader />
+            <AppContent />
+          </MusicProvider>
+        </LoadingProvider>
       </ThemeProvider>
     </BrowserRouter>
   );

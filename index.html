@@ -8,13 +8,461 @@
     <meta name="description" content="Portfolio of Khushang Singh · Product Designer and UX Engineer specializing in scalable design systems and high-fidelity product design." />
     <meta name="theme-color" content="#050505" />
 
+    <style>
+      #root[data-intro-theme]:empty {
+        min-block-size: 100vh;
+        background: #050505;
+      }
+
+      #root[data-intro-theme="light"]:empty { background: #f8f8f5; }
+
+      .portfolio-startup-message {
+        display: grid;
+        place-items: center;
+        min-block-size: 100vh;
+        margin: 0;
+        padding: 1.5rem;
+        text-align: center;
+        background: #050505;
+        color: #f8f8f5;
+      }
+
+      #root[data-intro-theme="light"] .portfolio-startup-message {
+        background: #f8f8f5;
+        color: #050505;
+      }
+
+      .portfolio-loader {
+        --loader-background: #0e0a08;
+        --loader-accent: #ff5e1a;
+        --loader-detail: rgb(255 224 204 / 18%);
+        --loader-orbit-highlight: rgb(255 94 26 / 35%);
+        --loader-lock-time: 160ms;
+        --loader-outro-delay: 1200ms;
+        --loader-exit-time: 1150ms;
+        --loader-core-radius: 0.875rem;
+        position: fixed;
+        inset: 0;
+        z-index: 100001;
+        place-content: center;
+        padding: 1rem;
+        background: var(--loader-background);
+        color: var(--loader-accent);
+        font-family: "Bricolage Grotesque", sans-serif;
+      }
+
+      .portfolio-loader:not([hidden]) {
+        display: grid;
+      }
+
+      html:has(.portfolio-loader:not([hidden])) {
+        overflow: hidden;
+      }
+
+      .portfolio-loader[data-theme="light"] {
+        --loader-background: #f6f0eb;
+        --loader-detail: rgb(56 31 22 / 22%);
+        --loader-orbit-highlight: rgb(255 94 26 / 48%);
+      }
+
+      .portfolio-loader__frame {
+        --corner-line: linear-gradient(var(--loader-detail), var(--loader-detail));
+        --corner-length: clamp(1rem, 3vw, 2.5rem);
+        position: absolute;
+        inset: clamp(1rem, 4vw, 3rem);
+        pointer-events: none;
+        background:
+          var(--corner-line) left top / var(--corner-length) 1px no-repeat,
+          var(--corner-line) left top / 1px var(--corner-length) no-repeat,
+          var(--corner-line) right top / var(--corner-length) 1px no-repeat,
+          var(--corner-line) right top / 1px var(--corner-length) no-repeat,
+          var(--corner-line) left bottom / var(--corner-length) 1px no-repeat,
+          var(--corner-line) left bottom / 1px var(--corner-length) no-repeat,
+          var(--corner-line) right bottom / var(--corner-length) 1px no-repeat,
+          var(--corner-line) right bottom / 1px var(--corner-length) no-repeat;
+      }
+
+      .portfolio-loader__orbits {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        inline-size: min(85vw, 72rem);
+        block-size: clamp(5.5rem, 31vh, 17rem);
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+      }
+
+      .portfolio-loader__orbits::before,
+      .portfolio-loader__orbits::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border: 1px solid var(--loader-detail);
+        border-radius: 50%;
+      }
+
+      .portfolio-loader__orbits::before { transform: rotate(-11deg); }
+
+      .portfolio-loader__orbits::after {
+        border-inline-end-color: var(--loader-orbit-highlight);
+        transform: rotate(11deg) scale(0.9, 0.78);
+      }
+
+      .portfolio-loader__progress {
+        position: absolute;
+        left: 50%;
+        bottom: clamp(1.75rem, 7vh, 4rem);
+        inline-size: clamp(5rem, 15vw, 10rem);
+        block-size: 2px;
+        background: var(--loader-detail);
+        transform: translateX(-50%);
+      }
+
+      .portfolio-loader__progress::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: var(--loader-accent);
+        transform: scaleX(var(--loader-progress, 0));
+        transform-origin: left;
+        transition: transform 180ms ease-out;
+      }
+
+      .portfolio-loader__announcement {
+        position: absolute;
+        inline-size: 1px;
+        block-size: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+
+      .portfolio-loader__reels {
+        --loader-row-height: 1.45em;
+        position: relative;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.35em;
+        font-size: clamp(1.1rem, 6vw, 5rem);
+        font-weight: 720;
+        line-height: 1;
+      }
+
+      .portfolio-loader__word {
+        display: flex;
+      }
+
+      .portfolio-loader__reel {
+        position: relative;
+        inline-size: 0.78em;
+        block-size: var(--loader-row-height);
+        overflow: hidden;
+      }
+
+      .portfolio-loader__reel[data-letter="I"] { inline-size: 0.46em; }
+
+      .portfolio-loader__reel:not([data-locked]) {
+        mask-image: linear-gradient(to bottom, transparent, #000 28% 72%, transparent);
+      }
+
+      .portfolio-loader__reel:not([data-locked])::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        backdrop-filter: blur(clamp(1px, 0.065em, 4px));
+        mask-image: linear-gradient(to bottom, #000, transparent 34% 66%, #000);
+      }
+
+      .portfolio-loader__rolling,
+      .portfolio-loader__letter {
+        position: absolute;
+        inset: 0;
+        animation-duration: var(--loader-lock-time);
+        animation-delay: calc(var(--lock-at) - var(--loader-lock-time));
+        animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+        animation-fill-mode: both;
+      }
+
+      .portfolio-loader__rolling {
+        overflow: hidden;
+        opacity: 0.8;
+        animation-name: portfolio-loader-roll-out;
+      }
+
+      .portfolio-loader__letter {
+        animation-name: portfolio-loader-lock-letter;
+      }
+
+      .portfolio-loader__reel[data-locked] .portfolio-loader__letter {
+        animation: none;
+      }
+
+      .portfolio-loader__strip {
+        display: block;
+        animation: portfolio-loader-roll var(--spin-time) linear infinite;
+      }
+
+      .portfolio-loader__strip > span,
+      .portfolio-loader__letter {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        block-size: var(--loader-row-height);
+      }
+
+      .portfolio-loader__strip > span {
+        transform: scaleX(0.79);
+      }
+
+      .portfolio-loader__reel[data-letter="I"] .portfolio-loader__strip > span { transform: scaleX(0.48); }
+
+      .portfolio-loader[data-phase="leaving"],
+      .portfolio-loader[data-phase="leaving"] .portfolio-loader__reels,
+      .portfolio-loader[data-phase="leaving"] .portfolio-loader__orbits,
+      .portfolio-loader[data-phase="leaving"]::after {
+        animation-duration: var(--loader-exit-time);
+        animation-delay: var(--loader-outro-delay);
+        animation-timing-function: cubic-bezier(0.55, 0.08, 0.57, 1);
+        animation-fill-mode: both;
+      }
+
+      .portfolio-loader[data-phase="leaving"] {
+        animation-name: portfolio-loader-exit;
+      }
+
+      .portfolio-loader[data-phase="leaving"] .portfolio-loader__reels {
+        animation-name: portfolio-loader-pull-in;
+      }
+
+      .portfolio-loader[data-phase="leaving"] .portfolio-loader__orbits {
+        animation-name: portfolio-loader-collapse-orbits;
+      }
+
+      .portfolio-loader[data-phase="leaving"]::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        inline-size: calc(var(--loader-core-radius) * 2);
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: #000;
+        box-shadow: inset 0 0 0 1px rgb(255 94 26 / 48%);
+        pointer-events: none;
+        animation-name: portfolio-loader-close-core;
+      }
+
+      @keyframes portfolio-loader-roll {
+        to { transform: translateY(calc(-100% + var(--loader-row-height))); }
+      }
+
+      @keyframes portfolio-loader-roll-out {
+        to { transform: translateY(-100%); }
+      }
+
+      @keyframes portfolio-loader-lock-letter {
+        from { transform: translateY(100%); }
+        to { transform: translateY(0); }
+      }
+
+      @keyframes portfolio-loader-exit {
+        0% { clip-path: circle(72% at center); }
+        72%, 82% { clip-path: circle(var(--loader-core-radius) at center); }
+        100% { clip-path: circle(0px at center); }
+      }
+
+      @keyframes portfolio-loader-pull-in {
+        0% { transform: rotate(0deg) scale(1); }
+        72%, 100% {
+          opacity: 0;
+          transform: rotate(-52deg) scale(0);
+        }
+      }
+
+      @keyframes portfolio-loader-collapse-orbits {
+        0% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+        72%, 100% {
+          opacity: 0;
+          transform: translate(-50%, -50%) rotate(-40deg) scale(0);
+        }
+      }
+
+      @keyframes portfolio-loader-close-core {
+        0%, 55% {
+          opacity: 0;
+          transform: translate(-50%, -50%) scale(0.65);
+        }
+        72%, 82% {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: translate(-50%, -50%) scale(0);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .portfolio-loader {
+          --loader-lock-time: 1ms;
+          --loader-exit-time: 1ms;
+        }
+
+        .portfolio-loader__rolling,
+        .portfolio-loader__letter,
+        .portfolio-loader[data-phase="leaving"] {
+          animation-timing-function: step-end;
+        }
+
+        .portfolio-loader__strip,
+        .portfolio-loader[data-phase="leaving"] .portfolio-loader__reels,
+        .portfolio-loader[data-phase="leaving"] .portfolio-loader__orbits,
+        .portfolio-loader[data-phase="leaving"]::after {
+          animation: none;
+        }
+
+        .portfolio-loader[data-phase="leaving"]::after { content: none; }
+        .portfolio-loader__reel:not([data-locked]) { mask-image: none; }
+        .portfolio-loader__reel:not([data-locked])::after { content: none; }
+        .portfolio-loader__progress::after { transition: none; }
+      }
+    </style>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-
   </head>
   <body>
+    <div id="portfolio-loader" class="portfolio-loader" role="status" hidden>
+      <span class="portfolio-loader__announcement">Opening Khushang Singh’s portfolio</span>
+      <div class="portfolio-loader__frame" aria-hidden="true"></div>
+      <div class="portfolio-loader__orbits" aria-hidden="true"></div>
+      <div class="portfolio-loader__reels" aria-hidden="true"></div>
+      <div class="portfolio-loader__progress" aria-hidden="true"></div>
+    </div>
     <div id="root"></div>
+    <script>
+      (() => {
+        const route = window.location.pathname.replace(/\/+$/, '').toLowerCase();
+        if (route !== '' && route !== '/designer') return;
+
+        const name = 'KHUSHANG SINGH';
+        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const spinLeadIn = 160;
+        const lockInterval = 200;
+        const loader = document.getElementById('portfolio-loader');
+        const reels = loader.querySelector('.portfolio-loader__reels');
+        const app = document.getElementById('root');
+        let theme = 'dark';
+
+        try {
+          if (localStorage.getItem('portfolio-theme') === 'light') theme = 'light';
+        } catch {
+          // Keep the dark default if storage is unavailable.
+        }
+
+        function createSpan(className, text = '') {
+          const span = document.createElement('span');
+          span.className = className;
+          span.textContent = text;
+          return span;
+        }
+
+        const letterReels = [];
+
+        for (const word of name.split(' ')) {
+          const group = createSpan('portfolio-loader__word');
+
+          for (const letter of word) {
+            const reel = createSpan('portfolio-loader__reel');
+            reel.dataset.letter = letter;
+            const rolling = createSpan('portfolio-loader__rolling');
+            const strip = createSpan('portfolio-loader__strip');
+            const target = createSpan('portfolio-loader__letter', letter);
+            const pool = [...alphabet];
+            pool.splice(pool.indexOf(letter), 1);
+
+            const glyphs = Array.from({ length: 8 }, () => {
+              const index = Math.floor(Math.random() * pool.length);
+              return pool.splice(index, 1)[0];
+            });
+
+            // Repeat the first glyph so the upward loop joins at the same position.
+            strip.append(...[...glyphs, glyphs[0]].map((glyph) => createSpan('', glyph)));
+            strip.style.setProperty('--spin-time', `${850 + Math.floor(Math.random() * 300)}ms`);
+            rolling.append(strip);
+            reel.append(rolling, target);
+            letterReels.push(reel);
+            reel.style.setProperty('--lock-at', `${spinLeadIn + letterReels.length * lockInterval}ms`);
+            group.append(reel);
+          }
+
+          reels.append(group);
+        }
+
+        const lastReel = letterReels.at(-1);
+        let lockedReels = 0;
+        let introReady = false;
+        let bootstrapReady = false;
+        let readinessTimeout;
+
+        function leave() {
+          window.clearTimeout(readinessTimeout);
+          loader.dataset.phase = 'leaving';
+        }
+
+        function handleBootstrapReady() {
+          bootstrapReady = true;
+          if (introReady) leave();
+        }
+
+        function lockReel(reel) {
+          if ('locked' in reel.dataset) return;
+          reel.querySelector('.portfolio-loader__rolling').remove();
+          reel.dataset.locked = '';
+          lockedReels += 1;
+          loader.style.setProperty('--loader-progress', lockedReels / letterReels.length);
+
+          if (reel === lastReel) {
+            introReady = true;
+            if (bootstrapReady) leave();
+            else readinessTimeout = window.setTimeout(leave, 8000);
+          }
+        }
+
+        function handleLetterLock(event) {
+          if (event.animationName === 'portfolio-loader-lock-letter') lockReel(event.target.parentElement);
+        }
+
+        function syncElapsedLocks() {
+          if (document.hidden) return;
+
+          // A background tab can defer animation events until it becomes visible again.
+          const elapsed = performance.now() - startTime;
+          const lockedCount = Math.max(0, Math.floor((elapsed - spinLeadIn) / lockInterval));
+          letterReels.slice(0, lockedCount).forEach(lockReel);
+        }
+
+        loader.addEventListener('animationend', (event) => {
+          if (event.target !== loader || event.animationName !== 'portfolio-loader-exit') return;
+          document.removeEventListener('portfolio-bootstrap-ready', handleBootstrapReady);
+          document.removeEventListener('visibilitychange', syncElapsedLocks);
+          loader.remove();
+          document.dispatchEvent(new Event('portfolio-intro-finished'));
+        });
+        reels.addEventListener('animationend', handleLetterLock);
+        document.addEventListener('portfolio-bootstrap-ready', handleBootstrapReady, { once: true });
+        document.addEventListener('visibilitychange', syncElapsedLocks);
+
+        loader.dataset.theme = theme;
+        app.dataset.introTheme = theme;
+        const startTime = performance.now();
+        loader.hidden = false;
+      })();
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

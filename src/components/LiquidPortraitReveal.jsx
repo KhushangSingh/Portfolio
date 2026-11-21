@@ -103,7 +103,7 @@ export default function LiquidPortraitReveal({ isDark }) {
       setIsHovering(false);
       lastPosRef.current = null;
       particlesRef.current.forEach(p => {
-        p.decay = Math.max(p.decay * 3, 0.06);
+        p.decay = Math.max(p.decay * 3, 0.08);
       });
     };
     window.addEventListener('blur', handleWindowBlur);
@@ -122,8 +122,8 @@ export default function LiquidPortraitReveal({ isDark }) {
       radius: radius * (0.9 + Math.random() * 0.25),
       maxRadius: radius * 1.55,
       alpha,
-      // Snappy liquid reveal decay and responsive fluid spread
-      decay: 0.0075 + Math.random() * 0.002,
+      // Responsive, brisk liquid reveal decay: dissolves smoothly and noticeably faster (~0.5 - 0.6s)
+      decay: 0.024 + Math.random() * 0.006,
       growth: 0.22 + Math.random() * 0.08,
       vx: (Math.random() - 0.5) * 0.22,
       vy: (Math.random() - 0.5) * 0.22
@@ -339,9 +339,9 @@ export default function LiquidPortraitReveal({ isDark }) {
   const handleMouseLeave = useCallback(() => {
     setIsHovering(false);
     lastPosRef.current = null;
-    // Accelerate decay so existing clouds vanish smoothly within ~150ms
+    // Accelerate decay so existing clouds vanish briskly within ~100-120ms
     particlesRef.current.forEach(p => {
-      p.decay = Math.max(p.decay * 3, 0.05);
+      p.decay = Math.max(p.decay * 3.5, 0.08);
     });
   }, []);
 
@@ -376,7 +376,7 @@ export default function LiquidPortraitReveal({ isDark }) {
     setIsHovering(false);
     lastPosRef.current = null;
     particlesRef.current.forEach(p => {
-      p.decay = Math.max(p.decay * 3, 0.05);
+      p.decay = Math.max(p.decay * 3.5, 0.08);
     });
   }, []);
 
@@ -389,66 +389,47 @@ export default function LiquidPortraitReveal({ isDark }) {
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
-      className={`relative w-full aspect-[1122/1402] select-none cursor-crosshair overflow-visible transition-[filter] duration-700 ${
-        isDark 
-          ? '' 
-          : 'drop-shadow-[0_20px_35px_rgba(0,0,0,0.18)]'
-      }`}
+      className="relative w-full aspect-[1122/1402] select-none cursor-crosshair overflow-visible"
       style={{ touchAction: 'none', aspectRatio: '1122 / 1402' }}
     >
-      {/* Soft Vignette Mask Wrapper: smoothly dissolves left/right arm borders and bottom torso border into background */}
-      <div 
-        className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden"
-        style={{
-          maskImage: 'linear-gradient(to right, transparent 0%, black 9%, black 91%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 9%, black 91%, transparent 100%)'
-        }}
-      >
-        <div 
-          className="relative w-full h-full"
-          style={{
-            maskImage: 'linear-gradient(to bottom, black 0%, black 74%, transparent 98%)',
-            WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 74%, transparent 98%)'
-          }}
-        >
-          {/* 1. Permanent hardware-accelerated DOM Base Portraits:
-              Light portrait and Dark portrait transition cleanly via CSS opacity.
-              Never hidden, never stale, 100% synchronized with theme state. */}
-          <div className="absolute inset-0 w-full h-full pointer-events-none">
-            {/* Light theme base portrait */}
+      <div className="relative w-full h-full overflow-hidden">
+        {/* 1. Permanent hardware-accelerated DOM Base Portraits:
+            Light portrait and Dark portrait transition cleanly via CSS opacity.
+            Never hidden, never stale, 100% synchronized with theme state. */}
+        <div className="absolute inset-0 w-full h-full pointer-events-none">
+          {/* Light theme base portrait */}
+          <img
+            src="/images/orange_geometric_portrait.png"
+            alt="Khushang Singh portrait"
+            className={`absolute inset-0 w-full h-full object-contain pointer-events-none transition-opacity duration-500 ${
+              isDark ? 'opacity-0' : 'opacity-100'
+            }`}
+            loading="eager"
+            decoding="async"
+          />
+
+          {/* Dark theme base portrait */}
+          <picture>
+            <source srcSet="/images/neon_thermal_portrait.webp" type="image/webp" />
             <img
-              src="/images/orange_geometric_portrait.png"
-              alt="Khushang Singh portrait"
+              src="/images/neon_thermal_portrait.png"
+              alt="Khushang Singh portrait (dark)"
               className={`absolute inset-0 w-full h-full object-contain pointer-events-none transition-opacity duration-500 ${
-                isDark ? 'opacity-0' : 'opacity-100'
+                isDark ? 'opacity-100' : 'opacity-0'
               }`}
               loading="eager"
               decoding="async"
             />
-
-            {/* Dark theme base portrait */}
-            <picture>
-              <source srcSet="/images/neon_thermal_portrait.webp" type="image/webp" />
-              <img
-                src="/images/neon_thermal_portrait.png"
-                alt="Khushang Singh portrait (dark)"
-                className={`absolute inset-0 w-full h-full object-contain pointer-events-none transition-opacity duration-500 ${
-                  isDark ? 'opacity-100' : 'opacity-0'
-                }`}
-                loading="eager"
-                decoding="async"
-              />
-            </picture>
-          </div>
-
-          {/* 2. Interactive Liquid Cloudy X-Ray Overlay Canvas:
-              Draws glowing blue radiographic trails wherever the cursor hovers.
-              Guaranteed 100% transparent when idle so the base portrait shines through. */}
-          <canvas
-            ref={canvasRef}
-            className="absolute inset-0 w-full h-full pointer-events-none"
-          />
+          </picture>
         </div>
+
+        {/* 2. Interactive Liquid Cloudy X-Ray Overlay Canvas:
+            Draws glowing blue radiographic trails wherever the cursor hovers.
+            Guaranteed 100% transparent when idle so the base portrait shines through. */}
+        <canvas
+          ref={canvasRef}
+          className="absolute inset-0 w-full h-full pointer-events-none"
+        />
       </div>
 
       {/* 3. Floating Toast-like Affordance Box beside the portrait: fades away completely during hover */}

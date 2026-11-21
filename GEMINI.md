@@ -20,6 +20,7 @@ This project strictly adheres to handcrafted, intentional frontend design standa
 9. **NO Fabricated Proof or Superlatives:** Never invent fake stats (*"Trusted by 50,000+ teams"*, *"10x faster"*, *"Elevate your workflow"*). Use honest, concise, grounded copy.
 10. **NO Floating Background Blobs:** Avoid arbitrary blurred colored circles (`blur-3xl opacity-30 rounded-full`) drifting aimlessly behind content.
 11. **NO Over-Engineered Tooltips / Popups (The 'Dot & Techno-Babble' Slop):** Never add indicator dots (status pips, pulsing LEDs), multi-line pseudo-tech jargon (e.g., `// CLICK TAB`, `DECK ACTIVE`), or redundant meta-descriptions to hover cards, tooltips, or action popups. Keep hover cues and action tips clean, simple, and elegant (like the Appearance rope hover box): single-line text (e.g. `Pull for Light`, `Push to Tuck`), compact padding (`px-3 py-1.5 rounded-lg`), theme-aware surface, crisp triangular beak, zero decorative dot clutter, zero extra text.
+12. **NO Pseudo-Technical Monospaced Status Labels / Deck Headers (e.g. `CREDENTIALS DECK // 02 OF 03`, `SECTION // 01 OF 03`):** Never generate synthetic uppercase monospaced indicator labels with double slashes (e.g., `CREDENTIALS DECK // 02 OF 03`, `WORKS // 01 OF 03`). They are artificial AI techno-babble clutter. Keep section headers confident, standard, and human, without synthetic deck counters or micro-status tags cluttering interactive cards.
 
 ---
 

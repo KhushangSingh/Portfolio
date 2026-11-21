@@ -9,10 +9,14 @@
   }
 }
 
-/* Default background */
+html,
 body {
   margin: 0;
   padding: 0;
+  overflow-x: clip;
+}
+
+body {
   background-color: black;
 }
 
@@ -43,7 +47,7 @@ html, body, * {
   scrollbar-color: rgba(140, 140, 140, 0.35) transparent !important;
 }
 
-/* 3. CIRCULAR LIGHT EXPANSION WAVE (From Top-Left Bulb to Bottom-Right Corner in 1.4s) */
+/* 3. HARDWARE-ACCELERATED HIGH-FPS CIRCULAR VIEW TRANSITION */
 ::view-transition,
 ::view-transition-group(*),
 ::view-transition-image-pair(*),
@@ -52,10 +56,17 @@ html, body, * {
   pointer-events: none !important;
 }
 
+::view-transition-group(root) {
+  animation-duration: 0.65s;
+}
+
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
+  will-change: clip-path;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 ::view-transition-old(root) {
@@ -64,7 +75,8 @@ html, body, * {
 
 ::view-transition-new(root) {
   z-index: 2;
-  animation: expand-light-wave 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  /* GPU-optimized 0.65s liquid expansion fallback */
+  animation: expand-light-wave 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes expand-light-wave {
@@ -76,8 +88,11 @@ html, body, * {
   }
 }
 
-html.is-theme-transitioning *:not(#studio, #studio *),
-html.is-theme-transitioning {
+/* Targeted transition suspension on root layers during snapshot (avoids main-thread style recalcs on '*' universal selector) */
+html.is-theme-transitioning,
+html.is-theme-transitioning body,
+html.is-theme-transitioning #main-content,
+html.is-theme-transitioning [class*="transition-colors"] {
   transition: none !important;
 }
 
@@ -108,26 +123,14 @@ html.lenis, html.lenis-smooth {
   pointer-events: none;
 }
 
-/* 5. THEME-ADAPTIVE HIGH-CONTRAST BESPOKE CURSORS
-   Prevents crosshairs and pointers from blending into light or dark backgrounds */
+/* 5. BESPOKE ORANGE POINTER CURSOR
+   Faithfully modeled after the reference pointer vector (clean concave delta / paper-plane pointer)
+   in solid brand orange (#ff5e1a) with zero border */
 
-/* DARK THEME: Pure White precision crosshair with dark outer stroke & orange pip */
 html.dark,
 html.dark body,
 html.dark .cursor-crosshair,
-.dark .cursor-crosshair {
-  cursor: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 2V8M12 16V22M2 12H8M16 12H22' stroke='black' stroke-width='3.5' stroke-linecap='round'/%3E%3Cpath d='M12 2V8M12 16V22M2 12H8M16 12H22' stroke='white' stroke-width='1.5' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='12' r='2' fill='%23ff4d00' stroke='black' stroke-width='0.5'/%3E%3C/svg%3E") 12 12, crosshair;
-}
-
-html.dark a,
-html.dark button,
-html.dark [role="button"],
-html.dark .cursor-pointer,
-.dark .cursor-pointer {
-  cursor: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 2L10.5 19.5L13.5 13L20 10L4 2Z' fill='white' stroke='black' stroke-width='2' stroke-linejoin='round'/%3E%3Ccircle cx='15' cy='14' r='1.5' fill='%23ff4d00'/%3E%3C/svg%3E") 4 2, pointer;
-}
-
-/* LIGHT THEME: Obsidian/Near-Black precision crosshair with white halo & orange pip */
+.dark .cursor-crosshair,
 html.light,
 html.light body,
 html.light .cursor-crosshair,
@@ -135,19 +138,15 @@ html.light .cursor-crosshair,
 html:not(.dark),
 html:not(.dark) body,
 html:not(.dark) .cursor-crosshair {
-  cursor: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 2V8M12 16V22M2 12H8M16 12H22' stroke='white' stroke-width='3.5' stroke-linecap='round'/%3E%3Cpath d='M12 2V8M12 16V22M2 12H8M16 12H22' stroke='%23111111' stroke-width='1.5' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='12' r='2' fill='%23ff4d00' stroke='white' stroke-width='0.5'/%3E%3C/svg%3E") 12 12, crosshair;
+  cursor: url("data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='2.3,2.8 2.4,3.8 10.0,23.1 10.6,23.8 11.4,23.9 11.9,23.4 13.9,14.5 14.3,13.9 23.4,11.7 23.9,11.3 23.9,10.3 23.3,9.8 3.5,2.3 2.8,2.3' fill='%23ff5e1a'/%3E%3C/svg%3E") 2 3, auto;
 }
 
-html.light a,
-html.light button,
-html.light [role="button"],
-html.light .cursor-pointer,
-.light .cursor-pointer,
-html:not(.dark) a,
-html:not(.dark) button,
-html:not(.dark) [role="button"],
-html:not(.dark) .cursor-pointer {
-  cursor: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 2L10.5 19.5L13.5 13L20 10L4 2Z' fill='%23111111' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3Ccircle cx='15' cy='14' r='1.5' fill='%23ff4d00'/%3E%3C/svg%3E") 4 2, pointer;
+html a,
+html button,
+html [role="button"],
+html .cursor-pointer,
+.cursor-pointer {
+  cursor: url("data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='2.3,2.8 2.4,3.8 10.0,23.1 10.6,23.8 11.4,23.9 11.9,23.4 13.9,14.5 14.3,13.9 23.4,11.7 23.9,11.3 23.9,10.3 23.3,9.8 3.5,2.3 2.8,2.3' fill='%23ff5e1a'/%3E%3C/svg%3E") 2 3, pointer;
 }
 
 /* Draggable & active states remain explicit */
