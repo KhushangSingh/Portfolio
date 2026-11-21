@@ -1,256 +1,341 @@
-import { useState } from 'react';
-import { Archive, Bookmark, Check, Library, MessageSquare, RotateCcw, Search, UsersRound } from 'lucide-react';
-import { demoTitles, initialLibrary, libraryStatuses, sampleInbox, searchDemoTitles, searchPrompts } from './demoData';
+import { useRef, useState } from 'react';
+import { MediaGrid, PlanButton, Poster } from './DemoMedia';
+import { ProfileView, TrackerView } from './DemoLibrary';
+import {
+  demoFriends, demoTitles, initialDates, initialLibrary, libraryStatuses,
+  sampleInbox, searchDemoTitles, searchPrompts
+} from './demoData';
+import './otakucircle-demo.css';
 
-const demoViews = [
-  { id: 'inbox', label: 'Friends', Icon: UsersRound },
-  { id: 'search', label: 'Smart Search', Icon: Search },
-  { id: 'library', label: 'Library', Icon: Library }
+const pages = [
+  ['home', 'Home'],
+  ['search', 'Smart Search'],
+  ['for-you', 'For You'],
+  ['friends', 'Friends']
 ];
+const mediaTypes = ['Anime', 'Manga'];
+const friendTaste = Math.round(demoFriends.reduce((sum, friend) => sum + friend.taste, 0) / demoFriends.length);
 
-function Poster({ title }) {
-  const [x, y, width, height] = title.crop;
+function DemoNavbar({ view, media, onMedia, onNavigate, onSearch }) {
+  const [text, setText] = useState('');
+  const [showNotifications, setShowNotifications] = useState(false);
 
-  return (
-    <span
-      aria-hidden="true"
-      className="oc-demo-poster"
-      style={{
-        backgroundSize: `${1480 / width * 100}% ${817 / height * 100}%`,
-        backgroundPosition: `${x / (1480 - width) * 100}% ${y / (817 - height) * 100}%`,
-      }}
-    />
-  );
-}
-
-function PlanButton({ title, status, onPlan }) {
-  const Icon = status ? Check : Bookmark;
+  function navigate(destination) {
+    setShowNotifications(false);
+    onNavigate(destination);
+  }
 
   return (
-    <button type="button" className="oc-demo-action oc-demo-watchlist" data-status={status} disabled={Boolean(status)} onClick={() => onPlan(title.id, 'planned')}>
-      <Icon size={16} aria-hidden="true" />
-      {status === 'planned' ? 'In Watchlist' : status ? libraryStatuses[status] : 'Watchlist'}
-    </button>
-  );
-}
-
-function InboxView({ library, archive, onArchive, onUpdate }) {
-  const [filter, setFilter] = useState('active');
-  const [selectedId, setSelectedId] = useState(sampleInbox[0].id);
-  const isArchive = filter === 'archive';
-  const isMultiFriend = filter === 'multi';
-  const groups = sampleInbox.filter(({ id, notes }) => archive.includes(id) === isArchive && (!isMultiFriend || notes.length > 1));
-  const activeGroups = sampleInbox.filter(({ id }) => !archive.includes(id));
-  const selected = groups.find(({ id }) => id === selectedId) ?? groups[0];
-  const title = selected && demoTitles[selected.id];
-
-  return (
-    <div className="oc-friends-view">
-      <header className="oc-friends-header">
-        <h3>Social Hub</h3>
-        <dl className="oc-friends-metrics">
-          <div><dt>Recs received</dt><dd>{sampleInbox.reduce((total, { notes }) => total + notes.length, 0)}</dd></div>
-          <div><dt>Active titles</dt><dd>{activeGroups.length}</dd></div>
-          <div><dt>Multi-friend titles</dt><dd>{activeGroups.filter(({ notes }) => notes.length > 1).length}</dd></div>
-        </dl>
-      </header>
-      <div className="oc-inbox">
-        <div className="oc-inbox-list">
-          <h3>Recommendations Stream</h3>
-          <div className="oc-demo-segment" role="group" aria-label="Filter recommendations">
-            <button type="button" aria-pressed={filter === 'active'} onClick={() => setFilter('active')}>Active <span>{activeGroups.length}</span></button>
-            <button type="button" aria-pressed={isMultiFriend} onClick={() => setFilter('multi')}>Multi-friend</button>
-            <button type="button" aria-pressed={isArchive} onClick={() => setFilter('archive')}>Archived <span>{archive.length}</span></button>
-          </div>
-          <ul className="oc-inbox-titles">
-            {groups.map(({ id, notes }) => (
-              <li key={id}>
-                <button type="button" aria-pressed={id === selected?.id} onClick={() => setSelectedId(id)}>
-                  <Poster title={demoTitles[id]} />
-                  <span className="oc-inbox-row-copy">
-                    <strong>{demoTitles[id].title}</strong><small>{demoTitles[id].genre}</small>
-                    <span className="oc-inbox-note-preview"><MessageSquare size={12} aria-hidden="true" /><span>{notes[0].message}</span></span>
-                  </span>
-                  <span className="oc-friend-count">{notes.length} {notes.length === 1 ? 'friend' : 'friends'}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-          {groups.length === 0 && <p className="oc-demo-empty">{isArchive ? 'Your archive is empty.' : isMultiFriend ? 'No active titles from multiple friends.' : 'Your inbox is clear.'}</p>}
-        </div>
-        <div className="oc-inbox-detail">
-          {selected ? (
-            <div className="oc-demo-content" key={selected.id}>
-              <div className="oc-inbox-title">
-                <Poster title={title} />
-                <div>
-                  <p className="oc-demo-meta">{title.type} · {title.genre} · {title.year}</p>
-                  <h3>{title.title}</h3>
-                  <p>{title.synopsis}</p>
-                </div>
-              </div>
-              <h4 className="oc-inbox-notes-heading"><MessageSquare size={16} aria-hidden="true" /> Friends’ notes</h4>
-              <ul className="oc-inbox-notes">
-                {selected.notes.map(({ friend, message }) => (
-                  <li key={friend}>
-                    <span aria-hidden="true">{friend[0]}</span>
-                    <div><strong>{friend}</strong><p>{message}</p></div>
-                  </li>
-                ))}
-              </ul>
-              <div className="oc-demo-actions">
-                <PlanButton title={title} status={library[title.id]} onPlan={onUpdate} />
-                {library[title.id] !== 'watched' && (
-                  <button type="button" className="oc-demo-action oc-demo-mark-watched" onClick={() => onUpdate(title.id, 'watched')}>
-                    <Check size={16} aria-hidden="true" /> Mark watched
-                  </button>
-                )}
-                <button type="button" className="oc-demo-action" onClick={() => onArchive(title.id, isArchive)}>
-                  {isArchive ? <RotateCcw size={16} aria-hidden="true" /> : <Archive size={16} aria-hidden="true" />}
-                  {isArchive ? 'Restore to inbox' : 'Archive'}
-                </button>
-              </div>
-            </div>
-          ) : <p className="oc-demo-empty">{isArchive ? 'Archived recommendations and their notes will appear here.' : isMultiFriend ? 'Switch to Active to see recommendations from one friend.' : 'You can restore titles from the archive at any time.'}</p>}
+    <header className="oc-demo-toolbar">
+      <div className="oc-demo-identity">
+        <button type="button" className="oc-demo-brand" onClick={() => navigate('home')}>OtakuCircle</button>
+        <div className="oc-demo-segment oc-demo-media-toggle" role="group" aria-label="Media type">
+          {mediaTypes.map((type) => (
+            <button key={type} type="button" aria-pressed={media === type} onClick={() => { setText(''); onMedia(type); }}>{type}</button>
+          ))}
         </div>
       </div>
+      <form className="oc-demo-global-search" role="search" aria-label="Search sample catalogue" onSubmit={(event) => {
+        event.preventDefault();
+        setShowNotifications(false);
+        onSearch(text);
+      }}>
+        <input type="search" aria-label={'Search ' + media.toLowerCase()} placeholder={'Search ' + media.toLowerCase() + '…'} value={text} onChange={(event) => setText(event.target.value)} />
+      </form>
+      <nav className="oc-demo-tabs" aria-label="OtakuCircle product navigation">
+        {pages.map(([page, label]) => (
+          <button type="button" key={page} aria-current={page === view ? 'page' : undefined} onClick={() => navigate(page)}>{label}</button>
+        ))}
+      </nav>
+      <div className="oc-demo-account">
+        <button type="button" className="oc-demo-notifications-button" aria-label="Notifications" aria-expanded={showNotifications} aria-controls="oc-demo-notifications" onClick={() => setShowNotifications((open) => !open)}>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 12a2 2 0 0 0 4 0" /></svg>
+        </button>
+        {showNotifications && <p id="oc-demo-notifications" className="oc-demo-notifications">You’re all caught up.</p>}
+        <button type="button" className="oc-demo-avatar oc-demo-profile-button" aria-label="My Profile" title="My Profile" aria-current={view === 'profile' || view === 'tracker' ? 'page' : undefined} onClick={() => navigate('profile')}>KS</button>
+      </div>
+    </header>
+  );
+}
+
+const trending = ['jujutsu-kaisen', 'demon-slayer', 'attack-on-titan', 'cyberpunk', 'ranking-of-kings', 'your-name', 'one-punch', 'naruto'];
+const popular = ['attack-on-titan', 'death-note', 'naruto', 'one-punch', 'jujutsu-kaisen', 'demon-slayer', 'hunter-x-hunter', 'code-geass'];
+
+function DiscoveryView({ forYou, media, library, onUpdate, onNavigate }) {
+  const [dismissed, setDismissed] = useState([]);
+  const catalogue = Object.values(demoTitles).filter((title) => title.media === media);
+  const watchedGenres = new Set(Object.keys(library).filter((id) => library[id] !== 'planned').map((id) => demoTitles[id].genre));
+  const titles = forYou ? catalogue.filter((title) => !library[title.id] && !dismissed.includes(title.id))
+    .sort((first, second) => Number(watchedGenres.has(second.genre)) - Number(watchedGenres.has(first.genre)) || second.rating - first.rating)
+    : catalogue;
+  const homeRows = media === 'Anime' ? [
+    ['Trending Now', trending.map((id) => demoTitles[id])],
+    ['Top Rated Masterpieces', [...catalogue].sort((first, second) => second.rating - first.rating)],
+    ['Popular Picks', popular.map((id) => demoTitles[id])]
+  ] : [['Trending Manga', catalogue]];
+
+  return (
+    <div className="oc-demo-page oc-discovery-view">
+      <header className="oc-discovery-hero" data-for-you={forYou}>
+        <h3>{forYou ? 'For You' : 'Discover ' + media}</h3>
+        <p>{forYou ? 'Recommendations based on your demo library and the genres you watch or read.' : 'Explore titles, keep track of your progress, and share what you find.'}</p>
+        <button type="button" className="oc-demo-action oc-demo-action-primary" onClick={() => onNavigate(forYou ? 'home' : 'search')}>
+          {forYou ? 'Browse Trending' : 'Try Smart Search'}
+        </button>
+      </header>
+      {!forYou && homeRows.map(([heading, items]) => (
+        <section key={heading} className="oc-discovery-shelf" aria-label={heading}>
+          <h4>{heading}</h4>
+          <MediaGrid items={items.slice(0, 8)} library={library} onUpdate={onUpdate} singleRow />
+        </section>
+      ))}
+      {forYou && <h4>Curated For You</h4>}
+      {forYou && (titles.length > 0 ? (
+        <MediaGrid items={titles} library={library} onUpdate={onUpdate} onDismiss={(id) => setDismissed((current) => [...current, id])} />
+      ) : (
+        <div className="oc-demo-empty">
+          <strong>You’re all caught up.</strong>
+          {dismissed.length > 0 && <button type="button" className="oc-demo-text-button" onClick={() => setDismissed([])}>Restore dismissed suggestions</button>}
+        </div>
+      ))}
     </div>
   );
 }
 
-function SearchView({ library, onPlan }) {
-  const [query, setQuery] = useState(searchPrompts[0]);
-  const [submitted, setSubmitted] = useState(searchPrompts[0]);
-  const results = searchDemoTitles(submitted);
+function SearchView({ library, media, initialQuery, onUpdate }) {
+  const [query, setQuery] = useState(initialQuery);
+  const [submitted, setSubmitted] = useState(initialQuery);
+  const results = searchDemoTitles(submitted, media);
+  const examples = searchPrompts[media];
 
   return (
-    <div className="oc-search-view">
+    <div className="oc-demo-page oc-search-view">
       <div className="oc-search-hero">
         <div>
-          <h3>Search by Feeling &amp; Context</h3>
-          <p>Describe the plot, a scene, or a character you remember.</p>
+          <h3>Search by<br /><span>Feeling &amp; Context</span></h3>
+          <p>Don’t recall the name? Describe the plot, the vibe, or the characters.</p>
         </div>
         <div>
-          <form className="oc-search-form" role="search" onSubmit={(event) => { event.preventDefault(); setSubmitted(query.trim()); }}>
-            <label className="oc-search-input">
-              <Search size={19} aria-hidden="true" />
-              <span className="sr-only">Describe a scene, character or plot</span>
-              <input value={query} maxLength={160} onChange={(event) => setQuery(event.target.value)} placeholder="Describe an anime" />
-            </label>
-            <button type="submit" className="oc-demo-action oc-demo-action-primary">Search</button>
+          <form className="oc-search-form" role="search" aria-label="Search by feeling and context" onSubmit={(event) => { event.preventDefault(); setSubmitted(query.trim()); }}>
+            <input type="search" aria-label="Describe a scene, character or plot" value={query} maxLength={160} onChange={(event) => setQuery(event.target.value)} placeholder={media === 'Anime' ? 'Describe an anime scene…' : 'Describe a manga scene…'} />
+            <button type="submit">Search</button>
           </form>
           <div className="oc-search-examples" role="group" aria-label="Example search prompts">
-            {searchPrompts.map((prompt) => (
+            <span>Examples</span>
+            {examples.map((prompt) => (
               <button type="button" key={prompt} onClick={() => { setQuery(prompt); setSubmitted(prompt); }}>{prompt}</button>
             ))}
           </div>
         </div>
       </div>
-      <p className="oc-demo-meta oc-search-result-count" aria-live="polite">
-        {submitted ? `All Matches · ${results.length}` : 'Enter a description or choose an example.'}
-      </p>
+      <div className="oc-search-result-count" role="status"><span>All Matches <strong>{results.length}</strong></span></div>
       {submitted && (results.length ? (
-        <ul className="oc-search-results oc-demo-content" key={submitted}>
-          {results.map((title) => (
-            <li key={title.id}>
-              <div className="oc-search-poster"><Poster title={title} /><span>Anime</span></div>
-              <div><h4>{title.title}</h4><p>{title.type} · {title.year}</p><p className="oc-search-synopsis">{title.synopsis}</p></div>
-              <PlanButton title={title} status={library[title.id]} onPlan={onPlan} />
-            </li>
-          ))}
-        </ul>
-      ) : <p className="oc-demo-empty">No sample titles match yet. Try a shorter clue or use one of the examples.</p>)}
+        <section className="oc-search-results" aria-labelledby="oc-demo-search-results">
+          <div className="oc-section-line">
+            <h4 id="oc-demo-search-results">Top Matches</h4><p className="oc-demo-meta">{results.length} titles found</p>
+          </div>
+          <MediaGrid items={results} library={library} onUpdate={onUpdate} />
+        </section>
+      ) : <p className="oc-demo-empty">No sample titles match. Try one of the examples.</p>)}
     </div>
   );
 }
 
-function LibraryView({ library, onUpdate }) {
-  const [filter, setFilter] = useState('all');
-  const items = Object.entries(library);
-  const counts = Object.fromEntries(Object.keys(libraryStatuses).map((status) => [status, items.filter(([, value]) => value === status).length]));
-  const visibleItems = filter === 'all' ? items : items.filter(([, status]) => status === filter);
+function RecommendationCard({ title, notes, status, archived, onArchive, onUpdate }) {
+  return (
+    <li className="oc-inbox-card">
+      <Poster title={title} />
+      <div className="oc-inbox-card-body">
+        <div className="oc-inbox-meta">
+          <span>{title.rating.toFixed(1)}</span><span>{title.year}</span>
+          <span className="oc-friend-count">{notes.length} {notes.length === 1 ? 'friend' : 'friends'}</span>
+        </div>
+        <h5>{title.title}</h5>
+        <p className="oc-demo-meta">{title.genre}</p>
+        <details className="oc-inbox-notes">
+          <summary aria-label={'Read friends’ notes for ' + title.title}><strong>{notes[0].friend}</strong> {notes[0].message}</summary>
+          <ul>{notes.map(({ friend, message }) => <li key={friend}><strong>{friend}</strong><p>{message}</p></li>)}</ul>
+        </details>
+        <div className="oc-demo-actions">
+          <PlanButton title={title} status={status} onPlan={onUpdate} />
+          {status !== 'watched' && <button type="button" className="oc-demo-action oc-demo-mark-watched" onClick={() => onUpdate(title.id, 'watched')}>Mark {title.media === 'Anime' ? 'watched' : 'read'}</button>}
+          <button type="button" className="oc-demo-action" onClick={() => onArchive(title.id, archived)}>{archived ? 'Restore' : 'Archive'}</button>
+        </div>
+      </div>
+    </li>
+  );
+}
+
+function FriendsView({ library, archive, onArchive, onUpdate }) {
+  const [filter, setFilter] = useState('recommended');
+  const [sender, setSender] = useState('');
+  const [query, setQuery] = useState('');
+  const [friendQuery, setFriendQuery] = useState('');
+  const [requests, setRequests] = useState('received');
+  const [openFriend, setOpenFriend] = useState('');
+  const active = sampleInbox.filter(({ id }) => !archive.includes(id));
+  const endorsed = active.filter(({ notes }) => notes.length > 1);
+  const archived = filter === 'archive';
+  const viewGroups = archived ? sampleInbox.filter(({ id }) => archive.includes(id)) : filter === 'endorsed' ? endorsed : active;
+  const groups = viewGroups.filter(({ id, notes }) =>
+    demoTitles[id].title.toLowerCase().includes(query.trim().toLowerCase()) && (!sender || notes.some(({ friend }) => friend === sender))
+  );
+  const matchingFriends = demoFriends.filter(({ name }) => name.toLowerCase().includes(friendQuery.trim().toLowerCase()));
 
   return (
-    <div className="oc-library-view">
-      <div className="oc-library-header">
-        <h3>Your watch library</h3>
-        <label>Filter <select value={filter} onChange={(event) => setFilter(event.target.value)}>
-          <option value="all">All statuses</option>
-          {Object.entries(libraryStatuses).map(([status, label]) => <option key={status} value={status}>{label}</option>)}
-        </select></label>
+    <div className="oc-demo-page oc-friends-view">
+      <header className="oc-friends-header">
+        <div>
+          <h3>Social Hub</h3>
+          <p>Discover peer-endorsed titles, compare tastes, and manage recommendations.</p>
+        </div>
+        <input type="search" aria-label="Find fellow otakus" placeholder="Find fellow otakus…" value={friendQuery} onChange={(event) => setFriendQuery(event.target.value)} />
+      </header>
+      <div className="oc-friends-layout">
+        <div>
+          <section aria-label="Circle Social Analytics">
+            <h4>Circle Social Analytics</h4>
+            <p className="oc-demo-meta">See how recommendations and shared taste overlap.</p>
+            <dl className="oc-friends-metrics">
+              <div><dt>Recs received</dt><dd>{sampleInbox.reduce((total, { notes }) => total + notes.length, 0)}</dd><small>{active.length} active in inbox</small></div>
+              <div><dt>Multi-friend endorsed</dt><dd>{endorsed.length}</dd><button type="button" className="oc-demo-text-button" onClick={() => setFilter('endorsed')}>From 2+ friends</button></div>
+              <div><dt>Avg circle taste</dt><dd>{friendTaste}%</dd><small>Taste alignment</small></div>
+              <div><dt>Circle friends</dt><dd>{demoFriends.length}</dd><small>Connected peers</small></div>
+            </dl>
+          </section>
+          <section className="oc-inbox-list" aria-labelledby="oc-inbox-title">
+            <h4 id="oc-inbox-title">Recommendations Stream</h4>
+            <p className="oc-demo-meta">Peer suggestions tailored for you</p>
+            <div className="oc-inbox-filters">
+              <input type="search" aria-label="Search recommendations" placeholder="Search…" value={query} onChange={(event) => setQuery(event.target.value)} />
+              <select aria-label="Filter recommendations by friend" value={sender} onChange={(event) => setSender(event.target.value)}>
+                <option value="">All Friends</option>
+                {demoFriends.map(({ name }) => <option key={name}>{name}</option>)}
+              </select>
+              <select aria-label="Recommendation view" value={filter} onChange={(event) => setFilter(event.target.value)}>
+                <option value="recommended">Recommended</option>
+                <option value="endorsed">Multi-friend</option>
+                <option value="archive">Archived</option>
+              </select>
+            </div>
+            {groups.length > 0 ? (
+              <ul className="oc-inbox-titles">
+                {groups.map(({ id, notes }) => <RecommendationCard key={id} title={demoTitles[id]} notes={notes} status={library[id]} archived={archived} onArchive={onArchive} onUpdate={onUpdate} />)}
+              </ul>
+            ) : <p className="oc-demo-empty">No recommendations match this view.</p>}
+          </section>
+        </div>
+        <aside className="oc-friends-sidebar">
+          <section aria-label="Friend Requests">
+            <h4>Friend Requests</h4>
+            <div className="oc-demo-segment oc-request-tabs" role="group" aria-label="Request direction">
+              {['received', 'sent'].map((type) => <button key={type} type="button" aria-pressed={requests === type} onClick={() => setRequests(type)}>{type === 'received' ? 'Received' : 'Sent'} (0)</button>)}
+            </div>
+            <p className="oc-demo-empty">{requests === 'received' ? 'No pending requests received' : 'No pending requests sent'}</p>
+          </section>
+          <section aria-label="Your Circle">
+            <div className="oc-section-line"><h4>Your Circle ({demoFriends.length})</h4><span className="oc-demo-meta">Connected peers</span></div>
+            <ul className="oc-circle-list">
+              {matchingFriends.map(({ name, taste, genre }) => (
+                <li key={name}>
+                  <span className="oc-demo-avatar" aria-hidden="true">{name[0]}</span>
+                  <div><strong>{name}</strong><p>{taste}% Shared Taste</p></div>
+                  <button type="button" className="oc-demo-rose-button" aria-label={'Profile for ' + name} aria-expanded={name === openFriend} onClick={() => setOpenFriend((current) => current === name ? '' : name)}>Profile</button>
+                  {name === openFriend && <p className="oc-circle-detail">{name} likes {genre.toLowerCase()}.</p>}
+                </li>
+              ))}
+            </ul>
+            {!matchingFriends.length && <p className="oc-demo-empty">No matching friends in this sample.</p>}
+          </section>
+        </aside>
       </div>
-      <dl className="oc-library-counts">
-        {Object.entries(libraryStatuses).map(([status, label]) => (
-          <div key={status}><dt>{label}</dt><dd>{counts[status]}</dd></div>
-        ))}
-      </dl>
-      {visibleItems.length ? (
-        <ul className="oc-library-items">
-          {visibleItems.map(([id, status]) => {
-            const title = demoTitles[id];
-
-            return (
-              <li key={id}>
-                <Poster title={title} />
-                <div><h4>{title.title}</h4><p>{title.type} · {title.genre} · {title.year}</p></div>
-                <select aria-label={`Viewing status for ${title.title}`} value={status} onChange={(event) => onUpdate(id, event.target.value)}>
-                  {Object.entries(libraryStatuses).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-                </select>
-              </li>
-            );
-          })}
-        </ul>
-      ) : <p className="oc-demo-empty">No titles with this status. Try another filter or plan a title from the inbox.</p>}
     </div>
   );
 }
 
 export default function OtakuCircleDemo() {
-  const [view, setView] = useState('inbox');
+  const viewport = useRef(null);
+  const [view, setView] = useState('friends');
+  const [media, setMedia] = useState('Anime');
   const [library, setLibrary] = useState(initialLibrary);
+  const [dates, setDates] = useState(initialDates);
   const [archive, setArchive] = useState([]);
   const [notice, setNotice] = useState('');
-  const [resetVersion, setResetVersion] = useState(0);
+  const [query, setQuery] = useState('');
+  const [trackerFilter, setTrackerFilter] = useState('all');
+  const [viewVersion, setViewVersion] = useState(0);
+
+  function navigate(destination, value = '') {
+    setQuery(destination === 'search' ? value.trim() : '');
+    setTrackerFilter(destination === 'tracker' && value ? value : 'all');
+    setView(destination);
+    setViewVersion((version) => version + 1);
+    if (viewport.current) viewport.current.scrollTop = 0;
+  }
+
+  function changeMedia(type) {
+    if (type === media) return;
+    setMedia(type);
+    setQuery('');
+    if (viewport.current) viewport.current.scrollTop = 0;
+  }
 
   function updateLibrary(id, status) {
     setLibrary((items) => ({ ...items, [id]: status }));
-    setNotice(`${demoTitles[id].title} · ${libraryStatuses[status]}`);
+    setNotice(demoTitles[id].title + ' · ' + libraryStatuses[status]);
+  }
+
+  function changeDate(id, field, date) {
+    setDates((previous) => ({ ...previous, [id]: { ...previous[id], [field]: date } }));
+  }
+
+  function removeTitle(id) {
+    setLibrary((items) => {
+      const next = { ...items };
+      delete next[id];
+      return next;
+    });
+    setDates((previous) => {
+      const next = { ...previous };
+      delete next[id];
+      return next;
+    });
+    setNotice(demoTitles[id].title + ' removed from your library');
   }
 
   function updateArchive(id, restore) {
     setArchive((items) => restore ? items.filter((item) => item !== id) : [...new Set([...items, id])]);
-    setNotice(`${demoTitles[id].title} ${restore ? 'restored to inbox' : 'archived'}`);
+    setNotice(demoTitles[id].title + (restore ? ' restored to inbox' : ' archived'));
   }
 
   function resetDemo() {
-    setView('inbox');
     setLibrary(initialLibrary);
+    setDates(initialDates);
     setArchive([]);
-    setResetVersion((value) => value + 1);
+    setMedia('Anime');
     setNotice('Demo reset');
+    navigate('friends');
   }
 
   return (
-    <div className="oc-demo" aria-label="Interactive OtakuCircle demo">
-      <div className="oc-demo-toolbar">
-        <div className="oc-demo-brand"><img src="/images/otakucircle/logo.png" alt="" width="32" height="32" loading="lazy" /> OtakuCircle</div>
-        <div className="oc-demo-tabs" role="group" aria-label="Choose a feature to try">
-          {demoViews.map(({ id, label, Icon }) => (
-            <button type="button" key={id} aria-pressed={view === id} onClick={() => setView(id)}>
-              <Icon size={17} aria-hidden="true" /> {label}
-            </button>
-          ))}
+    <div className="oc-demo-shell">
+      <div className="oc-demo">
+        <div className="oc-demo-viewport" ref={viewport} tabIndex={0} role="region" aria-label="Scrollable OtakuCircle demo" data-lenis-prevent>
+          <DemoNavbar view={view} media={media} onMedia={changeMedia} onNavigate={navigate} onSearch={(value) => navigate('search', value)} />
+          <div className="oc-demo-content" key={viewVersion + '-' + media}>
+            {view === 'home' && <DiscoveryView media={media} library={library} onUpdate={updateLibrary} onNavigate={navigate} />}
+            {view === 'search' && <SearchView media={media} library={library} initialQuery={query} onUpdate={updateLibrary} />}
+            {view === 'for-you' && <DiscoveryView forYou media={media} library={library} onUpdate={updateLibrary} onNavigate={navigate} />}
+            {view === 'friends' && <FriendsView library={library} archive={archive} onArchive={updateArchive} onUpdate={updateLibrary} />}
+            {view === 'profile' && <ProfileView library={library} archive={archive} onTracker={(status) => navigate('tracker', status)} />}
+            {view === 'tracker' && <TrackerView library={library} dates={dates} initialStatus={trackerFilter} onProfile={() => navigate('profile')} onUpdate={updateLibrary} onDate={changeDate} onRemove={removeTitle} />}
+          </div>
         </div>
-        <button type="button" className="oc-demo-reset" onClick={resetDemo}><RotateCcw size={15} aria-hidden="true" /> Reset demo</button>
-      </div>
-      <div className="oc-demo-stage oc-demo-content" key={`${view}-${resetVersion}`}>
-        {view === 'inbox' && <InboxView library={library} archive={archive} onArchive={updateArchive} onUpdate={updateLibrary} />}
-        {view === 'search' && <SearchView library={library} onPlan={updateLibrary} />}
-        {view === 'library' && <LibraryView library={library} onUpdate={updateLibrary} />}
       </div>
       <div className="oc-demo-footer">
-        <p>Sample friends and titles. Smart Search matches this demo’s local catalogue.</p>
+        <p>Changes stay in this demo. Smart Search uses a sample catalogue.</p>
         <p role="status">{notice}</p>
+        <button type="button" className="oc-demo-text-button" onClick={resetDemo}>Reset demo</button>
       </div>
     </div>
   );
