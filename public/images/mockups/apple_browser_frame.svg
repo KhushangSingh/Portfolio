@@ -1,0 +1,12 @@
+<svg viewBox="0 0 627 451" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Apple Browser Window Frame -->
+  <rect width="627" height="451" rx="14" fill="#FFFFFF"/>
+  <rect x="0.5" y="0.5" width="626" height="450" rx="13.5" stroke="#E2E2DF" stroke-width="1"/>
+  <!-- Top Bar -->
+  <path d="M0 14C0 6.26801 6.26801 0 14 0H613C620.732 0 627 6.26801 627 14V36H0V14Z" fill="#F1F1EE"/>
+  <line x1="0" y1="36" x2="627" y2="36" stroke="#E2E2DF" stroke-width="1"/>
+  <!-- macOS Traffic Lights -->
+  <circle cx="22" cy="18" r="5.5" fill="#FF5F56" stroke="#E0443E" stroke-width="0.5"/>
+  <circle cx="39" cy="18" r="5.5" fill="#FFBD2E" stroke="#DEA123" stroke-width="0.5"/>
+  <circle cx="56" cy="18" r="5.5" fill="#27C93F" stroke="#1AAB29" stroke-width="0.5"/>
+</svg>

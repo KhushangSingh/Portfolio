@@ -161,6 +161,8 @@ export const logPageView = (path = '/') => {
   // 2. Exclude internal studio and admin routes
   const normalizedPath = path || '/';
   if (
+    normalizedPath.startsWith('/hq') ||
+    normalizedPath.startsWith('/headquarters') ||
     normalizedPath.startsWith('/dashboard') ||
     normalizedPath.startsWith('/analytics') ||
     normalizedPath.startsWith('/inbox')

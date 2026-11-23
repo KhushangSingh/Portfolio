@@ -101,7 +101,7 @@ export default function Dashboard() {
     }
   };
 
-  const handleLockDashboard = () => {
+  const handleLockHQ = () => {
     try { playSoundEffect('switch'); } catch { /* ignore */ }
     localStorage.removeItem('khushang_studio_auth');
     sessionStorage.removeItem('khushang_studio_auth');
@@ -298,7 +298,7 @@ export default function Dashboard() {
         }`}>
           <div className="flex flex-col items-center text-center space-y-2 mb-8">
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
-              Studio Dashboard
+              Studio HQ
             </h1>
             <p className="text-xs text-neutral-500 max-w-xs leading-relaxed">
               Restricted management access. Authorization required to inspect inquiries and live telemetry.
@@ -347,7 +347,7 @@ export default function Dashboard() {
               type="submit"
               className="w-full py-3 rounded-xl text-xs font-sans font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all shadow-md cursor-pointer mt-2"
             >
-              Unlock Dashboard
+              Unlock HQ
             </button>
           </form>
 
@@ -374,13 +374,13 @@ export default function Dashboard() {
       <div className="max-w-[1500px] mx-auto">
         <div className="flex flex-col lg:flex-row gap-8 items-start">
           
-          {/* LEFT SIDEBAR: Navigation tabs, Portfolio Home link and Lock Dashboard button */}
+          {/* LEFT SIDEBAR: Navigation tabs, Portfolio Home link and Lock HQ button */}
           <aside className={`w-full lg:w-64 lg:sticky lg:top-36 lg:mt-6 shrink-0 rounded-2xl border p-4 sm:p-5 flex flex-col gap-6 ${
             isDark ? 'bg-[#0e0f14] border-white/10' : 'bg-white border-black/10 shadow-sm'
           }`}>
             <div>
               <h1 className="text-xl sm:text-2xl font-black tracking-tight">
-                Studio Dashboard
+                Studio HQ
               </h1>
               <p className="text-xs text-neutral-500 font-sans mt-1">
                 Management Terminal
@@ -388,7 +388,7 @@ export default function Dashboard() {
             </div>
 
             {/* Vertical Navigation Tabs */}
-            <nav aria-label="Dashboard views" className="flex flex-col gap-1.5">
+            <nav aria-label="HQ views" className="flex flex-col gap-1.5">
               <button
                 onClick={() => setActiveTab('messages')}
                 className={`w-full px-4 py-2.5 rounded-xl text-xs font-sans font-bold uppercase tracking-wider transition-all flex items-center justify-between text-left cursor-pointer ${
@@ -453,11 +453,11 @@ export default function Dashboard() {
               </Link>
 
               <button
-                onClick={handleLockDashboard}
+                onClick={handleLockHQ}
                 className="w-full px-4 py-2.5 rounded-xl text-xs font-sans font-bold uppercase tracking-wider border border-red-500/25 text-red-400 hover:bg-red-500/10 transition-all cursor-pointer text-center"
-                title="Lock dashboard and end session"
+                title="Lock HQ and end session"
               >
-                Lock Dashboard
+                Lock HQ
               </button>
             </div>
           </aside>
@@ -1250,7 +1250,7 @@ export default function Dashboard() {
                   Update Studio Passcode
                 </h3>
                 <p className="text-xs sm:text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
-                  Update the confidential passcode required to unlock this dashboard from any browser.
+                  Update the confidential passcode required to unlock HQ from any browser.
                 </p>
 
                 {passcodeSuccessMsg && (

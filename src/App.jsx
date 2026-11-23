@@ -61,13 +61,15 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<Designer />} />
           <Route path="/summary" element={<PortfolioSummary />} />
-          <Route path="/dashboard" element={(
-            <Suspense fallback={<p className="sr-only" role="status">Opening studio dashboard</p>}>
+          <Route path="/hq" element={(
+            <Suspense fallback={<p className="sr-only" role="status">Opening studio HQ</p>}>
               <Dashboard />
             </Suspense>
           )} />
-          <Route path="/analytics" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/inbox" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/headquarters" element={<Navigate to="/hq" replace />} />
+          <Route path="/dashboard" element={<Navigate to="/hq" replace />} />
+          <Route path="/analytics" element={<Navigate to="/hq" replace />} />
+          <Route path="/inbox" element={<Navigate to="/hq" replace />} />
           <Route path="/contact" element={<Navigate to="/#contact" replace />} />
           <Route path={OTAKU_CIRCLE_CASE_STUDY} element={(
             <Suspense fallback={<p className="sr-only" role="status">Opening the OtakuCircle case study</p>}>

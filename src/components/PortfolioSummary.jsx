@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import BrandMark from './BrandMark';
-import LaptopPhoneMockup from './LaptopPhoneMockup';
+import AppleBrowserMockup from './AppleBrowserMockup';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
@@ -47,7 +47,7 @@ export default function PortfolioSummary() {
       
       {/* 1. MAIN RESUME CONTENT CONTAINER */}
       {/* Generous top clearance (pt-28 sm:pt-32 md:pt-36) keeps content safely below the fixed name bulb on the top-left and music button on the top-right */}
-      <main className="max-w-[1200px] mx-auto px-6 md:px-12 pt-28 sm:pt-32 md:pt-36 pb-16 md:pb-24 flex flex-col gap-14 md:gap-18">
+      <main className="max-w-[1440px] xl:max-w-[1520px] mx-auto px-4 sm:px-6 md:px-8 lg:px-10 pt-28 sm:pt-32 md:pt-36 pb-16 md:pb-24 flex flex-col gap-14 md:gap-18">
         
         {/* Navigation & Action Bar: Positioned safely within page flow away from fixed header corners */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-8 border-b border-black/10 dark:border-white/10">
@@ -184,11 +184,11 @@ export default function PortfolioSummary() {
                 </Link>
               </div>
 
-              <div className="w-full md:w-72 lg:w-80 xl:w-96 shrink-0">
-                <LaptopPhoneMockup
-                  desktopSrc="/images/otakucircle/landing.webp"
-                  alt="OtakuCircle"
-                  className="transition-transform duration-300 ease-out group-hover:scale-[1.02] drop-shadow-md"
+              <div className="w-full md:w-80 lg:w-[440px] xl:w-[500px] shrink-0">
+                <AppleBrowserMockup
+                  src="/images/otakucircle/landing.webp"
+                  alt="OtakuCircle desktop experience"
+                  className="transition-transform duration-300 ease-out group-hover:scale-[1.02]"
                   loading="lazy"
                 />
               </div>
@@ -222,11 +222,11 @@ export default function PortfolioSummary() {
                 </div>
               </div>
 
-              <div className="w-full md:w-72 lg:w-80 xl:w-96 shrink-0">
-                <LaptopPhoneMockup
-                  desktopSrc="/images/squadsync_cover.jpg"
-                  alt="SquadSync"
-                  className="transition-transform duration-300 ease-out group-hover:scale-[1.02] drop-shadow-md"
+              <div className="w-full md:w-80 lg:w-[440px] xl:w-[500px] shrink-0">
+                <AppleBrowserMockup
+                  src="/images/squadsync_cover.jpg"
+                  alt="SquadSync desktop experience"
+                  className="transition-transform duration-300 ease-out group-hover:scale-[1.02]"
                   loading="lazy"
                 />
               </div>
@@ -260,11 +260,11 @@ export default function PortfolioSummary() {
                 </div>
               </div>
 
-              <div className="w-full md:w-72 lg:w-80 xl:w-96 shrink-0">
-                <LaptopPhoneMockup
-                  desktopSrc="/images/ledgerly_cover.jpg"
-                  alt="Ledgerly"
-                  className="transition-transform duration-300 ease-out group-hover:scale-[1.02] drop-shadow-md"
+              <div className="w-full md:w-80 lg:w-[440px] xl:w-[500px] shrink-0">
+                <AppleBrowserMockup
+                  src="/images/ledgerly_cover.jpg"
+                  alt="Ledgerly desktop experience"
+                  className="transition-transform duration-300 ease-out group-hover:scale-[1.02]"
                   loading="lazy"
                 />
               </div>

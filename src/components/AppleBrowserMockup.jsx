@@ -1,0 +1,78 @@
+import React from 'react';
+import { useTheme } from '../context/ThemeContext';
+
+/**
+ * AppleBrowserMockup Component
+ * Renders an authentic macOS Apple browser window mockup for flagship website project previews.
+ */
+export default function AppleBrowserMockup({
+  src,
+  alt = 'Project preview',
+  className = '',
+  loading = 'lazy',
+  priority = false,
+  aspectRatio = 'aspect-[627/451]',
+  objectPosition = 'object-top'
+}) {
+  const { isDark } = useTheme();
+  const loadMode = priority ? 'eager' : loading;
+
+  return (
+    <div
+      className={`relative w-full rounded-xl sm:rounded-2xl border overflow-hidden shadow-lg transition-all duration-300 ${
+        isDark 
+          ? 'bg-[#15161b] border-white/10 shadow-black/50' 
+          : 'bg-white border-black/10 shadow-black/5'
+      } ${className}`}
+      role="figure"
+      aria-label={alt}
+    >
+      {/* 1. APPLE MACOS BROWSER TOP BAR */}
+      <div className={`h-8 sm:h-9 px-3 sm:px-4 flex items-center justify-between border-b select-none ${
+        isDark 
+          ? 'bg-[#1e1f26] border-white/10' 
+          : 'bg-[#EDEDEB] border-black/10'
+      }`}>
+        {/* macOS Traffic Lights (Close, Minimize, Expand) */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <span 
+            className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#FF5F56] border border-[#E0443E]/40 inline-block shrink-0 shadow-xs" 
+            aria-hidden="true" 
+          />
+          <span 
+            className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123]/40 inline-block shrink-0 shadow-xs" 
+            aria-hidden="true" 
+          />
+          <span 
+            className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#27C93F] border border-[#1AAB29]/40 inline-block shrink-0 shadow-xs" 
+            aria-hidden="true" 
+          />
+        </div>
+
+        {/* Minimalist URL pill placeholder */}
+        <div 
+          className={`w-32 sm:w-48 h-4 sm:h-5 rounded-md mx-auto hidden sm:block ${
+            isDark ? 'bg-white/5' : 'bg-black/5'
+          }`} 
+          aria-hidden="true" 
+        />
+
+        {/* Symmetrical right spacer */}
+        <div className="w-8 sm:w-12" aria-hidden="true" />
+      </div>
+
+      {/* 2. BROWSER VIEWPORT APERTURE (Website Screen) */}
+      <div className={`relative w-full overflow-hidden ${aspectRatio} ${
+        isDark ? 'bg-black' : 'bg-white'
+      }`}>
+        <img
+          src={src}
+          alt={alt}
+          className={`w-full h-full object-cover ${objectPosition}`}
+          loading={loadMode}
+          decoding="async"
+        />
+      </div>
+    </div>
+  );
+}
