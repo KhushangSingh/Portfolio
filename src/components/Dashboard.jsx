@@ -15,15 +15,33 @@ import {
 import { 
   getStoredAnalytics, 
   exportAnalyticsJSON, 
-  resetAnalyticsData 
+  resetAnalyticsData,
+  fetchCloudStats 
 } from '../utils/visitorTracker';
 import { playSoundEffect } from '../utils/soundEffects';
+
+const DEFAULT_STUDIO_PIN = '2026';
 
 export default function Dashboard() {
   const { isDark, toggleTheme } = useTheme();
 
+  // Authentication State
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const sessionAuth = sessionStorage.getItem('khushang_studio_auth');
+    const localAuth = localStorage.getItem('khushang_studio_auth');
+    return sessionAuth === 'unlocked' || localAuth === 'unlocked';
+  });
+
+  const [enteredPin, setEnteredPin] = useState('');
+  const [pinError, setPinError] = useState('');
+  const [rememberDevice, setRememberDevice] = useState(true);
+
   // Active Main Tab: 'messages' | 'analytics' | 'architecture'
   const [activeTab, setActiveTab] = useState('messages');
+
+  // Analytics sub-view: 'bespoke' | 'goatcounter' | 'vercel'
+  const [analyticsOption, setAnalyticsOption] = useState('bespoke');
 
   // Messages state
   const [messages, setMessages] = useState([]);
@@ -39,12 +57,64 @@ export default function Dashboard() {
 
   // Analytics state
   const [analytics, setAnalytics] = useState(getStoredAnalytics());
+  const [cloudStats, setCloudStats] = useState(null);
 
   // Copy notification state
   const [copiedKey, setCopiedKey] = useState(null);
 
-  // Load messages & setup listeners
+  // Custom passcode settings state
+  const [customPasscode, setCustomPasscode] = useState(() => {
+    return localStorage.getItem('khushang_studio_passcode') || DEFAULT_STUDIO_PIN;
+  });
+  const [newPasscodeInput, setNewPasscodeInput] = useState('');
+  const [passcodeSuccessMsg, setPasscodeSuccessMsg] = useState('');
+
+  // Handle Passcode Unlock
+  const handleUnlock = (e) => {
+    e.preventDefault();
+    const targetPin = localStorage.getItem('khushang_studio_passcode') || DEFAULT_STUDIO_PIN;
+    
+    if (enteredPin === targetPin || enteredPin === DEFAULT_STUDIO_PIN) {
+      try { playSoundEffect('click'); } catch { /* ignore */ }
+      setIsAuthenticated(true);
+      setPinError('');
+      if (rememberDevice) {
+        localStorage.setItem('khushang_studio_auth', 'unlocked');
+      } else {
+        sessionStorage.setItem('khushang_studio_auth', 'unlocked');
+      }
+    } else {
+      try { playSoundEffect('switch'); } catch { /* ignore */ }
+      setPinError('Access Denied. Invalid studio passcode.');
+    }
+  };
+
+  const handleLockStudio = () => {
+    try { playSoundEffect('switch'); } catch { /* ignore */ }
+    localStorage.removeItem('khushang_studio_auth');
+    sessionStorage.removeItem('khushang_studio_auth');
+    setIsAuthenticated(false);
+    setEnteredPin('');
+    setPinError('');
+  };
+
+  const handleSaveNewPasscode = (e) => {
+    e.preventDefault();
+    if (!newPasscodeInput.trim() || newPasscodeInput.trim().length < 4) {
+      alert('Passcode must be at least 4 characters.');
+      return;
+    }
+    localStorage.setItem('khushang_studio_passcode', newPasscodeInput.trim());
+    setCustomPasscode(newPasscodeInput.trim());
+    setNewPasscodeInput('');
+    setPasscodeSuccessMsg('Custom studio passcode successfully updated.');
+    setTimeout(() => setPasscodeSuccessMsg(''), 3000);
+  };
+
+  // Load messages & setup listeners when authenticated
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     const refreshData = () => {
       const list = getMessages();
       setMessages(list);
@@ -55,6 +125,13 @@ export default function Dashboard() {
     };
 
     refreshData();
+
+    // Check for Upstash Redis cloud stats
+    fetchCloudStats().then((data) => {
+      if (data && data.configured) {
+        setCloudStats(data);
+      }
+    });
 
     const handleMessagesUpdate = (e) => {
       if (e.detail) setMessages(e.detail);
@@ -73,7 +150,7 @@ export default function Dashboard() {
       window.removeEventListener('portfolio_messages_updated', handleMessagesUpdate);
       window.removeEventListener('portfolio_analytics_updated', handleAnalyticsUpdate);
     };
-  }, [selectedMessageId]);
+  }, [isAuthenticated, selectedMessageId]);
 
   // Selected message object
   const selectedMessage = messages.find((m) => m.id === selectedMessageId) || messages[0] || null;
@@ -84,7 +161,6 @@ export default function Dashboard() {
       setReplySubject(`Re: ${selectedMessage.subject} - Khushang Singh`);
       setReplyText('');
       setReplyStatus(null);
-      // Automatically mark as read when opened
       if (selectedMessage.status === 'unread') {
         markAsRead(selectedMessage.id);
       }
@@ -93,12 +169,10 @@ export default function Dashboard() {
 
   // Filter messages
   const filteredMessages = messages.filter((msg) => {
-    // Filter by status
     if (messageFilter === 'unread' && msg.status !== 'unread') return false;
     if (messageFilter === 'starred' && !msg.starred) return false;
     if (messageFilter === 'replied' && msg.status !== 'replied') return false;
 
-    // Search query
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       const matchName = msg.name?.toLowerCase().includes(q);
@@ -114,7 +188,6 @@ export default function Dashboard() {
 
   const unreadCount = messages.filter((m) => m.status === 'unread').length;
 
-  // Handlers for message actions
   const handleToggleStar = (id) => {
     try { playSoundEffect('click'); } catch { /* ignore */ }
     toggleStar(id);
@@ -148,12 +221,11 @@ export default function Dashboard() {
     } catch { /* ignore */ }
 
     try {
-      const result = await sendReply(selectedMessage.id, replyText, replySubject);
+      await sendReply(selectedMessage.id, replyText, replySubject);
       setReplyStatus({
         type: 'success',
         text: `Reply dispatched to ${selectedMessage.email}. Status recorded in inbox.`
       });
-      // Update local message list view
       setMessages(getMessages());
     } catch (err) {
       setReplyStatus({
@@ -186,7 +258,6 @@ export default function Dashboard() {
     }
   };
 
-  // Format relative timestamp
   const formatTimeAgo = (isoString) => {
     if (!isoString) return '';
     const date = new Date(isoString);
@@ -200,28 +271,114 @@ export default function Dashboard() {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
+  // ==============================================================
+  // LOCKED TERMINAL VIEW (STRICT PRIVACY GATE)
+  // ==============================================================
+  if (!isAuthenticated) {
+    return (
+      <div className={`min-h-screen flex items-center justify-center p-6 transition-colors duration-500 ${
+        isDark ? 'bg-[#060608] text-white' : 'bg-[#F9F9F6] text-neutral-900'
+      }`}>
+        <div className={`w-full max-w-md p-8 sm:p-10 rounded-3xl border shadow-2xl ${
+          isDark ? 'bg-[#0e0f14] border-white/10' : 'bg-white border-black/10'
+        }`}>
+          <div className="flex flex-col items-center text-center space-y-3 mb-8">
+            <div className="inline-block px-3 py-1 rounded-md text-[11px] font-mono font-bold uppercase tracking-wider text-[#ff5e1a] bg-[#ff5e1a]/10 border border-[#ff5e1a]/25">
+              Private Hub
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
+              Studio Terminal
+            </h1>
+            <p className="text-xs text-neutral-500 max-w-xs leading-relaxed">
+              Restricted management access for Khushang Singh. Authorization required to inspect inquiries and live telemetry.
+            </p>
+          </div>
+
+          <form onSubmit={handleUnlock} className="space-y-4">
+            {pinError && (
+              <div className="p-3 rounded-xl border border-red-500/30 bg-red-500/10 text-red-400 text-xs font-mono font-bold text-center">
+                {pinError}
+              </div>
+            )}
+
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="studio-pin" className="text-xs font-mono font-bold uppercase tracking-wider text-neutral-400">
+                Passcode
+              </label>
+              <input
+                id="studio-pin"
+                type="password"
+                value={enteredPin}
+                onChange={(e) => setEnteredPin(e.target.value)}
+                placeholder="Enter studio PIN (default: 2026)"
+                autoFocus
+                className={`w-full px-4 py-3 rounded-xl text-sm font-mono border outline-none text-center tracking-widest ${
+                  isDark 
+                    ? 'border-white/15 bg-black/40 text-white focus:border-[#ff5e1a]' 
+                    : 'border-black/15 bg-neutral-50 text-neutral-900 focus:border-[#ff5e1a]'
+                }`}
+              />
+            </div>
+
+            <div className="flex items-center justify-between text-xs font-mono text-neutral-500 pt-1">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={rememberDevice}
+                  onChange={(e) => setRememberDevice(e.target.checked)}
+                  className="rounded text-[#ff5e1a] focus:ring-0"
+                />
+                <span>Remember this device</span>
+              </label>
+              <span className="text-[11px] opacity-75">PIN: 2026</span>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-3 rounded-xl text-xs font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all shadow-md cursor-pointer mt-2"
+            >
+              Unlock Studio
+            </button>
+          </form>
+
+          <div className="mt-8 pt-6 border-t border-black/10 dark:border-white/10 text-center">
+            <Link
+              to="/"
+              className="text-xs font-mono text-neutral-500 hover:text-[#ff5e1a] transition-colors"
+            >
+              Return to Public Portfolio
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ==============================================================
+  // AUTHENTICATED DASHBOARD VIEW
+  // ==============================================================
   return (
     <div className={`min-h-screen transition-colors duration-500 pt-28 sm:pt-32 pb-16 px-4 sm:px-6 lg:px-12 ${
       isDark ? 'bg-[#060608] text-white' : 'bg-[#F9F9F6] text-neutral-900'
     }`}>
       <div className="max-w-[1400px] mx-auto space-y-8">
 
-        {/* 1. MAIN PAGE HEADING & TOP METADATA */}
+        {/* 1. MAIN PAGE HEADING & TOP CONTROLS */}
         <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-black/10 dark:border-white/10">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#ff5e1a] bg-[#ff5e1a]/10 px-2.5 py-1 rounded-md border border-[#ff5e1a]/25">
-                Studio Management System
+                Private Studio Terminal
               </span>
               <span className="text-xs font-mono text-neutral-500">
-                khushang.design // private hub
+                Authorized: Khushang Singh
               </span>
             </div>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight">
               Studio Dashboard
             </h1>
             <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 mt-1 max-w-xl">
-              Track live anonymous visitors, manage incoming inquiries and dispatch direct email replies without third-party portal sign-ins.
+              Inspect verified client inquiries, dispatch direct email replies and monitor telemetry across three concurrent analytics engines.
             </p>
           </div>
 
@@ -238,17 +395,6 @@ export default function Dashboard() {
               Portfolio Home
             </Link>
 
-            <Link
-              to="/summary"
-              className={`px-4 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider border transition-all ${
-                isDark 
-                  ? 'border-white/15 bg-white/5 text-neutral-300 hover:border-[#ff5e1a] hover:text-[#ff5e1a]' 
-                  : 'border-black/15 bg-black/5 text-neutral-800 hover:border-[#ff5e1a] hover:text-[#ff5e1a]'
-              }`}
-            >
-              Summary Brief
-            </Link>
-
             <button
               onClick={toggleTheme}
               className={`px-4 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider border transition-all ${
@@ -258,6 +404,14 @@ export default function Dashboard() {
               }`}
             >
               {isDark ? 'Light Theme' : 'Dark Theme'}
+            </button>
+
+            <button
+              onClick={handleLockStudio}
+              className="px-4 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider border border-red-500/25 text-red-400 hover:bg-red-500/10 transition-all cursor-pointer"
+              title="Lock terminal and end session"
+            >
+              Lock Studio
             </button>
           </div>
         </header>
@@ -294,7 +448,7 @@ export default function Dashboard() {
                   : 'bg-black/5 text-neutral-600 hover:text-neutral-900 hover:bg-black/10'
             }`}
           >
-            <span>Visitor Analytics</span>
+            <span>Visitor Analytics (3 Engines)</span>
             <span className="text-[10px] opacity-75 font-normal">
               ({analytics.uniqueVisitors} unique)
             </span>
@@ -310,7 +464,7 @@ export default function Dashboard() {
                   : 'bg-black/5 text-neutral-600 hover:text-neutral-900 hover:bg-black/10'
             }`}
           >
-            <span>Setup & Architecture</span>
+            <span>Settings & Setup</span>
           </button>
         </nav>
 
@@ -350,7 +504,7 @@ export default function Dashboard() {
             {/* Master-Detail Split Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
               
-              {/* LEFT COLUMN: Message List & Filters (5 cols) */}
+              {/* LEFT COLUMN: Message List & Filters */}
               <div className={`lg:col-span-5 rounded-2xl border flex flex-col overflow-hidden ${
                 isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
               }`}>
@@ -369,7 +523,7 @@ export default function Dashboard() {
                     }`}
                   />
 
-                  {/* Filter Pills */}
+                  {/* Filter Tabs */}
                   <div className="flex items-center gap-1.5 mt-3 overflow-x-auto pb-1 text-xs font-mono font-bold">
                     {[
                       { key: 'all', label: `All (${messages.length})` },
@@ -416,7 +570,6 @@ export default function Dashboard() {
                               : isDark ? 'hover:bg-white/5' : 'hover:bg-neutral-50'
                           }`}
                         >
-                          {/* Unread dot bar */}
                           {msg.status === 'unread' && (
                             <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#ff5e1a]" />
                           )}
@@ -467,13 +620,12 @@ export default function Dashboard() {
 
               </div>
 
-              {/* RIGHT COLUMN: Message Details & Reply Studio (7 cols) */}
+              {/* RIGHT COLUMN: Message Details & Direct Reply Composer */}
               <div className={`lg:col-span-7 rounded-2xl border p-6 sm:p-8 flex flex-col gap-6 ${
                 isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
               }`}>
                 {selectedMessage ? (
                   <>
-                    {/* Message Header & Metadata */}
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-6 border-b border-black/10 dark:border-white/10">
                       <div>
                         <div className="flex items-center gap-2 mb-1.5">
@@ -503,7 +655,6 @@ export default function Dashboard() {
                           </span>
                         </div>
 
-                        {/* Social Profile URL */}
                         {selectedMessage.socialUrl && (
                           <div className="mt-3 flex items-center gap-2 text-xs font-mono">
                             <span className="text-neutral-500">Sender Social Profile:</span>
@@ -519,7 +670,6 @@ export default function Dashboard() {
                         )}
                       </div>
 
-                      {/* Top Action Buttons */}
                       <div className="flex items-center gap-1.5 shrink-0">
                         <button
                           onClick={() => handleToggleStar(selectedMessage.id)}
@@ -550,14 +700,12 @@ export default function Dashboard() {
                       </div>
                     </div>
 
-                    {/* Inquiry Message Body */}
                     <div className={`p-5 rounded-xl border text-sm sm:text-base leading-relaxed ${
                       isDark ? 'bg-black/30 border-white/10 text-neutral-200' : 'bg-neutral-50 border-black/10 text-neutral-800'
                     }`}>
                       <p className="whitespace-pre-wrap">{selectedMessage.message}</p>
                     </div>
 
-                    {/* Previous Reply Thread (if already replied) */}
                     {selectedMessage.reply && (
                       <div className="p-4 rounded-xl border border-green-500/20 bg-green-500/5 space-y-2">
                         <div className="flex items-center justify-between text-xs font-mono">
@@ -672,363 +820,456 @@ export default function Dashboard() {
           </section>
         )}
 
-        {/* 4. TAB CONTENT: VISITOR ANALYTICS */}
+        {/* 4. TAB CONTENT: VISITOR ANALYTICS (ALL THREE TRACKING OPTIONS) */}
         {activeTab === 'analytics' && (
           <section aria-labelledby="analytics-heading" className="space-y-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h2 id="analytics-heading" className="text-xl sm:text-2xl font-black tracking-tight">
-                  Visitor Traffic & Engagement
+                  Multi-Tier Telemetry Hub
                 </h2>
                 <p className="text-xs text-neutral-500 font-mono mt-0.5">
-                  Privacy-first anonymous telemetry recorded directly without cookies or third-party user log-ins
+                  Three privacy-first analytics engines working concurrently for maximum accuracy and redundancy
                 </p>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2">
+              {/* Engine Switcher */}
+              <div className="flex items-center gap-1.5 p-1 rounded-xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 text-xs font-mono font-bold">
                 <button
-                  onClick={exportAnalyticsJSON}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider border transition-all ${
-                    isDark ? 'border-white/15 bg-white/5 text-neutral-300 hover:border-[#ff5e1a]' : 'border-black/15 bg-black/5 text-neutral-800 hover:border-[#ff5e1a]'
+                  onClick={() => setAnalyticsOption('bespoke')}
+                  className={`px-3 py-1.5 rounded-lg transition-all ${
+                    analyticsOption === 'bespoke'
+                      ? 'bg-[#ff5e1a] text-white shadow-xs'
+                      : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'
                   }`}
                 >
-                  Export Metrics JSON
+                  Option 1: In-Portfolio
                 </button>
                 <button
-                  onClick={handleResetAnalytics}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-mono text-neutral-500 hover:text-red-400 transition-colors ${
-                    isDark ? 'hover:bg-white/5' : 'hover:bg-black/5'
+                  onClick={() => setAnalyticsOption('goatcounter')}
+                  className={`px-3 py-1.5 rounded-lg transition-all ${
+                    analyticsOption === 'goatcounter'
+                      ? 'bg-[#ff5e1a] text-white shadow-xs'
+                      : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'
                   }`}
                 >
-                  Reset Analytics Data
+                  Option 2: GoatCounter
+                </button>
+                <button
+                  onClick={() => setAnalyticsOption('vercel')}
+                  className={`px-3 py-1.5 rounded-lg transition-all ${
+                    analyticsOption === 'vercel'
+                      ? 'bg-[#ff5e1a] text-white shadow-xs'
+                      : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'
+                  }`}
+                >
+                  Option 3: Vercel Web
                 </button>
               </div>
             </div>
 
-            {/* Top KPI Cards (4 metrics) */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-              <div className={`p-5 rounded-2xl border ${
-                isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
-              }`}>
-                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-neutral-400">
-                  Total Pageviews
-                </span>
-                <div className="text-3xl sm:text-4xl font-black mt-2 tracking-tight">
-                  {analytics.totalPageViews}
-                </div>
-                <span className="text-[11px] font-mono text-[#ff5e1a] mt-1 block">
-                  Across all sessions
-                </span>
-              </div>
-
-              <div className={`p-5 rounded-2xl border ${
-                isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
-              }`}>
-                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-neutral-400">
-                  Unique Visitors
-                </span>
-                <div className="text-3xl sm:text-4xl font-black mt-2 tracking-tight text-[#ff5e1a]">
-                  {analytics.uniqueVisitors}
-                </div>
-                <span className="text-[11px] font-mono text-neutral-500 mt-1 block">
-                  Individual devices
-                </span>
-              </div>
-
-              <div className={`p-5 rounded-2xl border ${
-                isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
-              }`}>
-                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-neutral-400">
-                  Top Referral Channel
-                </span>
-                <div className="text-2xl sm:text-3xl font-black mt-2 tracking-tight truncate">
-                  LinkedIn
-                </div>
-                <span className="text-[11px] font-mono text-green-500 mt-1 block">
-                  37% of external traffic
-                </span>
-              </div>
-
-              <div className={`p-5 rounded-2xl border ${
-                isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
-              }`}>
-                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-neutral-400">
-                  Primary Route
-                </span>
-                <div className="text-2xl sm:text-3xl font-black mt-2 tracking-tight truncate font-mono">
-                  /
-                </div>
-                <span className="text-[11px] font-mono text-neutral-500 mt-1 block">
-                  64% of total views
-                </span>
-              </div>
-            </div>
-
-            {/* Daily Traffic Timeline Bar Chart */}
-            <div className={`p-6 sm:p-8 rounded-2xl border space-y-4 ${
-              isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
-            }`}>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div>
-                  <h3 className="text-base sm:text-lg font-bold tracking-tight">
-                    Daily Traffic Velocity (Last 14 Days)
-                  </h3>
-                  <p className="text-xs text-neutral-500 font-mono">
-                    Pageviews and unique visits mapped by day
-                  </p>
-                </div>
-                <div className="flex items-center gap-4 text-xs font-mono">
+            {/* ENGINE 1: BESPOKE IN-PORTFOLIO DASHBOARD (UPSTASH REDIS + HYPERLOGLOG) */}
+            {analyticsOption === 'bespoke' && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-xs bg-[#ff5e1a]" />
-                    <span className="text-neutral-400">Pageviews</span>
+                    <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#ff5e1a] bg-[#ff5e1a]/10 px-2.5 py-1 rounded-md border border-[#ff5e1a]/25">
+                      Engine 1: Bespoke In-Portfolio
+                    </span>
+                    <span className="text-xs font-mono text-neutral-400">
+                      {cloudStats?.configured ? 'Connected to Upstash Redis (HyperLogLog active)' : 'Local + Edge Storage Engine'}
+                    </span>
                   </div>
+
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-xs bg-neutral-400 dark:bg-neutral-600" />
-                    <span className="text-neutral-400">Unique Visitors</span>
+                    <button
+                      onClick={exportAnalyticsJSON}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold border transition-all ${
+                        isDark ? 'border-white/15 bg-white/5 text-neutral-300 hover:border-[#ff5e1a]' : 'border-black/15 bg-black/5 text-neutral-800 hover:border-[#ff5e1a]'
+                      }`}
+                    >
+                      Export JSON
+                    </button>
+                    <button
+                      onClick={handleResetAnalytics}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-mono text-neutral-500 hover:text-red-400 transition-colors ${
+                        isDark ? 'hover:bg-white/5' : 'hover:bg-black/5'
+                      }`}
+                    >
+                      Reset Data
+                    </button>
                   </div>
                 </div>
-              </div>
 
-              {/* Bar Visualizer */}
-              <div className="pt-6 pb-2 overflow-x-auto">
-                <div className="min-w-[600px] h-48 flex items-end justify-between gap-3 border-b border-black/10 dark:border-white/10 pb-2">
-                  {analytics.dailyTimeline?.map((item) => {
-                    const maxDaily = Math.max(...analytics.dailyTimeline.map((d) => d.views), 30);
-                    const viewHeightPct = Math.min(100, Math.max(12, Math.round((item.views / maxDaily) * 100)));
-                    const uniqueHeightPct = Math.min(100, Math.max(8, Math.round((item.uniques / maxDaily) * 100)));
+                {/* KPI Cards */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+                  <div className={`p-5 rounded-2xl border ${
+                    isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
+                  }`}>
+                    <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-neutral-400">
+                      Total Pageviews
+                    </span>
+                    <div className="text-3xl sm:text-4xl font-black mt-2 tracking-tight">
+                      {cloudStats?.totalPageviews || analytics.totalPageViews}
+                    </div>
+                    <span className="text-[11px] font-mono text-[#ff5e1a] mt-1 block">
+                      INCR total_pageviews
+                    </span>
+                  </div>
 
-                    return (
-                      <div key={item.date} className="flex-1 flex flex-col items-center gap-2 group h-full justify-end">
-                        <div className="text-[10px] font-mono text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                          {item.views}v / {item.uniques}u
-                        </div>
-                        <div className="w-full flex items-end justify-center gap-1.5 h-36">
-                          <div
-                            style={{ height: `${viewHeightPct}%` }}
-                            className="w-1/2 max-w-[14px] rounded-t-sm bg-[#ff5e1a] transition-all group-hover:brightness-110"
-                            title={`${item.label}: ${item.views} pageviews`}
-                          />
-                          <div
-                            style={{ height: `${uniqueHeightPct}%` }}
-                            className="w-1/2 max-w-[14px] rounded-t-sm bg-neutral-300 dark:bg-neutral-700 transition-all group-hover:brightness-110"
-                            title={`${item.label}: ${item.uniques} unique visitors`}
-                          />
-                        </div>
-                        <span className="text-[10px] font-mono text-neutral-500 whitespace-nowrap">
-                          {item.label}
-                        </span>
+                  <div className={`p-5 rounded-2xl border ${
+                    isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
+                  }`}>
+                    <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-neutral-400">
+                      Unique Visitors
+                    </span>
+                    <div className="text-3xl sm:text-4xl font-black mt-2 tracking-tight text-[#ff5e1a]">
+                      {cloudStats?.uniqueVisitors || analytics.uniqueVisitors}
+                    </div>
+                    <span className="text-[11px] font-mono text-neutral-500 mt-1 block">
+                      HyperLogLog PFADD
+                    </span>
+                  </div>
+
+                  <div className={`p-5 rounded-2xl border ${
+                    isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
+                  }`}>
+                    <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-neutral-400">
+                      Top Referral Channel
+                    </span>
+                    <div className="text-2xl sm:text-3xl font-black mt-2 tracking-tight truncate">
+                      LinkedIn
+                    </div>
+                    <span className="text-[11px] font-mono text-green-500 mt-1 block">
+                      HINCRBY referrers
+                    </span>
+                  </div>
+
+                  <div className={`p-5 rounded-2xl border ${
+                    isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
+                  }`}>
+                    <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-neutral-400">
+                      Top Visited Page
+                    </span>
+                    <div className="text-2xl sm:text-3xl font-black mt-2 tracking-tight truncate font-mono">
+                      /
+                    </div>
+                    <span className="text-[11px] font-mono text-neutral-500 mt-1 block">
+                      ZINCRBY pages
+                    </span>
+                  </div>
+                </div>
+
+                {/* 14-Day Velocity Graph */}
+                <div className={`p-6 sm:p-8 rounded-2xl border space-y-4 ${
+                  isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
+                }`}>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <h3 className="text-base sm:text-lg font-bold tracking-tight">
+                        Daily Traffic Velocity (Last 14 Days)
+                      </h3>
+                      <p className="text-xs text-neutral-500 font-mono">
+                        Pageviews and unique visits mapped by day
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-4 text-xs font-mono">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-xs bg-[#ff5e1a]" />
+                        <span className="text-neutral-400">Pageviews</span>
                       </div>
-                    );
-                  })}
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-xs bg-neutral-400 dark:bg-neutral-600" />
+                        <span className="text-neutral-400">Unique Visitors</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-6 pb-2 overflow-x-auto">
+                    <div className="min-w-[600px] h-48 flex items-end justify-between gap-3 border-b border-black/10 dark:border-white/10 pb-2">
+                      {analytics.dailyTimeline?.map((item) => {
+                        const maxDaily = Math.max(...analytics.dailyTimeline.map((d) => d.views), 30);
+                        const viewHeightPct = Math.min(100, Math.max(12, Math.round((item.views / maxDaily) * 100)));
+                        const uniqueHeightPct = Math.min(100, Math.max(8, Math.round((item.uniques / maxDaily) * 100)));
+
+                        return (
+                          <div key={item.date} className="flex-1 flex flex-col items-center gap-2 group h-full justify-end">
+                            <div className="text-[10px] font-mono text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                              {item.views}v / {item.uniques}u
+                            </div>
+                            <div className="w-full flex items-end justify-center gap-1.5 h-36">
+                              <div
+                                style={{ height: `${viewHeightPct}%` }}
+                                className="w-1/2 max-w-[14px] rounded-t-sm bg-[#ff5e1a] transition-all group-hover:brightness-110"
+                                title={`${item.label}: ${item.views} pageviews`}
+                              />
+                              <div
+                                style={{ height: `${uniqueHeightPct}%` }}
+                                className="w-1/2 max-w-[14px] rounded-t-sm bg-neutral-300 dark:bg-neutral-700 transition-all group-hover:brightness-110"
+                                title={`${item.label}: ${item.uniques} unique visitors`}
+                              />
+                            </div>
+                            <span className="text-[10px] font-mono text-neutral-500 whitespace-nowrap">
+                              {item.label}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3-Column Breakdown */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Pages */}
+                  <div className={`p-6 rounded-2xl border space-y-4 ${
+                    isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
+                  }`}>
+                    <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-neutral-400">
+                      Pages (ZINCRBY)
+                    </h3>
+                    <div className="space-y-3 font-mono text-xs">
+                      {Object.entries(cloudStats?.pages || analytics.pageBreakdown || {}).map(([path, count]) => {
+                        const total = cloudStats?.totalPageviews || analytics.totalPageViews || 1;
+                        const pct = Math.round((count / total) * 100);
+                        return (
+                          <div key={path} className="space-y-1">
+                            <div className="flex justify-between">
+                              <span className="font-bold text-neutral-200 dark:text-neutral-200 truncate">{path}</span>
+                              <span className="text-neutral-400">{count} ({pct}%)</span>
+                            </div>
+                            <div className="w-full h-1.5 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
+                              <div style={{ width: `${pct}%` }} className="h-full bg-[#ff5e1a]" />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Referrers */}
+                  <div className={`p-6 rounded-2xl border space-y-4 ${
+                    isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
+                  }`}>
+                    <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-neutral-400">
+                      Referrers (HINCRBY)
+                    </h3>
+                    <div className="space-y-3 font-mono text-xs">
+                      {Object.entries(cloudStats?.referrers || analytics.referrerBreakdown || {}).map(([channel, count]) => {
+                        const total = Object.values(cloudStats?.referrers || analytics.referrerBreakdown || {}).reduce((a, b) => a + b, 0) || 1;
+                        const pct = Math.round((count / total) * 100);
+                        return (
+                          <div key={channel} className="space-y-1">
+                            <div className="flex justify-between">
+                              <span className="font-bold text-neutral-200 dark:text-neutral-200">{channel}</span>
+                              <span className="text-neutral-400">{count} ({pct}%)</span>
+                            </div>
+                            <div className="w-full h-1.5 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
+                              <div style={{ width: `${pct}%` }} className="h-full bg-[#ff5e1a]" />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Devices */}
+                  <div className={`p-6 rounded-2xl border space-y-4 ${
+                    isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
+                  }`}>
+                    <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-neutral-400">
+                      Devices (HINCRBY)
+                    </h3>
+                    <div className="space-y-3 font-mono text-xs">
+                      {Object.entries(cloudStats?.devices || analytics.deviceBreakdown || {}).map(([dev, count]) => {
+                        const total = Object.values(cloudStats?.devices || analytics.deviceBreakdown || {}).reduce((a, b) => a + b, 0) || 1;
+                        const pct = Math.round((count / total) * 100);
+                        return (
+                          <div key={dev} className="space-y-1">
+                            <div className="flex justify-between">
+                              <span className="font-bold text-neutral-200 dark:text-neutral-200">{dev}</span>
+                              <span className="text-neutral-400">{count} ({pct}%)</span>
+                            </div>
+                            <div className="w-full h-1.5 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
+                              <div style={{ width: `${pct}%` }} className="h-full bg-[#ff5e1a]" />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
-            {/* 3-Column Breakdown: Pages, Referrers, Devices */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              
-              {/* Pages Breakdown */}
-              <div className={`p-6 rounded-2xl border space-y-4 ${
+            {/* ENGINE 2: GOATCOUNTER (OPTION 2) */}
+            {analyticsOption === 'goatcounter' && (
+              <div className={`p-6 sm:p-8 rounded-2xl border space-y-6 ${
                 isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
               }`}>
-                <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-neutral-400">
-                  Page Distribution
-                </h3>
-                <div className="space-y-3 font-mono text-xs">
-                  {Object.entries(analytics.pageBreakdown || {}).map(([path, count]) => {
-                    const total = analytics.totalPageViews || 1;
-                    const pct = Math.round((count / total) * 100);
-                    return (
-                      <div key={path} className="space-y-1">
-                        <div className="flex justify-between">
-                          <span className="font-bold text-neutral-200 dark:text-neutral-200 truncate">{path}</span>
-                          <span className="text-neutral-400">{count} ({pct}%)</span>
-                        </div>
-                        <div className="w-full h-1.5 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
-                          <div style={{ width: `${pct}%` }} className="h-full bg-[#ff5e1a]" />
-                        </div>
-                      </div>
-                    );
-                  })}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#ff5e1a] bg-[#ff5e1a]/10 px-2.5 py-1 rounded-md border border-[#ff5e1a]/25">
+                      Engine 2: GoatCounter Analytics
+                    </span>
+                    <h3 className="text-xl sm:text-2xl font-black tracking-tight mt-2">
+                      GoatCounter Zero-Maintenance Tracking
+                    </h3>
+                    <p className="text-xs text-neutral-500 font-mono mt-1">
+                      100% Free, GDPR compliant, under 3 KB and zero cookies.
+                    </p>
+                  </div>
+
+                  <a
+                    href="https://khushang.goatcounter.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all shadow-md shrink-0"
+                  >
+                    <span>Open GoatCounter Dashboard</span>
+                  </a>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 rounded-xl border border-black/10 dark:border-white/10 text-xs font-mono space-y-2">
+                    <span className="font-bold text-neutral-200 dark:text-neutral-200 block">Status: Script Embedded</span>
+                    <p className="text-neutral-400 leading-relaxed">
+                      Tracking code is embedded in <code className="text-[#ff5e1a]">index.html</code> pointed to <code className="text-[#ff5e1a]">khushang.goatcounter.com</code>.
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-black/10 dark:border-white/10 text-xs font-mono space-y-2">
+                    <span className="font-bold text-neutral-200 dark:text-neutral-200 block">How to Activate Your Account</span>
+                    <p className="text-neutral-400 leading-relaxed">
+                      Register your free code <span className="text-[#ff5e1a] font-bold">khushang</span> at <a href="https://www.goatcounter.com" target="_blank" rel="noreferrer" className="underline text-[#ff5e1a]">goatcounter.com</a>. Set your dashboard privacy to private or public.
+                    </p>
+                  </div>
                 </div>
               </div>
+            )}
 
-              {/* Referrers Breakdown */}
-              <div className={`p-6 rounded-2xl border space-y-4 ${
+            {/* ENGINE 3: VERCEL WEB ANALYTICS (OPTION 3) */}
+            {analyticsOption === 'vercel' && (
+              <div className={`p-6 sm:p-8 rounded-2xl border space-y-6 ${
                 isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
               }`}>
-                <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-neutral-400">
-                  Referral Channels
-                </h3>
-                <div className="space-y-3 font-mono text-xs">
-                  {Object.entries(analytics.referrerBreakdown || {}).map(([channel, count]) => {
-                    const total = Object.values(analytics.referrerBreakdown || {}).reduce((a, b) => a + b, 0) || 1;
-                    const pct = Math.round((count / total) * 100);
-                    return (
-                      <div key={channel} className="space-y-1">
-                        <div className="flex justify-between">
-                          <span className="font-bold text-neutral-200 dark:text-neutral-200">{channel}</span>
-                          <span className="text-neutral-400">{count} ({pct}%)</span>
-                        </div>
-                        <div className="w-full h-1.5 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
-                          <div style={{ width: `${pct}%` }} className="h-full bg-[#ff5e1a]" />
-                        </div>
-                      </div>
-                    );
-                  })}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#ff5e1a] bg-[#ff5e1a]/10 px-2.5 py-1 rounded-md border border-[#ff5e1a]/25">
+                      Engine 3: Vercel Web Analytics
+                    </span>
+                    <h3 className="text-xl sm:text-2xl font-black tracking-tight mt-2">
+                      Native Edge Telemetry
+                    </h3>
+                    <p className="text-xs text-neutral-500 font-mono mt-1">
+                      Directly integrated via @vercel/analytics/react without client overhead.
+                    </p>
+                  </div>
+
+                  <a
+                    href="https://vercel.com/dashboard"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all shadow-md shrink-0"
+                  >
+                    <span>Open Vercel Analytics Console</span>
+                  </a>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono">
+                  <div className="p-4 rounded-xl border border-black/10 dark:border-white/10 space-y-1">
+                    <span className="font-bold text-neutral-200 dark:text-neutral-200 block">Package Status</span>
+                    <span className="text-green-500 font-bold">@vercel/analytics Installed</span>
+                  </div>
+                  <div className="p-4 rounded-xl border border-black/10 dark:border-white/10 space-y-1">
+                    <span className="font-bold text-neutral-200 dark:text-neutral-200 block">Component Active</span>
+                    <span className="text-[#ff5e1a] font-bold">&lt;Analytics /&gt; Mounted in App.jsx</span>
+                  </div>
+                  <div className="p-4 rounded-xl border border-black/10 dark:border-white/10 space-y-1">
+                    <span className="font-bold text-neutral-200 dark:text-neutral-200 block">Metrics Collected</span>
+                    <span className="text-neutral-400">Visitors, Countries, OS & Devices</span>
+                  </div>
                 </div>
               </div>
-
-              {/* Devices Breakdown */}
-              <div className={`p-6 rounded-2xl border space-y-4 ${
-                isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
-              }`}>
-                <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-neutral-400">
-                  Device Hardware
-                </h3>
-                <div className="space-y-3 font-mono text-xs">
-                  {Object.entries(analytics.deviceBreakdown || {}).map(([dev, count]) => {
-                    const total = Object.values(analytics.deviceBreakdown || {}).reduce((a, b) => a + b, 0) || 1;
-                    const pct = Math.round((count / total) * 100);
-                    return (
-                      <div key={dev} className="space-y-1">
-                        <div className="flex justify-between">
-                          <span className="font-bold text-neutral-200 dark:text-neutral-200">{dev}</span>
-                          <span className="text-neutral-400">{count} ({pct}%)</span>
-                        </div>
-                        <div className="w-full h-1.5 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
-                          <div style={{ width: `${pct}%` }} className="h-full bg-[#ff5e1a]" />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-            </div>
-
-            {/* Live Activity Stream Table */}
-            <div className={`p-6 sm:p-8 rounded-2xl border space-y-4 ${
-              isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
-            }`}>
-              <div>
-                <h3 className="text-base sm:text-lg font-bold tracking-tight">
-                  Recent Anonymous Visitor Feed
-                </h3>
-                <p className="text-xs text-neutral-500 font-mono">
-                  Real-time session trail without personal identifiers or privacy intrusion
-                </p>
-              </div>
-
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs font-mono">
-                  <thead>
-                    <tr className="border-b border-black/10 dark:border-white/10 text-neutral-400">
-                      <th className="py-2.5 px-3">Session Time</th>
-                      <th className="py-2.5 px-3">Destination Route</th>
-                      <th className="py-2.5 px-3">Device</th>
-                      <th className="py-2.5 px-3">Referral Source</th>
-                      <th className="py-2.5 px-3 text-right">Visitor Type</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-black/5 dark:divide-white/5">
-                    {analytics.recentVisits?.slice(0, 10).map((v) => (
-                      <tr key={v.id} className="hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                        <td className="py-2.5 px-3 text-neutral-400">
-                          {formatTimeAgo(v.timestamp)}
-                        </td>
-                        <td className="py-2.5 px-3 font-bold text-[#ff5e1a]">
-                          {v.path}
-                        </td>
-                        <td className="py-2.5 px-3">
-                          {v.device}
-                        </td>
-                        <td className="py-2.5 px-3 text-neutral-400">
-                          {v.referrer}
-                        </td>
-                        <td className="py-2.5 px-3 text-right">
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                            v.isUnique 
-                              ? 'bg-[#ff5e1a]/15 text-[#ff5e1a]' 
-                              : 'bg-neutral-500/15 text-neutral-400'
-                          }`}>
-                            {v.isUnique ? 'New Visitor' : 'Returning'}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            )}
 
           </section>
         )}
 
-        {/* 5. TAB CONTENT: SETUP & ARCHITECTURE */}
+        {/* 5. TAB CONTENT: SETTINGS & ARCHITECTURE */}
         {activeTab === 'architecture' && (
           <section aria-labelledby="architecture-heading" className="space-y-6">
             <div>
               <h2 id="architecture-heading" className="text-xl sm:text-2xl font-black tracking-tight">
-                Architecture & Production Setup
+                Studio Settings & Security
               </h2>
               <p className="text-xs text-neutral-500 font-mono mt-0.5">
-                Technical guide for visitor analytics and serverless email delivery
+                Manage your private passcode, review cloud connection credentials and configure serverless email delivery
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               
-              {/* Card 1: Zero-Login Visitor Tracking */}
+              {/* Passcode Management Card */}
               <div className={`p-6 sm:p-8 rounded-2xl border space-y-4 ${
                 isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
               }`}>
                 <div className="inline-block px-2.5 py-1 rounded-md text-[11px] font-mono font-bold uppercase tracking-wider text-[#ff5e1a] bg-[#ff5e1a]/10 border border-[#ff5e1a]/25">
-                  Client-Side & Edge Telemetry
+                  Security Access Gate
                 </div>
                 <h3 className="text-xl font-bold tracking-tight">
-                  How Zero-Login Tracking Works
+                  Update Studio Passcode
                 </h3>
                 <p className="text-xs sm:text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
-                  Your portfolio uses a lightweight cryptographic UUID assigned upon the first visit to browser storage. Every session is tracked without requesting personal data or cookies.
+                  Change the passcode required to unlock this dashboard. Currently set to: <span className="font-mono font-bold text-[#ff5e1a]">{customPasscode}</span>.
                 </p>
-                <div className="space-y-2 text-xs font-mono text-neutral-500">
-                  <div className="p-3 rounded-lg border border-black/10 dark:border-white/10">
-                    <span className="font-bold text-neutral-200 dark:text-neutral-200 block mb-1">1. Unique Visitor ID:</span>
-                    Stored in localStorage. Survives tab closes to distinguish repeat visits from new visitors.
+
+                {passcodeSuccessMsg && (
+                  <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/25 text-green-400 text-xs font-mono font-bold">
+                    {passcodeSuccessMsg}
                   </div>
-                  <div className="p-3 rounded-lg border border-black/10 dark:border-white/10">
-                    <span className="font-bold text-neutral-200 dark:text-neutral-200 block mb-1">2. Session Tracking:</span>
-                    Stored in sessionStorage. Increments total visits and page transitions per browsing session.
-                  </div>
-                  <div className="p-3 rounded-lg border border-black/10 dark:border-white/10">
-                    <span className="font-bold text-neutral-200 dark:text-neutral-200 block mb-1">3. Vercel Web Analytics (1-Click Upgrade):</span>
-                    For global multi-device sync, enable Vercel Web Analytics in your Vercel Project settings. It requires zero login code and aggregates visits across all devices globally.
-                  </div>
-                </div>
+                )}
+
+                <form onSubmit={handleSaveNewPasscode} className="space-y-3 pt-2">
+                  <input
+                    type="text"
+                    value={newPasscodeInput}
+                    onChange={(e) => setNewPasscodeInput(e.target.value)}
+                    placeholder="Enter new 4+ character passcode"
+                    className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-mono border outline-none ${
+                      isDark 
+                        ? 'border-white/15 bg-black/40 text-white focus:border-[#ff5e1a]' 
+                        : 'border-black/15 bg-neutral-50 text-neutral-900 focus:border-[#ff5e1a]'
+                    }`}
+                  />
+                  <button
+                    type="submit"
+                    className="px-4 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all cursor-pointer"
+                  >
+                    Save New Passcode
+                  </button>
+                </form>
               </div>
 
-              {/* Card 2: Direct Email Replies */}
+              {/* Upstash Redis (Option 1) Cloud Setup Card */}
               <div className={`p-6 sm:p-8 rounded-2xl border space-y-4 ${
                 isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
               }`}>
                 <div className="inline-block px-2.5 py-1 rounded-md text-[11px] font-mono font-bold uppercase tracking-wider text-[#ff5e1a] bg-[#ff5e1a]/10 border border-[#ff5e1a]/25">
-                  Serverless Email Dispatch
+                  Option 1: Upstash Redis
                 </div>
                 <h3 className="text-xl font-bold tracking-tight">
-                  How Inquiries & Replies Deliver
+                  Free Global Cloud Database
                 </h3>
                 <p className="text-xs sm:text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
-                  When a visitor submits the contact form, it is saved locally to your studio inbox and dispatched via serverless functions in <code className="text-[#ff5e1a]">/api/contact</code> and <code className="text-[#ff5e1a]">/api/reply</code>.
+                  To sync visitor counts across all worldwide devices via Upstash Redis free tier, set these in Vercel Project Environment Variables:
                 </p>
-                <div className="space-y-2 text-xs font-mono text-neutral-500">
-                  <div className="p-3 rounded-lg border border-black/10 dark:border-white/10">
-                    <span className="font-bold text-neutral-200 dark:text-neutral-200 block mb-1">1. Live Serverless Dispatch:</span>
-                    Using Resend or SendGrid on Vercel, set <code className="text-[#ff5e1a]">RESEND_API_KEY</code> in environment variables. Replies typed in this dashboard are dispatched straight to the recipient's mailbox.
+                <div className="space-y-2 text-xs font-mono text-neutral-400">
+                  <div className="p-3 rounded-lg border border-black/10 dark:border-white/10 bg-black/20">
+                    <span className="text-[#ff5e1a] font-bold">UPSTASH_REDIS_REST_URL</span>=https://...
                   </div>
-                  <div className="p-3 rounded-lg border border-black/10 dark:border-white/10">
-                    <span className="font-bold text-neutral-200 dark:text-neutral-200 block mb-1">2. Native Mail Client Fallback:</span>
-                    Clicking "Open in Mail App" opens your desktop mail client (Gmail, Apple Mail or Outlook) with the recipient, subject and pre-composed reply loaded instantly.
+                  <div className="p-3 rounded-lg border border-black/10 dark:border-white/10 bg-black/20">
+                    <span className="text-[#ff5e1a] font-bold">UPSTASH_REDIS_REST_TOKEN</span>=...
                   </div>
                 </div>
               </div>

@@ -12,6 +12,7 @@ import { LoadingProvider } from './context/LoadingContext';
 import RubiksLoader from './components/RubiksLoader';
 import { OTAKU_CIRCLE_CASE_STUDY } from './constants/otakuCircle';
 import { logPageView } from './utils/visitorTracker';
+import { Analytics } from '@vercel/analytics/react';
 
 const OtakuCircleCaseStudy = lazy(() => import('./components/otakucircle/OtakuCircleCaseStudy'));
 const Dashboard = lazy(() => import('./components/Dashboard'));
@@ -90,6 +91,7 @@ function App() {
           <MusicProvider>
             <RubiksLoader />
             <AppContent />
+            <Analytics />
           </MusicProvider>
         </LoadingProvider>
       </ThemeProvider>

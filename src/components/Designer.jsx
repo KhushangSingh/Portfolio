@@ -917,7 +917,6 @@ const Footer = () => {
                             <li><a href="#about" className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>About</a></li>
                             <li><a href="#contact" className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>Contact Form</a></li>
                             <li><Link to="/summary" className="inline-block w-fit text-xs sm:text-sm text-[#ff5e1a] font-medium hover:underline">Visual Summary</Link></li>
-                            <li><Link to="/dashboard" className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>Dashboard</Link></li>
                             <li><a href={resumeUrl} target="_blank" rel="noreferrer" className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>Resume (PDF)</a></li>
                         </ul>
                     </motion.div>

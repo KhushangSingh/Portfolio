@@ -444,21 +444,12 @@ export default function PortfolioSummary() {
             © 2026 Khushang Singh. Designed and developed with care.
           </p>
 
-          <div className="flex items-center gap-4">
-            <Link
-              to="/dashboard"
-              className="hover:text-[#ff5e1a] transition-colors font-mono font-bold uppercase text-[11px]"
-            >
-              Studio Dashboard
-            </Link>
-
-            <button
-              onClick={scrollToTop}
-              className="inline-flex items-center gap-1.5 hover:text-[#ff5e1a] transition-colors cursor-pointer font-mono font-bold uppercase text-[11px]"
-            >
-              <span>Back to Top</span>
-            </button>
-          </div>
+          <button
+            onClick={scrollToTop}
+            className="inline-flex items-center gap-1.5 hover:text-[#ff5e1a] transition-colors cursor-pointer font-mono font-bold uppercase text-[11px]"
+          >
+            <span>Back to Top</span>
+          </button>
         </div>
       </footer>
 

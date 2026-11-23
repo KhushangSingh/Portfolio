@@ -1,5 +1,6 @@
 // Vercel Serverless Function: api/track.js
-// Lightweight anonymous edge telemetry endpoint for tracking portfolio visits.
+// Anonymous telemetry endpoint supporting Upstash Redis (Option 1)
+// Tracks total page views, HyperLogLog unique visitors and page/device/referrer distributions.
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -12,27 +13,49 @@ export default async function handler(req, res) {
   }
 
   if (req.method !== 'POST') {
-    return res.status(200).json({ status: 'telemetry_online' });
+    return res.status(200).json({ status: 'telemetry_ready' });
   }
 
   try {
-    const { path, device, referrer, isNewUniqueVisitor } = req.body || {};
+    const { path = '/', device = 'Desktop', referrer = 'Direct', visitorHash = 'anon' } = req.body || {};
 
-    // In a multi-tenant or global store setup (e.g. Upstash Redis or Supabase),
-    // you can increment global keys here:
-    // await redis.incr('global_page_views');
-    // if (isNewUniqueVisitor) await redis.incr('global_unique_visitors');
+    const normalizedPath = path || '/';
+    const redisUrl = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+    const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+
+    // If Upstash Redis is configured, execute HyperLogLog and counters pipeline
+    if (redisUrl && redisToken) {
+      const pipelineCommands = [
+        ['INCR', 'portfolio:total_pageviews'],
+        ['PFADD', 'portfolio:unique_visitors', visitorHash],
+        ['ZINCRBY', 'portfolio:pages', 1, normalizedPath],
+        ['HINCRBY', 'portfolio:referrers', referrer, 1],
+        ['HINCRBY', 'portfolio:devices', device, 1]
+      ];
+
+      try {
+        await fetch(`${redisUrl}/pipeline`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${redisToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(pipelineCommands)
+        });
+      } catch (redisErr) {
+        console.warn('Upstash Redis pipeline notice:', redisErr);
+      }
+    }
 
     return res.status(200).json({
       tracked: true,
-      path: path || '/',
-      device: device || 'Unknown',
-      referrer: referrer || 'Direct',
-      isNewUniqueVisitor: Boolean(isNewUniqueVisitor),
-      timestamp: new Date().toISOString()
+      path: normalizedPath,
+      device,
+      referrer,
+      redisConfigured: Boolean(redisUrl && redisToken)
     });
   } catch (error) {
-    console.error('Track handler notice:', error);
+    console.error('Track handler error:', error);
     return res.status(200).json({ tracked: false });
   }
 }

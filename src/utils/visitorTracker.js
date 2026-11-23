@@ -1,5 +1,5 @@
 // Visitor & Pageview Tracker Utility
-// Tracks total visits and unique visitors anonymously without any sign-up or login requirement.
+// Implements Option 1: Anonymous rotated client-side hash, Upstash Redis telemetry sync and local fallback.
 
 const STORAGE_KEY = 'khushang_portfolio_analytics_v1';
 const VISITOR_ID_KEY = 'khushang_visitor_id';
@@ -11,6 +11,27 @@ const generateUUID = () => {
     return crypto.randomUUID();
   }
   return 'v_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
+};
+
+// Rotated anonymous visitor hash: Rotates daily so visitors remain completely anonymous
+export const getRotatedVisitorHash = () => {
+  if (typeof window === 'undefined') return 'anon_' + Date.now();
+  try {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const storedDailyHash = localStorage.getItem('khushang_daily_hash');
+    const storedHashDate = localStorage.getItem('khushang_daily_hash_date');
+    
+    if (storedDailyHash && storedHashDate === todayStr) {
+      return storedDailyHash;
+    }
+    
+    const newHash = `${todayStr}_${Math.random().toString(36).substring(2, 10)}`;
+    localStorage.setItem('khushang_daily_hash', newHash);
+    localStorage.setItem('khushang_daily_hash_date', todayStr);
+    return newHash;
+  } catch {
+    return 'anon_guest';
+  }
 };
 
 // Detect device category from screen width and user agent
@@ -115,7 +136,6 @@ const saveAnalytics = (data) => {
   if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    // Emit custom event so open dashboard tabs update instantly
     window.dispatchEvent(new CustomEvent('portfolio_analytics_updated', { detail: data }));
   } catch (err) {
     console.error('Failed to save analytics storage:', err);
@@ -203,7 +223,8 @@ export const logPageView = (path = '/') => {
     data.lastUpdated = new Date().toISOString();
     saveAnalytics(data);
 
-    // Optional beacon to serverless track endpoint
+    // Non-blocking fetch to serverless telemetry endpoint with anonymous rotated hash
+    const rotatedHash = getRotatedVisitorHash();
     if (typeof fetch !== 'undefined') {
       fetch('/api/track', {
         method: 'POST',
@@ -212,14 +233,28 @@ export const logPageView = (path = '/') => {
           path: normalizedPath,
           device,
           referrer,
+          visitorHash: rotatedHash,
           isNewUniqueVisitor
         })
       }).catch(() => {
-        // Silent catch for local development or when API is offline
+        // Silent catch for offline or local dev
       });
     }
   } catch (err) {
     console.warn('Analytics tracking error:', err);
+  }
+};
+
+// Fetch cloud stats from /api/stats (Upstash Redis)
+export const fetchCloudStats = async () => {
+  if (typeof fetch === 'undefined') return null;
+  try {
+    const res = await fetch('/api/stats');
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data;
+  } catch {
+    return null;
   }
 };
 
