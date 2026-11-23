@@ -400,6 +400,21 @@ const HeroSection = () => {
 
     return (
         <div id="hero-page" className="relative pt-36 md:pt-48 pb-28 md:pb-40 px-6 md:px-12 z-10 min-h-[85vh] md:min-h-[90vh] flex flex-col justify-center items-center text-center overflow-visible">
+            {/* Top Right: Quick 5-min link for fast evaluators and busy recruiters */}
+            <div className="absolute top-6 sm:top-8 right-6 md:right-12 z-20">
+                <Link
+                    to="/summary"
+                    className={`inline-flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider border transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] cursor-pointer shadow-sm ${
+                        isDark
+                            ? 'border-white/15 bg-white/5 hover:bg-white/10 text-neutral-200 hover:border-[#ff5e1a] hover:text-[#ff5e1a]'
+                            : 'border-black/15 bg-black/5 hover:bg-black/10 text-neutral-800 hover:border-[#ff5e1a] hover:text-[#ff5e1a]'
+                    } backdrop-blur-md`}
+                    title="Quick 5-minute portfolio overview and executive summary"
+                >
+                    <span>Have 5 Mins?</span>
+                </Link>
+            </div>
+
             <div className="max-w-[1400px] w-full mx-auto flex flex-col items-center overflow-visible">
                 <div className="max-w-6xl w-full mx-auto flex flex-col items-center text-center overflow-visible">
                     {/* Headline with Staggered Directional Blur Clearance & Generous Right Margin for 'R' */}
@@ -757,9 +772,9 @@ const Footer = () => {
                                                 ? 'border-white/15 bg-white/5 text-neutral-200 hover:border-[#ff5e1a] hover:text-[#ff5e1a]' 
                                                 : 'border-black/15 bg-black/5 text-neutral-800 hover:border-[#ff5e1a] hover:text-[#ff5e1a]'
                                         }`}
-                                        title="View condensed portfolio summary & visual resume"
+                                        title="Quick 5-minute portfolio overview and executive summary"
                                     >
-                                        <span>Visual Summary</span>
+                                        <span>Have 5 Mins?</span>
                                     </Link>
 
                                     <a
@@ -824,7 +839,7 @@ const Footer = () => {
                             <li><a href="#projects" className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>Projects</a></li>
                             <li><a href="#about" className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>About</a></li>
                             <li><a href="#contact" className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>Contact Form</a></li>
-                            <li><Link to="/summary" className="inline-block w-fit text-xs sm:text-sm text-[#ff5e1a] font-medium hover:underline">Visual Summary</Link></li>
+                            <li><Link to="/summary" className="inline-block w-fit text-xs sm:text-sm text-[#ff5e1a] font-medium hover:underline">Have 5 Mins?</Link></li>
                             <li><a href={resumeUrl} target="_blank" rel="noreferrer" className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>Resume (PDF)</a></li>
                         </ul>
                     </motion.div>
