@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
+import { favoriteTrack } from '../constants/favoriteTrack';
 
 export default function MoodBoardSection() {
   const { isDark } = useTheme();
@@ -227,7 +228,7 @@ function CardRenderer({ card, isDark }) {
     case 'alltime_music':
       return <AllTimeMusicCard isDark={isDark} />;
 
-    // 3. CURRENT FAVORITE SONG (BAD BUNNY - DTMF)
+    // 3. CURRENT FAVORITE SONG
     case 'current_music':
       return (
         <div className={`w-[220px] sm:w-[245px] p-3.5 sm:p-4 rounded-xl border relative shadow-xl backdrop-blur-md select-none ${
@@ -240,13 +241,21 @@ function CardRenderer({ card, isDark }) {
             <span className="text-xs sm:text-sm font-black tracking-tight text-neutral-900 dark:text-white">
               Current Repeat
             </span>
-            <span className="text-[10px] font-mono text-gray-400 dark:text-gray-500">2025</span>
+            <span className="text-[10px] font-mono text-gray-400 dark:text-gray-500">{favoriteTrack.year}</span>
           </div>
 
           <div className="mb-2.5">
-            <span className="text-[11px] font-mono text-gray-500 dark:text-gray-400 font-bold block mb-0.5">Bad Bunny</span>
+            <span className="text-[11px] font-mono text-gray-500 dark:text-gray-400 font-bold block mb-0.5">{favoriteTrack.artist}</span>
             <h4 className="text-sm sm:text-base font-bold tracking-tight text-neutral-900 dark:text-white leading-tight">
-              DTMF (DeBÍ TiRAR MáS FOToS)
+              <a
+                href={favoriteTrack.pageUrl}
+                target="_blank"
+                rel="noreferrer"
+                onPointerDown={(event) => event.stopPropagation()}
+                className="underline-offset-4 hover:underline"
+              >
+                {favoriteTrack.title}
+              </a>
             </h4>
           </div>
 
@@ -366,7 +375,7 @@ function CardRenderer({ card, isDark }) {
               Spider-Man
             </div>
 
-            <blockquote className="max-w-[120px] sm:max-w-[130px] text-[9.5px] italic text-gray-600 dark:text-gray-400 border-l-2 border-[#ff5e1a] pl-2 leading-snug">
+            <blockquote className="max-w-[120px] sm:max-w-[130px] text-[9.5px] italic text-gray-600 dark:text-gray-400 leading-snug">
               "With great power comes great responsibility."
             </blockquote>
           </div>
@@ -502,7 +511,7 @@ function CardRenderer({ card, isDark }) {
             </li>
           </ul>
 
-          <div className="text-[9px] font-mono text-[#ff5e1a] mt-3 pt-1 border-t border-[#ff5e1a]/20 text-right italic font-medium">
+          <div className="text-[9px] font-mono text-[#ff5e1a] mt-3 text-right italic font-medium">
             and never stop learning something new
           </div>
         </div>
@@ -790,7 +799,7 @@ const CARDS = [
     desktopStyle: { left: '24.8%', top: '56.5%' },
     mobileStyle: { left: '8%', top: '56%' }
   },
-  // 8. Current Repeat (Bad Bunny DTMF, center-middle under Favorite Movies)
+  // 8. Current Repeat
   {
     id: 'current_music',
     type: 'current_music',

@@ -71,7 +71,7 @@ export function ProfileView({ library, archive, onTracker }) {
       </header>
       <section className="oc-profile-summary" aria-labelledby="oc-profile-journey">
         <h3 id="oc-profile-journey">Your Entertainment Journey</h3>
-        <p className="oc-demo-meta">Library status, genre distribution, and friend recommendations.</p>
+        <p className="oc-demo-meta">Library status, genre distribution and friend recommendations.</p>
         <div className="oc-profile-stats">
           <div className="oc-profile-tile oc-profile-level">
             <div className="oc-section-line">
@@ -175,7 +175,7 @@ function TrackerTable({ rows, library, dates, onUpdate, onDate, onRemove }) {
               <td><span className="oc-tracker-type">{title.media}</span></td>
               <td><span className="oc-tracker-genre">{title.genre}</span></td>
               <td><select aria-label={'Status for ' + title.title} data-status={library[title.id]} value={library[title.id]} onChange={(event) => onUpdate(title.id, event.target.value)}><StatusOptions /></select></td>
-              <td>{title.hours ?? '—'}</td>
+              <td>{title.hours ?? 'Unknown'}</td>
               <td className="oc-tracker-rating">{title.rating.toFixed(1)}</td>
               {['started', 'ended'].map((field) => (
                 <td key={field}><input type="date" aria-label={field + ' date for ' + title.title} value={dates[title.id]?.[field] ?? ''} onChange={(event) => onDate(title.id, field, event.target.value)} /></td>
@@ -243,7 +243,7 @@ export function TrackerView({ library, dates, initialStatus, onProfile, onUpdate
     <div className="oc-demo-page oc-tracker-view">
       <button type="button" className="oc-demo-text-button oc-tracker-back" onClick={onProfile}>Back to My Profile</button>
       <h3>Library Tracker <span className="oc-demo-badge">{ids.length}</span></h3>
-      <p className="oc-demo-meta">Deep-dive tracking for your personal library. Manage statuses, watch hours, ratings, and start and finish dates.</p>
+      <p className="oc-demo-meta">Deep-dive tracking for your personal library. Manage statuses, watch hours, ratings and start and finish dates.</p>
       <div className="oc-tracker-toolbar">
         <div className="oc-tracker-modes" role="group" aria-label="Tracker layout">
           {trackerModes.map(([key, label]) => <button key={key} type="button" aria-pressed={key === mode} onClick={() => setMode(key)}>{label}</button>)}

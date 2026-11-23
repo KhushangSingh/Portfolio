@@ -1,3 +1,4 @@
+import { playCustomEffect } from '../../utils/soundEffects';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -47,11 +48,7 @@ export default function BayWindowZone({ onCloseZone }) {
 
   // Soft fabric curtain closing sound synthesis
   const playCurtainSound = useCallback(() => {
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
-      const ctx = new AudioCtx();
-      const t = ctx.currentTime;
+    playCustomEffect(.45, (ctx, output, t) => {
       const bufferSize = ctx.sampleRate * 0.45;
       const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
       const data = buffer.getChannelData(0);
@@ -69,18 +66,14 @@ export default function BayWindowZone({ onCloseZone }) {
       gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
       noise.connect(filter);
       filter.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(output);
       noise.start(t);
-    } catch {}
+    });
   }, []);
 
   // Tactile sound for button toggle actions
   const playToggleSound = useCallback(() => {
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
-      const ctx = new AudioCtx();
-      const t = ctx.currentTime;
+    playCustomEffect(.06, (ctx, output, t) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sine';
@@ -89,10 +82,10 @@ export default function BayWindowZone({ onCloseZone }) {
       gain.gain.setValueAtTime(0.15, t);
       gain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(output);
       osc.start(t);
       osc.stop(t + 0.06);
-    } catch {}
+    });
   }, []);
 
   // Handle Play/Pause Motion Video

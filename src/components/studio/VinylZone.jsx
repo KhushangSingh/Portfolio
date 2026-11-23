@@ -1,7 +1,9 @@
+import { playCustomEffect } from '../../utils/soundEffects';
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTheme } from '../../context/ThemeContext';
 import { useMusic } from '../../context/MusicContext';
+import { favoriteTrack } from '../../constants/favoriteTrack';
 
 export default function VinylZone({ onCloseZone }) {
   const { isDark } = useTheme();
@@ -9,13 +11,12 @@ export default function VinylZone({ onCloseZone }) {
 
   const records = [
     {
-      id: 'bad-bunny',
-      title: 'DtMF (Lo-Fi Chill Rework)',
-      artist: 'Bad Bunny',
+      id: 'earrings',
+      title: favoriteTrack.title,
+      artist: favoriteTrack.artist,
       labelColor: '#FF5E1A',
       coverGradient: 'from-[#ff7a3d] via-[#ea4e0c] to-[#c73c02]',
-      tag: 'Caribbean Chill Beats',
-      bpm: '84 BPM',
+      tag: 'Indie R&B',
       rpm: '33 RPM'
     },
     {
@@ -47,11 +48,7 @@ export default function VinylZone({ onCloseZone }) {
 
   // Play needle drop sound via Web Audio API
   const playNeedleDrop = () => {
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
-      const ctx = new AudioCtx();
-      const now = ctx.currentTime;
+    playCustomEffect(.12, (ctx, output, now) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'triangle';
@@ -60,10 +57,10 @@ export default function VinylZone({ onCloseZone }) {
       gain.gain.setValueAtTime(0.25, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(output);
       osc.start(now);
       osc.stop(now + 0.12);
-    } catch {}
+    });
   };
 
   const handleTogglePlay = () => {

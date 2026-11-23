@@ -2,7 +2,7 @@ const titles = [
   {
     id: 'spirited-away', title: 'Spirited Away', type: 'Film', year: '2001', genre: 'Fantasy',
     synopsis: 'A young girl takes a job in a bathhouse for spirits while trying to rescue her parents.',
-    clues: 'girl spirit world bathhouse parents pigs chihiro ghibli magical supernatural'
+    clues: 'girl spirit world bathhouse train parents pigs chihiro ghibli magical supernatural'
   },
   {
     id: 'cowboy-bebop', title: 'Cowboy Bebop', type: 'Series', year: '1998', genre: 'Space western',
@@ -104,14 +104,18 @@ export const demoFriends = [
   { name: 'Ren', taste: 74, genre: 'Music and character-driven stories' }
 ];
 
+export const movieNightClue = 'A bathhouse and a train';
+
+export const movieNightRecommendation = {
+  id: 'spirited-away',
+  notes: [
+    { friend: 'Mina', message: 'Save it for a quiet evening.' },
+    { friend: 'Ren', message: 'The train scene is worth watching twice.' }
+  ]
+};
+
 export const sampleInbox = [
-  {
-    id: 'spirited-away',
-    notes: [
-      { friend: 'Mina', message: 'For that weekend you wanted a rainy-day film.' },
-      { friend: 'Kai', message: 'The train scene alone is worth watching.' }
-    ]
-  },
+  movieNightRecommendation,
   {
     id: 'cowboy-bebop',
     notes: [{ friend: 'Ren', message: 'Start with the first episode. I think you’ll love the score.' }]
@@ -126,7 +130,7 @@ export const sampleInbox = [
   },
   {
     id: 'cyberpunk',
-    notes: [{ friend: 'Ren', message: 'It gets intense quickly, and the city is worth seeing.' }]
+    notes: [{ friend: 'Ren', message: 'It gets intense quickly. The city is worth seeing too.' }]
   },
   {
     id: 'witch-hat',

@@ -5,6 +5,9 @@ import { designData } from '../constants/data';
 import BrandMark from './BrandMark';
 import { useTheme } from '../context/ThemeContext';
 import SelectedWorksShowcase from './SelectedWorksShowcase';
+import ProjectMockup from './ProjectMockup';
+import ProjectPreview from './ProjectPreview';
+import { playSoundEffect } from '../utils/soundEffects';
 import MoodBoardSection from './MoodBoardSection';
 import StudioSection from './StudioSection';
 import { GymBadgeCase } from './GymBadgeCase';
@@ -147,6 +150,7 @@ const ProjectModal = ({ project, onClose }) => {
 
   const gallery = project.gallery?.length ? project.gallery : [project.image].filter(Boolean);
   const tools = project.tools?.split(', ') ?? [];
+  const study = project.study;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center">
@@ -160,15 +164,46 @@ const ProjectModal = ({ project, onClose }) => {
         onKeyDown={(event) => { if (event.key === 'Escape') onClose(); }}
         variants={modalVariants} initial="hidden" animate="visible" exit="exit"
         style={{ '--project-accent': project.accent, '--project-base': isDark ? '#0a0a0a' : '#fafafa' }}
-        className={'relative z-10 h-full w-full overflow-y-auto [background-color:color-mix(in_srgb,var(--project-accent,transparent)_6%,var(--project-base))] ' + (isDark ? 'text-white' : 'text-neutral-900')}
+        className={'project-detail-scroll relative z-10 h-full w-full overflow-y-auto [background-color:color-mix(in_srgb,var(--project-accent,transparent)_6%,var(--project-base))] ' + (isDark ? 'text-white' : 'text-neutral-900')}
         data-lenis-prevent
       >
         <div className="mx-auto max-w-6xl px-5 py-8 sm:px-10 sm:py-12">
-          <header className="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-4 gap-y-2 border-s-4 ps-4 [border-color:var(--project-accent,currentColor)]">
+          <header className="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-4 gap-y-2">
             <h2 id="project-detail-title" className="text-3xl font-bold tracking-tight sm:text-5xl">{project.title}</h2>
             <button type="button" autoFocus onClick={onClose} className="min-h-10 rounded-md border border-current px-3 text-sm font-semibold hover:underline">Back</button>
-            {project.role && <p className="col-span-full text-sm text-neutral-500 dark:text-neutral-400">{project.role}</p>}
+            {!study && project.role && <p className="col-span-full text-sm text-neutral-500 dark:text-neutral-400">{project.role}</p>}
           </header>
+          {study && (
+            <section className="mb-8 grid gap-5" aria-labelledby="project-flow-title">
+              <div className="grid items-start gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(12rem,0.55fr)]">
+                <p className="max-w-[58ch] leading-relaxed text-neutral-700 dark:text-neutral-300">{study.context}</p>
+                <dl className="grid gap-3 rounded-md bg-black/[.03] p-4 text-sm dark:bg-white/[.06]">
+                  <div><dt className="text-neutral-500 dark:text-neutral-400">My role</dt><dd className="font-semibold">{project.role}</dd></div>
+                  <div><dt className="text-neutral-500 dark:text-neutral-400">Timeline</dt><dd className="font-semibold">{project.timeline}</dd></div>
+                </dl>
+              </div>
+              <div>
+                <h3 id="project-flow-title" className="mb-2 text-lg font-bold">{study.flow}</h3>
+                <ol className="grid overflow-hidden rounded-md border border-black/10 bg-black/[.02] dark:border-white/10 dark:bg-white/[.04] sm:grid-cols-3">
+                  {study.steps.map(([label, detail]) => (
+                    <li key={label} className="border-t border-black/10 px-4 py-3 first:border-t-0 dark:border-white/10 sm:border-s sm:border-t-0 sm:first:border-s-0">
+                      <strong>{label}</strong>
+                      <p className="mt-1 text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">{detail}</p>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </section>
+          )}
+          {project.previewVideo && (
+            <ProjectPreview
+              src={project.image}
+              alt={`${project.title} website walkthrough`}
+              videoSrc={project.previewVideo}
+              className="mb-5 aspect-video w-full overflow-hidden rounded-lg border border-black/10 dark:border-white/10"
+              loading="eager"
+            />
+          )}
           <div className="grid gap-5">
             {gallery.map((asset, index) => {
               const source = '/' + asset.replace(/^\/+/, '');
@@ -184,6 +219,13 @@ const ProjectModal = ({ project, onClose }) => {
               );
             })}
           </div>
+          {study && (
+            <dl className="mt-7 grid gap-4 border-y border-black/10 py-5 text-sm dark:border-white/10 sm:grid-cols-3">
+              <div><dt className="font-bold">Design decision</dt><dd className="mt-1 leading-relaxed text-neutral-700 dark:text-neutral-300">{study.decision}</dd></div>
+              <div><dt className="font-bold">Recovery</dt><dd className="mt-1 leading-relaxed text-neutral-700 dark:text-neutral-300">{study.recovery}</dd></div>
+              <div><dt className="font-bold">What I’d test next</dt><dd className="mt-1 leading-relaxed text-neutral-700 dark:text-neutral-300">{study.nextTest}</dd></div>
+            </dl>
+          )}
           {(tools.length > 0 || project.live || project.github) && (
             <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm">
               {tools.map((tool) => (
@@ -633,7 +675,7 @@ const InfoSection = ({ onCertClick }) => {
                                                 data-cursor="RESUME"
                                                 className="group inline-flex items-center gap-2 text-[#ff5e1a] hover:text-[#ff783b] transition-colors cursor-pointer"
                                             >
-                                                <span className="text-sm font-bold uppercase tracking-widest border-b pb-0.5 border-[#ff5e1a]/70 group-hover:border-[#ff5e1a] transition-colors">Download Resume</span>
+                                                <span className="text-sm font-bold uppercase tracking-widest underline decoration-[#ff5e1a]/70 underline-offset-4 group-hover:decoration-[#ff5e1a] transition-colors">Download Resume</span>
                                             </a>
                                         </motion.div>
                                     )}
@@ -901,6 +943,7 @@ const Designer = () => {
   const [showSecondaryCatalog, setShowSecondaryCatalog] = useState(false);
 
   const openProject = (project) => {
+    playSoundEffect('open');
     if (project.caseStudy) navigate(project.caseStudy);
     else setSelectedProject(project);
   };
@@ -931,14 +974,6 @@ const Designer = () => {
       isDark ? 'bg-[#050505] text-white' : 'bg-[#F8F8F5] text-[#121212]'
     }`}>
       
-      {/* GLOBAL SCROLLBAR STYLE */}
-      <style>{`
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: ${isDark ? '#050505' : '#F8F8F5'}; }
-        ::-webkit-scrollbar-thumb { background: #ff4d00; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #cc3d00; }
-      `}</style>
-
       {/* 1. CINEMATIC GRAIN OVERLAY */}
       <div className={`fixed inset-0 pointer-events-none z-0 mix-blend-overlay ${isDark ? 'opacity-[0.07]' : 'opacity-[0.03]'}`} 
            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}>
@@ -949,7 +984,7 @@ const Designer = () => {
       <ProcessSection />
       
       {/* MAIN SELECTED WORKS SHOWCASE SECTION */}
-      <SelectedWorksShowcase onProjectClick={openProject} />
+      <SelectedWorksShowcase onProjectClick={openProject} previewsEnabled={!selectedProject} />
 
       {/* PROJECTS SECTION: Default design with button to view secondary layout */}
       <div className="relative z-10 pt-16 md:pt-24 pb-24" id="projects">
@@ -986,12 +1021,12 @@ const Designer = () => {
                 <p className={`text-sm sm:text-base leading-relaxed mb-8 max-w-lg ${
                   isDark ? 'text-neutral-400' : 'text-neutral-600'
                 }`}>
-                  Browse the complete archive of shipped design systems, full-stack applications, and interaction experiments.
+                  Browse the complete archive of shipped design systems, full-stack applications and interaction experiments.
                 </p>
 
                 {/* Button that reveals secondary design */}
                 <button
-                  onClick={() => setShowSecondaryCatalog(true)}
+                  onClick={() => { playSoundEffect('open'); setShowSecondaryCatalog(true); }}
                   className="group relative inline-flex items-center gap-3 px-7 py-3.5 rounded-full text-xs sm:text-sm font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] shadow-lg hover:shadow-[#ff5e1a]/25 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
                 >
                   <span>View All Projects</span>
@@ -1011,7 +1046,7 @@ const Designer = () => {
                 All Projects // Secondary Archive Layout
               </span>
               <button
-                onClick={() => setShowSecondaryCatalog(false)}
+                onClick={() => { playSoundEffect('close'); setShowSecondaryCatalog(false); }}
                 className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider border border-black/10 dark:border-white/10 hover:border-[#ff5e1a] text-neutral-600 dark:text-neutral-300 hover:text-[#ff5e1a] transition-colors cursor-pointer"
               >
                 <span>Collapse</span>
@@ -1107,27 +1142,18 @@ const Designer = () => {
                             className={`group relative cursor-pointer ${index % 2 === 1 ? 'lg:translate-y-16' : ''}`}
                             onClick={() => openProject(project)}
                         >
-                            {/* 1. THE IMAGE CARD */}
-                            <div 
-                                className={`relative aspect-[16/10] w-full overflow-hidden rounded-sm border transition-all duration-500 ${
-                                  isDark ? 'bg-[#111] border-white/10' : 'bg-white border-black/10 shadow-sm'
-                                }`}
-                            >
-                                <div className={`absolute inset-0 bg-gradient-to-t ${isDark ? 'from-black via-transparent to-transparent opacity-60' : 'from-black/40 via-transparent to-transparent opacity-40'} z-10 group-hover:opacity-20 transition-opacity duration-500`} />
+                            <div className={`flex aspect-[16/10] w-full items-center justify-center overflow-hidden rounded-sm border transition-all duration-500 ${
+                              isDark ? 'bg-[#111] border-white/10' : 'bg-white border-black/10 shadow-sm'
+                            }`}>
                                 {project.image && (
-                                    <img 
-                                        src={project.image} 
-                                        alt={project.title}
-                                        className="w-full h-full object-cover transition-transform duration-[1.2s] ease-[0.22,1,0.36,1] scale-100 group-hover:scale-105"
+                                    <ProjectMockup
+                                        src={project.image}
+                                        alt={`${project.title} project preview`}
+                                        videoSrc={project.previewVideo}
+                                        active={!selectedProject}
+                                        className="w-[min(62%,24rem)] motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover:scale-[1.03]"
                                     />
                                 )}
-                                <div className="absolute top-4 left-4 z-20">
-                                    <div className={`backdrop-blur-md border px-3 py-1 flex items-center gap-2 ${
-                                      isDark ? 'bg-black/50 border-white/10 text-gray-300' : 'bg-white/90 border-black/10 text-neutral-800 shadow-sm'
-                                    }`}>
-                                        <span className="text-[9px] font-sans uppercase tracking-widest font-bold">{project.subCat}</span>
-                                    </div>
-                                </div>
                             </div>
 
                             {/* 2. TYPOGRAPHY & BUTTON BELOW */}
@@ -1139,6 +1165,9 @@ const Designer = () => {
                                         }`}>
                                             {project.title}
                                         </h3>
+                                    )}
+                                    {project.subCat && (
+                                        <p className={`text-xs font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{project.subCat}</p>
                                     )}
                                     {project.desc && (
                                         <p className={`text-md transition-colors duration-300 max-w-xl ${

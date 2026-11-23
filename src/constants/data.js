@@ -1,4 +1,7 @@
-import { OTAKU_CIRCLE_CASE_STUDY, OTAKU_CIRCLE_LIVE } from './otakuCircle';
+import { OTAKU_CIRCLE_CASE_STUDY, OTAKU_CIRCLE_LIVE, OTAKU_CIRCLE_PREVIEW_VIDEO, OTAKU_CIRCLE_TIMELINE } from './otakuCircle';
+import { favoriteTrack } from './favoriteTrack';
+
+const LEDGERLY_PREVIEW_VIDEO = '/videos/ledgerly-preview.mp4';
 
 export const designData = {
   hero: {
@@ -37,12 +40,7 @@ export const designData = {
     ]
   },
 
-  favoriteMusic: {
-    title: "DTMF (DeBÍ TiRAR MáS FOToS)",
-    artist: "Bad Bunny",
-    audioUrl: "/audio/bad_bunny_dtmf.mp3",
-    cdnUrl: "https://archive.org/download/bad-bunny-dtmf-lyrics/Bad%20bunny%20Dtmf%20%28lyrics%29.mp3"
-  },
+  favoriteMusic: favoriteTrack,
 
   about: {
     title: "About Me",
@@ -92,9 +90,10 @@ export const designData = {
           desc: "A social platform for anime enthusiasts to browse, review and track their journey with friends.",
           longDesc: "OtakuCircle bridges the gap between cataloging and social interaction. Designed an immersive obsidian dark UI with frosted glassmorphism, 2:3 aspect ratio poster dynamics and AI vibe-based recommendation architecture.",
           tools: "Figma, React, Tailwind CSS",
-          timeline: "4 Weeks",
+          timeline: OTAKU_CIRCLE_TIMELINE,
           live: OTAKU_CIRCLE_LIVE,
           caseStudy: OTAKU_CIRCLE_CASE_STUDY,
+          previewVideo: OTAKU_CIRCLE_PREVIEW_VIDEO,
           github: "",
           tags: ["Web Applications", "SaaS", "Product Design"],
           gallery: ["/images/otakucircle/landing.webp"]
@@ -125,7 +124,20 @@ export const designData = {
           timeline: "2 Weeks",
           github: "https://github.com/KhushangSingh/Ledgerly",
           live: "https://ledgerly-ks.vercel.app/",
+          previewVideo: LEDGERLY_PREVIEW_VIDEO,
           image: "/images/ledgerly_cover.jpg",
+          study: {
+            context: "Useful links were scattered across bookmarks and messages. Ledgerly gives developers and designers a personal place to save resources and find them again.",
+            flow: "Save a resource and find it again",
+            steps: [
+              ["Save the link", "Paste the URL and give it a title."],
+              ["Pick a category", "File the resource in My Vault for later."],
+              ["Find it again", "Search by title or filter by category in My Vault."]
+            ],
+            decision: "My Vault keeps personal organization separate from community discovery. Sharing is a choice people can make for each link.",
+            recovery: "If the URL is already saved, the form names the existing link so the user can find that entry in My Vault.",
+            nextTest: "Ask someone to save a resource and find it again later without help."
+          },
           tags: ["Web Applications", "SaaS", "Product Design"],
           gallery: [
             "images/LedgerlyProject/Ledgerly-LandingPage.png",
@@ -142,13 +154,27 @@ export const designData = {
           accent: "#ff6f00",
           subCat: "SaaS",
           role: "Product Designer & Frontend Engineer",
-          desc: "End-to-end guild management and team analytics SaaS featuring role-based matchmaking and real-time activity metrics.",
-          longDesc: "Designed complex administrative dashboards, team roster scheduling and permission matrices for high-velocity gaming communities and competitive esports squads.",
-          tools: "Figma, React, Next.js, Tailwind CSS",
+          desc: "Discover local hackathons, sports and other activities, then find a clan to join.",
+          longDesc: "Members can browse clans by category and request to join. Hosts can create clans, review requests and manage their roster.",
+          tools: "Figma, React, Tailwind CSS",
           timeline: "3 Weeks",
-          image: "/images/UnderDevelopment.png",
+          live: "https://clanforge.vercel.app/",
+          previewVideo: "/videos/clanforge-preview.mp4",
+          image: "/images/clanforge-live.webp",
+          study: {
+            context: "Students without an established network can struggle to find teammates for an event. ClanForge gives them a place to discover groups with open spots.",
+            flow: "Find a clan and request to join",
+            steps: [
+              ["Browse clans", "Pick a category that fits the activity."],
+              ["Check the details", "Open a clan to see what the host is looking for."],
+              ["Send a request", "Add an introduction and send it to the host for review."]
+            ],
+            decision: "Joining starts with a request. The introduction gives hosts context for reviewing applicants and adds a step before the applicant can join.",
+            recovery: "If a category is empty, choose All Clans to see the wider list.",
+            nextTest: "Watch a participant find and request a clan. Then check whether a host can locate and respond to the request without help."
+          },
           tags: ["SaaS", "Web Applications", "Product Design"],
-          gallery: ["/images/UnderDevelopment.png"]
+          gallery: ["/images/clanforge-live.webp"]
         }
       ]
     },
@@ -199,6 +225,7 @@ export const designData = {
           timeline: "2 Weeks",
           github: "https://github.com/KhushangSingh/Ledgerly",
           live: "https://ledgerly-ks.vercel.app/",
+          previewVideo: LEDGERLY_PREVIEW_VIDEO,
           tags: ["Frontend Development", "Design Engineering"],
           gallery: [
             "images/LedgerlyProject/Ledgerly-LandingPage.png",
@@ -350,4 +377,4 @@ export const designData = {
 };
 
 // Backwards-compatibility export to prevent import resolution errors
-export const devData = {};
+export const devData = {};

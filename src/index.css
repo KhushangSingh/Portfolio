@@ -16,35 +16,60 @@ body {
   overflow-x: clip;
 }
 
-body {
-  background-color: black;
+:root {
+  --page-canvas: #050505;
+  --scrollbar-accent: #ff5e1a;
+  --scrollbar-tone: #fff;
+  background-color: var(--page-canvas);
 }
 
-/* 2. TRANSPARENT VERTICAL SCROLLBAR TRACK & PATH */
-::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
+:root.light {
+  --page-canvas: #f8f8f5;
+  --scrollbar-tone: #241812;
 }
 
-::-webkit-scrollbar-track {
-  background: transparent !important;
+.header-music-record {
+  border: 1px solid #ef8b55;
+  background:
+    radial-gradient(circle, #20120c 0 9%, #ff5e1a 13% 32%, transparent 36%),
+    radial-gradient(circle, transparent 0 50%, rgb(0 0 0 / 45%) 54% 64%, transparent 68%),
+    conic-gradient(from 15deg, #211611 0deg 20deg, #b77251 45deg, #211611 72deg 192deg, #805039 221deg, #211611 250deg);
 }
 
-::-webkit-scrollbar-thumb {
-  background-color: rgba(140, 140, 140, 0.35);
-  border-radius: 9999px;
-  border: 1px solid transparent;
-  background-clip: padding-box;
+:root:has(.project-detail-scroll) .portfolio-header-actions {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(140, 140, 140, 0.6);
+/* Native scrollbars use the current theme and any project-specific accent. */
+:root,
+.project-detail-scroll {
+  --scrollbar-thumb: color-mix(in srgb, var(--project-accent, var(--scrollbar-accent)) 78%, var(--scrollbar-tone));
 }
 
-/* Firefox scrollbar styling: subtle thumb with completely transparent track */
-html, body, * {
+* {
   scrollbar-width: thin;
-  scrollbar-color: rgba(140, 140, 140, 0.35) transparent !important;
+  scrollbar-color: var(--scrollbar-thumb, #ff5e1a) transparent;
+}
+
+@supports not (scrollbar-color: auto) {
+  ::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+  }
+
+  ::-webkit-scrollbar,
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-track-piece,
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb, #ff5e1a);
+    border-radius: 9999px;
+  }
 }
 
 /* 3. HARDWARE-ACCELERATED HIGH-FPS CIRCULAR VIEW TRANSITION */

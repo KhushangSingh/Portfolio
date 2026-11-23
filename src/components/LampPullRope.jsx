@@ -1,3 +1,4 @@
+import { playCustomEffect } from '../utils/soundEffects';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useTheme } from '../context/ThemeContext';
 
@@ -199,11 +200,7 @@ export const LampPullRope = () => {
 
   // Mechanical switch audio synthesis
   const playClickSound = useCallback((nextIsLight) => {
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
-      const ctx = new AudioCtx();
-      const t = ctx.currentTime;
+    playCustomEffect(.045, (ctx, output, t) => {
       
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -216,20 +213,16 @@ export const LampPullRope = () => {
       gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
       
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(output);
       
       osc.start(t);
       osc.stop(t + 0.045);
-    } catch {}
+    });
   }, []);
 
   // Realistic electrical arc blowout & glass shatter audio synthesis
   const playBulbShatterSound = useCallback(() => {
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
-      const ctx = new AudioCtx();
-      const t = ctx.currentTime;
+    playCustomEffect(.65, (ctx, output, t) => {
 
       // 1. High-voltage electrical arc crack
       const arcOsc = ctx.createOscillator();
@@ -240,7 +233,7 @@ export const LampPullRope = () => {
       arcGain.gain.setValueAtTime(0.38, t);
       arcGain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
       arcOsc.connect(arcGain);
-      arcGain.connect(ctx.destination);
+      arcGain.connect(output);
       arcOsc.start(t);
       arcOsc.stop(t + 0.13);
 
@@ -265,7 +258,7 @@ export const LampPullRope = () => {
 
       noiseSource.connect(filter);
       filter.connect(noiseGain);
-      noiseGain.connect(ctx.destination);
+      noiseGain.connect(output);
       noiseSource.start(t);
       noiseSource.stop(t + 0.62);
 
@@ -278,19 +271,15 @@ export const LampPullRope = () => {
       popGain.gain.setValueAtTime(0.5, t);
       popGain.gain.exponentialRampToValueAtTime(0.001, t + 0.19);
       popOsc.connect(popGain);
-      popGain.connect(ctx.destination);
+      popGain.connect(output);
       popOsc.start(t);
       popOsc.stop(t + 0.2);
-    } catch {}
+    });
   }, []);
 
   // Dull mechanical dud click when attempting to pull while bulb is repairing
   const playDudPullSound = useCallback(() => {
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
-      const ctx = new AudioCtx();
-      const t = ctx.currentTime;
+    playCustomEffect(.09, (ctx, output, t) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'square';
@@ -299,10 +288,10 @@ export const LampPullRope = () => {
       gain.gain.setValueAtTime(0.14, t);
       gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(output);
       osc.start(t);
       osc.stop(t + 0.09);
-    } catch {}
+    });
   }, []);
 
   const repairHintTimerRef = useRef(null);

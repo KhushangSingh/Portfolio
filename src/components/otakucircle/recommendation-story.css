@@ -2,7 +2,6 @@
   --story-bubble-background: #392d39;
   --story-bubble-ink: #fff6f7;
   --story-bubble-speaker: #f7adb9;
-  margin-block: 0 clamp(2.5rem, 5vw, 4.5rem);
   scroll-margin-top: var(--oc-header-offset);
 }
 .oc-case[data-theme="light"] .oc-story {
@@ -13,7 +12,7 @@
 
 .oc-story-stage { container-type: inline-size; }
 .oc-story-visual {
-  --story-headroom: clamp(5.75rem, 12cqw, 7rem);
+  --story-headroom: clamp(5.25rem, 10cqw, 6rem);
   --story-floor: .75rem;
   --story-art-height: min(36rem, 67cqw, max(7rem, calc(100svh - var(--oc-header-offset) - var(--story-headroom) - 1.75rem)));
   position: relative;
@@ -197,7 +196,7 @@
 }
 
 .oc-story-exchange-art {
-  --story-room-gap: clamp(1.15rem, 7cqw, 6rem);
+  --story-room-gap: clamp(1.6rem, 12cqw, 10rem);
   --story-exchange-height: min(var(--story-art-height), calc((100cqw - var(--story-room-gap)) / 1.5));
   position: absolute;
   bottom: calc(var(--story-floor) - var(--story-exchange-height) * .059);

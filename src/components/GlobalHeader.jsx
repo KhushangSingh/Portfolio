@@ -7,7 +7,7 @@ import { LampPullRope } from './LampPullRope';
 
 const GlobalHeader = () => {
   const { isDark, isBulbBroken } = useTheme();
-  const { isPlaying, isPastHero, isPlayerFullyHidden, handleHeaderPlayClick } = useMusic();
+  const { isPlaying, isPastHero, handleHeaderPlayClick } = useMusic();
   const [textIndex, setTextIndex] = useState(0);
   const [isStudioZoneOpen, setIsStudioZoneOpen] = useState(false);
   const [isMonitorOpen, setIsMonitorOpen] = useState(false);
@@ -173,7 +173,7 @@ const GlobalHeader = () => {
     }, 2300);
   };
 
-  const songName = designData?.favoriteMusic?.title || 'DTMF';
+  const songName = designData.favoriteMusic.title;
 
   // Alternate text between "Now Playing" and the song title while music is playing
   useEffect(() => {
@@ -197,10 +197,9 @@ const GlobalHeader = () => {
 
   const logoStyle = isDark ? darkGlassStyle : bulbGlowStyle;
 
-  // Music Button Style: 100% solid opaque pill in both themes with deep contrast so scrolling text never mixes
-  const musicGlassStyle = isDark 
-    ? 'bg-[#0a0a0d] border-white/15 hover:border-white/25 text-white shadow-xl'
-    : 'bg-[#FAF9F5] border-black/12 hover:border-black/20 text-neutral-900 shadow-md';
+  const musicGlassStyle = isDark
+    ? 'bg-[#3b2117] border-[#ff5e1a]/40 hover:border-[#ff5e1a]/60 text-white shadow-xl'
+    : 'bg-[#ffe8dc] border-[#ff5e1a]/35 hover:border-[#ff5e1a]/55 text-neutral-900 shadow-md';
 
   const glassBase = "backdrop-blur-xl border rounded-full transition-all duration-300 pointer-events-auto relative";
 
@@ -217,15 +216,13 @@ const GlobalHeader = () => {
   const textSlotWidth = isPlaying ? 'w-[86px] sm:w-[100px]' : 'w-[78px] sm:w-[92px]';
 
   return (
-    <header className={`fixed top-0 left-0 w-full z-[10000] px-6 py-6 md:px-12 flex justify-between items-center pointer-events-none font-sans transition-all duration-300 ${
-      isMonitorOpen ? 'opacity-0 pointer-events-none -translate-y-8' : 'opacity-100'
-    }`}>
+    <header className="fixed top-0 left-0 w-full z-[10000] px-4 py-6 md:px-12 flex justify-between items-start gap-2 pointer-events-none font-sans">
       {/* 1. TOP LEFT: LOGO WITH ATTACHED LAMP PULL ROPE */}
       <motion.div 
         initial={{ opacity: 0, y: -16, filter: 'blur(8px)' }}
         animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="relative inline-flex flex-col items-start pointer-events-auto"
+        className={`relative inline-flex flex-col items-start ${isMonitorOpen ? 'invisible' : 'pointer-events-auto'}`}
       >
         {/* Warm ambient orange light bloom when glowing like a bulb in light mode (extinguished when broken) */}
         {!isDark && !isBulbBroken && (
@@ -429,9 +426,9 @@ const GlobalHeader = () => {
       </motion.div>
 
       {/* 2. TOP RIGHT: PLAY MUSIC BUTTON (Revealed when past hero or in studio zone) */}
-      <div className="pointer-events-auto min-h-[44px] flex items-center">
+      <div className="portfolio-header-actions">
         <AnimatePresence mode="wait">
-          {(isPastHero || isStudioZoneOpen) && (
+          {!isMonitorOpen && (isPastHero || isStudioZoneOpen) && (
             <motion.div
               key="header-play-music-button"
               initial={{ opacity: 0, scale: 0.95, x: 20, filter: 'blur(8px)' }}
@@ -476,7 +473,11 @@ const GlobalHeader = () => {
                     </motion.span>
                   </AnimatePresence>
                 </div>
-
+                <span
+                  aria-hidden="true"
+                  className="header-music-record size-4 shrink-0 rounded-full motion-safe:animate-spin"
+                  style={{ animationDuration: '2.8s', animationPlayState: isPlaying ? 'running' : 'paused' }}
+                />
               </motion.button>
             </motion.div>
           )}

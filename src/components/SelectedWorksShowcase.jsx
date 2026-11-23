@@ -2,30 +2,31 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { designData } from '../constants/data';
+import ProjectMockup from './ProjectMockup';
 
-// Top 3 Flagship Projects (matching the reference card design)
+const portfolioProjects = designData.sections.flatMap(({ projects }) => projects);
+
+// Featured live projects.
 const TOP_PROJECTS = [
   {
     id: 1,
     rawId: 1,
     title: "OtakuCircle",
     subtitle: "Community & Anime Discovery · Full Stack SaaS",
-    desc: "A full social platform for anime enthusiasts to browse, review, and track their journey with friends. Designed an immersive obsidian dark UI with frosted glassmorphism, smart search by scenario, and AI vibe-based recommendation architecture.",
+    desc: "A full social platform for anime enthusiasts to browse, review and track their journey with friends. Designed an immersive obsidian dark UI with frosted glassmorphism, smart search by scenario and AI vibe-based recommendation architecture.",
     tags: ["SaaS platform", "Social discovery", "Design tokens"],
     footerNote: "End-to-end flows, dark mode tokens & responsive web application",
-    image: "/images/otakucircle/landing.webp",
     accent: "#10b981"
   },
   {
-    id: 2,
-    rawId: 2,
-    title: "SquadSync",
-    subtitle: "Merit-Based Team Collaboration · Studio Suite",
-    desc: "Collaboration platform connecting university students based on competency with a structured 'Request & Approval' workflow. Replaced chaotic social groups with skill-matching logic, project workspaces, and applicant review dashboards.",
-    tags: ["Collaboration", "SaaS workflow", "Dashboard UI"],
-    footerNote: "Competency matching algorithm & applicant review dashboards",
-    image: "/images/squadsync_cover.jpg",
-    accent: "#ec4899"
+    id: 4,
+    rawId: 4,
+    title: "ClanForge",
+    subtitle: "Team Discovery · Community Events",
+    desc: "Browse clans for hackathons, sports, gaming and other activities. Request to join an existing clan or start one and review applications as a host.",
+    tags: ["Clan discovery", "Join requests", "Roster management"],
+    footerNote: "Category filters and host approval workflows",
+    accent: "#ff6f00"
   },
   {
     id: 3,
@@ -35,12 +36,14 @@ const TOP_PROJECTS = [
     desc: "A centralized digital library built to eliminate the chaos of scattered bookmarks. Provides a structured environment where developers and designers can discover curated domain-specific tools and maintain personalized repositories for instant access.",
     tags: ["Tool vault", "Resource curation", "React architecture"],
     footerNote: "High-speed retrieval architecture, token design & interactive vaults",
-    image: "/images/ledgerly_cover.jpg",
     accent: "#f97316"
   }
-];
+].map(project => {
+  const details = portfolioProjects.find(({ id }) => id === project.rawId);
+  return { ...project, image: details?.image, previewVideo: details?.previewVideo };
+});
 
-export default function SelectedWorksShowcase({ onProjectClick }) {
+export default function SelectedWorksShowcase({ onProjectClick, previewsEnabled = true }) {
   const { isDark } = useTheme();
   const trackRef = useRef(null);
   const [progress, setProgress] = useState(0);
@@ -104,11 +107,7 @@ export default function SelectedWorksShowcase({ onProjectClick }) {
   // Helper to open case study modal
   const handleOpenCaseStudy = (rawId) => {
     if (!onProjectClick) return;
-    let matched = null;
-    for (const sec of designData.sections || []) {
-      matched = sec.projects.find((p) => p.id === rawId);
-      if (matched) break;
-    }
+    const matched = portfolioProjects.find(({ id }) => id === rawId);
     if (matched) {
       onProjectClick(matched);
     }
@@ -168,6 +167,7 @@ export default function SelectedWorksShowcase({ onProjectClick }) {
 
   const p3Raw = Math.min(1, Math.max(0, (progress - 0.48) / 0.30));
   const ease3 = 1 - Math.pow(1 - p3Raw, 3);
+  const activeCard = p3Raw > 0.75 ? 2 : p2Raw > 0.75 ? 1 : 0;
 
   // Subtle stacking offset so layered cards peek cleanly without crowding the top rim
   const card1Y = -(ease2 * 10 + ease3 * 10);
@@ -270,7 +270,7 @@ export default function SelectedWorksShowcase({ onProjectClick }) {
                 >
                   <ProjectHorizontalCard
                     project={TOP_PROJECTS[0]}
-                    isMobile={isMobile}
+                    previewActive={previewsEnabled && activeCard === 0}
                     onOpenCaseStudy={handleOpenCaseStudy}
                   />
                 </div>
@@ -288,7 +288,7 @@ export default function SelectedWorksShowcase({ onProjectClick }) {
                 >
                   <ProjectHorizontalCard
                     project={TOP_PROJECTS[1]}
-                    isMobile={isMobile}
+                    previewActive={previewsEnabled && activeCard === 1}
                     onOpenCaseStudy={handleOpenCaseStudy}
                   />
                 </div>
@@ -306,7 +306,7 @@ export default function SelectedWorksShowcase({ onProjectClick }) {
                 >
                   <ProjectHorizontalCard
                     project={TOP_PROJECTS[2]}
-                    isMobile={isMobile}
+                    previewActive={previewsEnabled && activeCard === 2}
                     onOpenCaseStudy={handleOpenCaseStudy}
                   />
                 </div>
@@ -333,7 +333,7 @@ export { SelectedWorksShowcase as ReelRingShowcase };
    - Left side: Project title, summary and metadata
    - Right side: High-precision hardware desktop monitor displaying the product UI
    ========================================================================= */
-function ProjectHorizontalCard({ project, isMobile, onOpenCaseStudy }) {
+function ProjectHorizontalCard({ project, previewActive, onOpenCaseStudy }) {
   return (
     <div
       className="relative w-full rounded-[22px] sm:rounded-[28px] md:rounded-[32px] p-5 sm:p-7 md:p-7 lg:p-8 xl:p-9 shadow-[0_24px_55px_rgba(0,0,0,0.25)] border border-black/[0.08] bg-[#F8F8F5] text-neutral-900 transition-all duration-300 overflow-hidden opacity-100 select-none min-h-[415px] sm:min-h-[450px] md:min-h-[490px] lg:min-h-[520px] xl:min-h-[545px] flex flex-col justify-center"
@@ -388,43 +388,15 @@ function ProjectHorizontalCard({ project, isMobile, onOpenCaseStudy }) {
 
         </div>
 
-        {/* RIGHT COLUMN: REALISTIC HARDWARE DESKTOP MONITOR MOCKUP (~56% width) */}
-        <div className="w-full md:w-[54%] lg:w-[56%] flex flex-col items-center justify-center relative py-1 sm:py-1.5">
-          
-          {/* MONITOR DISPLAY SCREEN & BEZEL */}
-          <div className="relative w-full aspect-[16/10] max-h-[240px] sm:max-h-[285px] md:max-h-[325px] lg:max-h-[365px] xl:max-h-[385px] rounded-[14px] sm:rounded-[18px] md:rounded-[22px] bg-[#0a0a0c] p-1.5 sm:p-2 md:p-2.5 shadow-[0_22px_55px_rgba(0,0,0,0.5)] border border-neutral-800">
-            
-            {/* Top Bezel Camera Dot */}
-            <div className="absolute top-1 sm:top-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-neutral-700/80 pointer-events-none" />
-
-            {/* Inner Glass Display with Project UI Screenshot */}
-            <div className="relative w-full h-full rounded-[8px] sm:rounded-[12px] md:rounded-[14px] overflow-hidden bg-neutral-900 border border-black/40">
-              <img
-                src={project.image}
-                alt={`${project.title} Interface Preview`}
-                className="w-full h-full object-cover object-top select-none pointer-events-none transition-transform duration-700 hover:scale-[1.02]"
-                loading="eager"
-              />
-
-              {/* Specular Diagonal Reflection Sheen */}
-              <div 
-                className="absolute inset-0 pointer-events-none opacity-20"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.05) 30%, transparent 60%)'
-                }}
-              />
-            </div>
-          </div>
-
-          {/* MONITOR METALLIC STAND NECK */}
-          <div className="w-9 sm:w-11 md:w-13 h-4 sm:h-5 md:h-6 bg-gradient-to-b from-[#8f949e] via-[#6c727d] to-[#4c5057] shadow-inner -mt-0.5 border-x border-neutral-700/50" />
-
-          {/* MONITOR HORIZONTAL / ELLIPTICAL STAND BASE */}
-          <div className="relative w-26 sm:w-32 md:w-40 h-2 sm:h-3 rounded-full bg-gradient-to-r from-[#7a7f8a] via-[#a3a9b5] to-[#7a7f8a] shadow-[0_4px_10px_rgba(0,0,0,0.4)] border border-neutral-600/60" />
-
-          {/* REALISTIC CONTACT SHADOW ON WHITE CARD FLOOR */}
-          <div className="w-34 sm:w-48 h-2 rounded-full bg-black/25 blur-[5px] -mt-1 pointer-events-none" />
-
+        <div className="flex w-full min-w-0 items-center justify-center md:w-[54%] lg:w-[56%]">
+          <ProjectMockup
+            src={project.image}
+            alt={`${project.title} interface preview`}
+            videoSrc={project.previewVideo}
+            active={previewActive}
+            className="w-full max-w-[min(13.5rem,36svh)] sm:max-w-[16rem] md:max-w-[23.5rem] lg:max-w-[27rem] xl:max-w-[29rem]"
+            loading="eager"
+          />
         </div>
 
       </div>

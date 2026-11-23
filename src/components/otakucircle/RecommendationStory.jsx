@@ -228,7 +228,7 @@ export default function RecommendationStory() {
   }, [index, reducedMotion, visible]);
 
   return (
-    <section id="oc-story-title" className="oc-story" ref={player} aria-label="OtakuCircle recommendation animation">
+    <section id="oc-story-title" className="oc-story oc-wrap" ref={player} aria-label="OtakuCircle recommendation animation">
       <SceneArt scene={scene} playing={visible && !reducedMotion} reducedMotion={reducedMotion} />
     </section>
   );

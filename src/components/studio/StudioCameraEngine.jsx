@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useAnimationControls } from 'framer-motion';
 import { useTheme } from '../../context/ThemeContext';
+import { playSoundEffect } from '../../utils/soundEffects';
 import MonitorOS from './MonitorOS';
 import BookshelfZone from './BookshelfZone';
 import VinylZone from './VinylZone';
@@ -153,6 +154,7 @@ export default function StudioCameraEngine({ onZoneStateChange }) {
   // Zone dive trigger: dramatic camera zoom-in and 3D rotation first, then reveals closer look
   const handleZoneClick = (zoneId) => {
     if (activeZoneId) return;
+    playSoundEffect('open');
 
     // Pin scroll position directly to studio section so there is 0 top cut-off and 0 white space below
     const studioEl = document.getElementById('studio');

@@ -28,6 +28,7 @@
   min-width: 0;
   min-height: 0;
   overflow: auto;
+  overscroll-behavior-y: contain;
   scrollbar-gutter: stable;
   scroll-padding-top: 6rem;
 }
@@ -65,15 +66,6 @@
 .oc-demo-tabs button:hover,
 .oc-demo-tabs [aria-current="page"] { color: var(--demo-rose); }
 
-.oc-demo-tabs [aria-current="page"]::after {
-  position: absolute;
-  right: 12%;
-  bottom: .05rem;
-  left: 12%;
-  height: 2px;
-  background: var(--demo-red);
-  content: '';
-}
 
 .oc-demo-segment {
   display: inline-flex;
@@ -103,7 +95,6 @@
 .oc-demo-global-search input,
 .oc-friends-header > input { width: 100%; min-height: 2.55rem; padding-inline: 1rem; border-radius: 999px; }
 .oc-demo-page { padding: clamp(1.2rem, 4cqw, 3.25rem) var(--demo-gutter) 2.8rem; }
-.oc-demo-content { animation: oc-enter .32s cubic-bezier(.22, 1, .36, 1) both; }
 .oc-demo h3 { font-size: clamp(1.4rem, 3.1cqw, 2.5rem); font-weight: 800; letter-spacing: -.055em; line-height: 1.05; }
 .oc-demo h4 { font-size: clamp(.95rem, 1.45cqw, 1.24rem); font-weight: 750; letter-spacing: -.025em; }
 .oc-demo-meta { color: var(--demo-muted); font-size: .82rem; }
@@ -309,8 +300,8 @@
 .oc-tracker-filters { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
 .oc-tracker-toolbar { justify-content: space-between; margin-top: 1.15rem; border-bottom: 1px solid var(--demo-line); }
 .oc-tracker-toolbar > .oc-demo-rose-button { margin-block: .25rem; box-shadow: 0 4px 12px rgb(225 29 72 / 20%); }
-.oc-tracker-modes button { min-height: 2.5rem; padding: .25rem .46rem; border-bottom: 2px solid transparent; color: var(--demo-muted); font-weight: 750; }
-.oc-tracker-modes [aria-pressed="true"] { border-bottom-color: var(--demo-rose); color: var(--demo-text); }
+.oc-tracker-modes button { min-height: 2.5rem; padding: .25rem .46rem; border-radius: .45rem; color: var(--demo-muted); font-weight: 750; }
+.oc-tracker-modes [aria-pressed="true"] { background: var(--demo-layer); color: var(--demo-text); }
 .oc-tracker-filters { margin-block: .72rem 1.05rem; }
 .oc-tracker-filters input { margin-left: auto; width: min(100%, 11rem); }
 .oc-tracker-add { display: flex; flex-wrap: wrap; align-items: end; gap: .6rem; padding: .65rem; margin-top: .72rem; border: 1px solid var(--demo-line); border-radius: .55rem; background: var(--demo-raised); }

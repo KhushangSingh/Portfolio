@@ -1,6 +1,8 @@
-import { useRef, useState } from 'react';
+import { useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
 import { MediaGrid, PlanButton, Poster } from './DemoMedia';
 import { ProfileView, TrackerView } from './DemoLibrary';
+import { bindDemoScrollHandoff } from './demoScrollHandoff';
+import { playSoundEffect } from '../../utils/soundEffects';
 import {
   demoFriends, demoTitles, initialDates, initialLibrary, libraryStatuses,
   sampleInbox, searchDemoTitles, searchPrompts
@@ -78,7 +80,7 @@ function DiscoveryView({ forYou, media, library, onUpdate, onNavigate }) {
     <div className="oc-demo-page oc-discovery-view">
       <header className="oc-discovery-hero" data-for-you={forYou}>
         <h3>{forYou ? 'For You' : 'Discover ' + media}</h3>
-        <p>{forYou ? 'Recommendations based on your demo library and the genres you watch or read.' : 'Explore titles, keep track of your progress, and share what you find.'}</p>
+        <p>{forYou ? 'Recommendations based on your demo library and the genres you watch or read.' : 'Explore titles, keep track of your progress and share what you find.'}</p>
         <button type="button" className="oc-demo-action oc-demo-action-primary" onClick={() => onNavigate(forYou ? 'home' : 'search')}>
           {forYou ? 'Browse Trending' : 'Try Smart Search'}
         </button>
@@ -113,7 +115,7 @@ function SearchView({ library, media, initialQuery, onUpdate }) {
       <div className="oc-search-hero">
         <div>
           <h3>Search by<br /><span>Feeling &amp; Context</span></h3>
-          <p>Don’t recall the name? Describe the plot, the vibe, or the characters.</p>
+          <p>Don’t recall the name? Describe the plot, the vibe or the characters.</p>
         </div>
         <div>
           <form className="oc-search-form" role="search" aria-label="Search by feeling and context" onSubmit={(event) => { event.preventDefault(); setSubmitted(query.trim()); }}>
@@ -136,14 +138,14 @@ function SearchView({ library, media, initialQuery, onUpdate }) {
           </div>
           <MediaGrid items={results} library={library} onUpdate={onUpdate} />
         </section>
-      ) : <p className="oc-demo-empty">No sample titles match. Try one of the examples.</p>)}
+      ) : <p className="oc-demo-empty">No sample titles match. Try a scene detail, simpler wording or an example.</p>)}
     </div>
   );
 }
 
-function RecommendationCard({ title, notes, status, archived, onArchive, onUpdate }) {
+function RecommendationCard({ title, notes, status, archived, showNotes, onArchive, onUpdate }) {
   return (
-    <li className="oc-inbox-card">
+    <li className="oc-inbox-card" data-title-id={title.id}>
       <Poster title={title} />
       <div className="oc-inbox-card-body">
         <div className="oc-inbox-meta">
@@ -152,7 +154,7 @@ function RecommendationCard({ title, notes, status, archived, onArchive, onUpdat
         </div>
         <h5>{title.title}</h5>
         <p className="oc-demo-meta">{title.genre}</p>
-        <details className="oc-inbox-notes">
+        <details className="oc-inbox-notes" open={showNotes || undefined}>
           <summary aria-label={'Read friends’ notes for ' + title.title}><strong>{notes[0].friend}</strong> {notes[0].message}</summary>
           <ul>{notes.map(({ friend, message }) => <li key={friend}><strong>{friend}</strong><p>{message}</p></li>)}</ul>
         </details>
@@ -166,10 +168,10 @@ function RecommendationCard({ title, notes, status, archived, onArchive, onUpdat
   );
 }
 
-function FriendsView({ library, archive, onArchive, onUpdate }) {
-  const [filter, setFilter] = useState('recommended');
+function FriendsView({ library, archive, initialFilter, initialTitle, onArchive, onUpdate }) {
+  const [filter, setFilter] = useState(initialFilter);
   const [sender, setSender] = useState('');
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(demoTitles[initialTitle]?.title ?? '');
   const [friendQuery, setFriendQuery] = useState('');
   const [requests, setRequests] = useState('received');
   const [openFriend, setOpenFriend] = useState('');
@@ -187,7 +189,7 @@ function FriendsView({ library, archive, onArchive, onUpdate }) {
       <header className="oc-friends-header">
         <div>
           <h3>Social Hub</h3>
-          <p>Discover peer-endorsed titles, compare tastes, and manage recommendations.</p>
+          <p>Discover peer-endorsed titles, compare tastes and manage recommendations.</p>
         </div>
         <input type="search" aria-label="Find fellow otakus" placeholder="Find fellow otakus…" value={friendQuery} onChange={(event) => setFriendQuery(event.target.value)} />
       </header>
@@ -220,7 +222,7 @@ function FriendsView({ library, archive, onArchive, onUpdate }) {
             </div>
             {groups.length > 0 ? (
               <ul className="oc-inbox-titles">
-                {groups.map(({ id, notes }) => <RecommendationCard key={id} title={demoTitles[id]} notes={notes} status={library[id]} archived={archived} onArchive={onArchive} onUpdate={onUpdate} />)}
+                {groups.map(({ id, notes }) => <RecommendationCard key={id} title={demoTitles[id]} notes={notes} status={library[id]} archived={archived} showNotes={id === initialTitle} onArchive={onArchive} onUpdate={onUpdate} />)}
               </ul>
             ) : <p className="oc-demo-empty">No recommendations match this view.</p>}
           </section>
@@ -253,9 +255,9 @@ function FriendsView({ library, archive, onArchive, onUpdate }) {
   );
 }
 
-export default function OtakuCircleDemo() {
+export default function OtakuCircleDemo({ ref }) {
   const viewport = useRef(null);
-  const [view, setView] = useState('friends');
+  const [view, setView] = useState('home');
   const [media, setMedia] = useState('Anime');
   const [library, setLibrary] = useState(initialLibrary);
   const [dates, setDates] = useState(initialDates);
@@ -263,24 +265,67 @@ export default function OtakuCircleDemo() {
   const [notice, setNotice] = useState('');
   const [query, setQuery] = useState('');
   const [trackerFilter, setTrackerFilter] = useState('all');
+  const [inboxFilter, setInboxFilter] = useState('recommended');
+  const [inboxTitle, setInboxTitle] = useState('');
   const [viewVersion, setViewVersion] = useState(0);
 
+  useEffect(() => bindDemoScrollHandoff(viewport.current), [viewVersion, media]);
+
   function navigate(destination, value = '') {
+    playSoundEffect('select');
     setQuery(destination === 'search' ? value.trim() : '');
     setTrackerFilter(destination === 'tracker' && value ? value : 'all');
+    setInboxFilter(destination === 'friends' && value === 'archive' ? 'archive' : 'recommended');
+    setInboxTitle('');
     setView(destination);
     setViewVersion((version) => version + 1);
     if (viewport.current) viewport.current.scrollTop = 0;
   }
 
+  useImperativeHandle(ref, () => ({
+    showSearch(clue, focus) {
+      setMedia('Anime');
+      navigate('search', clue);
+      if (focus) viewport.current?.focus({ preventScroll: true });
+    },
+    showRecommendation(titleId) {
+      navigate('friends', archive.includes(titleId) ? 'archive' : 'recommended');
+      setInboxTitle(titleId);
+      viewport.current?.focus({ preventScroll: true });
+    },
+    showRecovery(scenario) {
+      if (scenario === 'archive') {
+        setArchive((items) => items.length ? items : [sampleInbox[0].id]);
+        navigate('friends', 'archive');
+      } else {
+        setMedia('Anime');
+        navigate('search', 'I vaguely remember it');
+      }
+      viewport.current?.focus({ preventScroll: true });
+    }
+  }));
+
+  useLayoutEffect(() => {
+    if (inboxFilter !== 'archive' && !inboxTitle) return;
+    const scroller = viewport.current;
+    const match = [...scroller.querySelectorAll('[data-title-id]')].find((card) => card.dataset.titleId === inboxTitle);
+    const target = match ?? scroller.querySelector('.oc-inbox-list');
+    const toolbar = scroller.querySelector('.oc-demo-toolbar');
+    if (target && toolbar) {
+      scroller.scrollTop += target.getBoundingClientRect().top - toolbar.getBoundingClientRect().bottom - 12;
+    }
+  }, [inboxFilter, inboxTitle, media, viewVersion]);
+
   function changeMedia(type) {
     if (type === media) return;
+    playSoundEffect('select');
     setMedia(type);
     setQuery('');
     if (viewport.current) viewport.current.scrollTop = 0;
   }
 
   function updateLibrary(id, status) {
+    playSoundEffect('confirm');
     setLibrary((items) => ({ ...items, [id]: status }));
     setNotice(demoTitles[id].title + ' · ' + libraryStatuses[status]);
   }
@@ -290,6 +335,7 @@ export default function OtakuCircleDemo() {
   }
 
   function removeTitle(id) {
+    playSoundEffect('close');
     setLibrary((items) => {
       const next = { ...items };
       delete next[id];
@@ -304,6 +350,7 @@ export default function OtakuCircleDemo() {
   }
 
   function updateArchive(id, restore) {
+    playSoundEffect(restore ? 'confirm' : 'close');
     setArchive((items) => restore ? items.filter((item) => item !== id) : [...new Set([...items, id])]);
     setNotice(demoTitles[id].title + (restore ? ' restored to inbox' : ' archived'));
   }
@@ -314,11 +361,11 @@ export default function OtakuCircleDemo() {
     setArchive([]);
     setMedia('Anime');
     setNotice('Demo reset');
-    navigate('friends');
+    navigate('home');
   }
 
   return (
-    <div className="oc-demo-shell">
+    <div data-case-motion="media" className="oc-demo-shell">
       <div className="oc-demo">
         <div className="oc-demo-viewport" ref={viewport} tabIndex={0} role="region" aria-label="Scrollable OtakuCircle demo" data-lenis-prevent>
           <DemoNavbar view={view} media={media} onMedia={changeMedia} onNavigate={navigate} onSearch={(value) => navigate('search', value)} />
@@ -326,7 +373,7 @@ export default function OtakuCircleDemo() {
             {view === 'home' && <DiscoveryView media={media} library={library} onUpdate={updateLibrary} onNavigate={navigate} />}
             {view === 'search' && <SearchView media={media} library={library} initialQuery={query} onUpdate={updateLibrary} />}
             {view === 'for-you' && <DiscoveryView forYou media={media} library={library} onUpdate={updateLibrary} onNavigate={navigate} />}
-            {view === 'friends' && <FriendsView library={library} archive={archive} onArchive={updateArchive} onUpdate={updateLibrary} />}
+            {view === 'friends' && <FriendsView library={library} archive={archive} initialFilter={inboxFilter} initialTitle={inboxTitle} onArchive={updateArchive} onUpdate={updateLibrary} />}
             {view === 'profile' && <ProfileView library={library} archive={archive} onTracker={(status) => navigate('tracker', status)} />}
             {view === 'tracker' && <TrackerView library={library} dates={dates} initialStatus={trackerFilter} onProfile={() => navigate('profile')} onUpdate={updateLibrary} onDate={changeDate} onRemove={removeTitle} />}
           </div>

@@ -86,7 +86,7 @@ export default function PortfolioSummary() {
           <p className="text-base sm:text-lg text-neutral-700 dark:text-neutral-300 leading-relaxed max-w-3xl font-normal">
             B.Tech in Computer Science & Engineering at Vellore Institute of Technology (VIT). 
             Bridging user empathy and technical execution by designing scalable design token architectures, 
-            crafting complex SaaS interaction workflows, and writing production-ready React code with obsessive physical craft.
+            crafting complex SaaS interaction workflows and writing production-ready React code with obsessive physical craft.
           </p>
 
           {/* Key Facts Strip */}
@@ -171,7 +171,7 @@ export default function PortfolioSummary() {
                   Product Designer & Full Stack Developer
                 </p>
                 <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                  A comprehensive anime community & tracking discovery platform. Designed an immersive obsidian dark UI with frosted glassmorphism, smart search by scenario, and AI vibe-based recommendation architecture. Built responsive frontend tokens and cataloging flows.
+                  A comprehensive anime community & tracking discovery platform. Designed an immersive obsidian dark UI with frosted glassmorphism, smart search by scenario and AI vibe-based recommendation architecture. Built responsive frontend tokens and cataloging flows.
                 </p>
                 <div className="flex flex-wrap gap-2 pt-2">
                   {['Figma', 'React 19', 'Tailwind CSS', 'Design Tokens', 'SaaS Architecture'].map((tag, idx) => (
@@ -212,7 +212,7 @@ export default function PortfolioSummary() {
                   Product Designer & Interaction Architect
                 </p>
                 <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                  Merit-based collaboration platform connecting university students based on competency with a structured 'Request & Approval' workflow. Replaced chaotic social groups with verified skill matching, workspaces, and applicant review dashboards.
+                  Merit-based collaboration platform connecting university students based on competency with a structured 'Request & Approval' workflow. Replaced chaotic social groups with verified skill matching, workspaces and applicant review dashboards.
                 </p>
                 <div className="flex flex-wrap gap-2 pt-2">
                   {['Product Design', 'Figma Systems', 'Applicant Dashboards', 'Workflow Logic'].map((tag, idx) => (
@@ -407,7 +407,7 @@ export default function PortfolioSummary() {
               Ready to create together?
             </h3>
             <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400">
-              Available for design engineering internships, product design contracts, and ambitious software builds.
+              Available for design engineering internships, product design contracts and ambitious software builds.
             </p>
           </div>
 

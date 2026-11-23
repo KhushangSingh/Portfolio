@@ -35,16 +35,13 @@
       .portfolio-loader {
         --loader-background: #0e0a08;
         --loader-accent: #ff5e1a;
-        --loader-detail: rgb(255 224 204 / 18%);
-        --loader-orbit-highlight: rgb(255 94 26 / 35%);
         --loader-lock-time: 160ms;
-        --loader-outro-delay: 1200ms;
-        --loader-exit-time: 1150ms;
-        --loader-core-radius: 0.875rem;
+        --loader-exit-time: 440ms;
         position: fixed;
         inset: 0;
         z-index: 100001;
         place-content: center;
+        overflow: hidden;
         padding: 1rem;
         background: var(--loader-background);
         color: var(--loader-accent);
@@ -59,74 +56,7 @@
         overflow: hidden;
       }
 
-      .portfolio-loader[data-theme="light"] {
-        --loader-background: #f6f0eb;
-        --loader-detail: rgb(56 31 22 / 22%);
-        --loader-orbit-highlight: rgb(255 94 26 / 48%);
-      }
-
-      .portfolio-loader__frame {
-        --corner-line: linear-gradient(var(--loader-detail), var(--loader-detail));
-        --corner-length: clamp(1rem, 3vw, 2.5rem);
-        position: absolute;
-        inset: clamp(1rem, 4vw, 3rem);
-        pointer-events: none;
-        background:
-          var(--corner-line) left top / var(--corner-length) 1px no-repeat,
-          var(--corner-line) left top / 1px var(--corner-length) no-repeat,
-          var(--corner-line) right top / var(--corner-length) 1px no-repeat,
-          var(--corner-line) right top / 1px var(--corner-length) no-repeat,
-          var(--corner-line) left bottom / var(--corner-length) 1px no-repeat,
-          var(--corner-line) left bottom / 1px var(--corner-length) no-repeat,
-          var(--corner-line) right bottom / var(--corner-length) 1px no-repeat,
-          var(--corner-line) right bottom / 1px var(--corner-length) no-repeat;
-      }
-
-      .portfolio-loader__orbits {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        inline-size: min(85vw, 72rem);
-        block-size: clamp(5.5rem, 31vh, 17rem);
-        transform: translate(-50%, -50%);
-        pointer-events: none;
-      }
-
-      .portfolio-loader__orbits::before,
-      .portfolio-loader__orbits::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border: 1px solid var(--loader-detail);
-        border-radius: 50%;
-      }
-
-      .portfolio-loader__orbits::before { transform: rotate(-11deg); }
-
-      .portfolio-loader__orbits::after {
-        border-inline-end-color: var(--loader-orbit-highlight);
-        transform: rotate(11deg) scale(0.9, 0.78);
-      }
-
-      .portfolio-loader__progress {
-        position: absolute;
-        left: 50%;
-        bottom: clamp(1.75rem, 7vh, 4rem);
-        inline-size: clamp(5rem, 15vw, 10rem);
-        block-size: 2px;
-        background: var(--loader-detail);
-        transform: translateX(-50%);
-      }
-
-      .portfolio-loader__progress::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: var(--loader-accent);
-        transform: scaleX(var(--loader-progress, 0));
-        transform-origin: left;
-        transition: transform 180ms ease-out;
-      }
+      .portfolio-loader[data-theme="light"] { --loader-background: #f6f0eb; }
 
       .portfolio-loader__announcement {
         position: absolute;
@@ -219,40 +149,108 @@
 
       .portfolio-loader__reel[data-letter="I"] .portfolio-loader__strip > span { transform: scaleX(0.48); }
 
-      .portfolio-loader[data-phase="leaving"],
-      .portfolio-loader[data-phase="leaving"] .portfolio-loader__reels,
-      .portfolio-loader[data-phase="leaving"] .portfolio-loader__orbits,
-      .portfolio-loader[data-phase="leaving"]::after {
-        animation-duration: var(--loader-exit-time);
-        animation-delay: var(--loader-outro-delay);
-        animation-timing-function: cubic-bezier(0.55, 0.08, 0.57, 1);
-        animation-fill-mode: both;
+      .portfolio-loader__progress {
+        position: absolute;
+        inset-inline-end: clamp(.5rem, 2vw, 1.5rem);
+        inset-block-end: 0;
+        color: var(--loader-accent);
+        font-size: clamp(3rem, 14vw, 11rem);
+        font-weight: 760;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -.07em;
+        line-height: .82;
+        text-box: trim-end cap alphabetic;
+        pointer-events: none;
       }
 
-      .portfolio-loader[data-phase="leaving"] {
-        animation-name: portfolio-loader-exit;
+      @supports not (text-box: trim-end cap alphabetic) {
+        .portfolio-loader__progress { translate: 0 .12em; }
       }
 
-      .portfolio-loader[data-phase="leaving"] .portfolio-loader__reels {
-        animation-name: portfolio-loader-pull-in;
+      .portfolio-loader__glass {
+        position: absolute;
+        z-index: 2;
+        inset-block-start: 0;
+        inset-inline-start: 0;
+        inline-size: clamp(3rem, 8.4vw, 7.15rem);
+        aspect-ratio: 1;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 180ms ease-out;
       }
 
-      .portfolio-loader[data-phase="leaving"] .portfolio-loader__orbits {
-        animation-name: portfolio-loader-collapse-orbits;
-      }
+      .portfolio-loader__glass[data-scanning] { opacity: 1; }
+      .portfolio-loader[data-phase="expanding"] .portfolio-loader__glass { opacity: 0; }
 
-      .portfolio-loader[data-phase="leaving"]::after {
+      .portfolio-loader__glass::before {
         content: "";
         position: absolute;
-        top: 50%;
-        left: 50%;
-        inline-size: calc(var(--loader-core-radius) * 2);
-        aspect-ratio: 1;
+        inset-inline-start: 78%;
+        inset-block-start: 75%;
+        inline-size: 54%;
+        block-size: 15%;
+        border: 1px solid #8a5b46;
+        border-radius: 0 35% 35% 0;
+        background: linear-gradient(180deg, #ab7659 0%, #43281e 29%, #211611 62%, #684735 100%);
+        box-shadow: inset -.28em 0 #a57353, 0 .15em .38em #180d08a6;
+        transform: rotate(40deg);
+        transform-origin: left center;
+      }
+
+      .portfolio-loader__lens {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+        isolation: isolate;
+        border: clamp(2px, .35vw, 5px) solid #72503e;
+        border-block-start-color: #c69775;
+        border-block-end-color: #38251d;
         border-radius: 50%;
-        background: #000;
-        box-shadow: inset 0 0 0 1px rgb(255 94 26 / 48%);
+        background: var(--loader-accent);
+        box-shadow: 0 0 0 1px #241810, 0 .2em .75em #1009038c, inset 0 0 .35em #6a230a;
+      }
+
+      .portfolio-loader__lens .portfolio-loader__reels {
+        position: absolute;
+        inset-block-start: 50%;
+        inset-inline-start: 50%;
+        color: #8e3518;
+        transform-origin: top left;
+      }
+
+      .portfolio-loader__lens::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        border-radius: inherit;
+        background: radial-gradient(ellipse at 31% 18%, #fff8d64d, transparent 42%);
+        box-shadow: inset 0 0 0 1px #ffe1b88c, inset 0 -.13em .45em #762a13a8;
         pointer-events: none;
-        animation-name: portfolio-loader-close-core;
+      }
+
+      .portfolio-loader__lens-clue {
+        position: absolute;
+        z-index: 2;
+        color: #35150a;
+        font-size: clamp(.39rem, .74vw, .68rem);
+        font-weight: 800;
+        line-height: 1.05;
+        letter-spacing: .07em;
+        text-align: center;
+        text-transform: uppercase;
+        text-shadow: 0 0 .4em #ff9656, 0 0 .9em #ff9656;
+      }
+
+      .portfolio-loader[data-phase="revealing"] {
+        background: var(--loader-accent);
+        animation: portfolio-loader-exit var(--loader-exit-time) ease-out both;
+      }
+
+      .portfolio-loader[data-phase="revealing"] :is(.portfolio-loader__reels, .portfolio-loader__progress, .portfolio-loader__glass) {
+        visibility: hidden;
       }
 
       @keyframes portfolio-loader-roll {
@@ -269,65 +267,23 @@
       }
 
       @keyframes portfolio-loader-exit {
-        0% { clip-path: circle(72% at center); }
-        72%, 82% { clip-path: circle(var(--loader-core-radius) at center); }
-        100% { clip-path: circle(0px at center); }
-      }
-
-      @keyframes portfolio-loader-pull-in {
-        0% { transform: rotate(0deg) scale(1); }
-        72%, 100% {
-          opacity: 0;
-          transform: rotate(-52deg) scale(0);
-        }
-      }
-
-      @keyframes portfolio-loader-collapse-orbits {
-        0% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
-        72%, 100% {
-          opacity: 0;
-          transform: translate(-50%, -50%) rotate(-40deg) scale(0);
-        }
-      }
-
-      @keyframes portfolio-loader-close-core {
-        0%, 55% {
-          opacity: 0;
-          transform: translate(-50%, -50%) scale(0.65);
-        }
-        72%, 82% {
-          opacity: 1;
-          transform: translate(-50%, -50%) scale(1);
-        }
-        100% {
-          opacity: 0;
-          transform: translate(-50%, -50%) scale(0);
-        }
+        0%, 14% { opacity: 1; }
+        100% { opacity: 0; }
       }
 
       @media (prefers-reduced-motion: reduce) {
         .portfolio-loader {
           --loader-lock-time: 1ms;
-          --loader-exit-time: 1ms;
+          --loader-exit-time: 200ms;
         }
 
         .portfolio-loader__rolling,
-        .portfolio-loader__letter,
-        .portfolio-loader[data-phase="leaving"] {
-          animation-timing-function: step-end;
-        }
+        .portfolio-loader__letter { animation-timing-function: step-end; }
+        .portfolio-loader__strip { animation: none; }
+        .portfolio-loader__glass { display: none; }
 
-        .portfolio-loader__strip,
-        .portfolio-loader[data-phase="leaving"] .portfolio-loader__reels,
-        .portfolio-loader[data-phase="leaving"] .portfolio-loader__orbits,
-        .portfolio-loader[data-phase="leaving"]::after {
-          animation: none;
-        }
-
-        .portfolio-loader[data-phase="leaving"]::after { content: none; }
         .portfolio-loader__reel:not([data-locked]) { mask-image: none; }
         .portfolio-loader__reel:not([data-locked])::after { content: none; }
-        .portfolio-loader__progress::after { transition: none; }
       }
     </style>
 
@@ -338,10 +294,13 @@
   <body>
     <div id="portfolio-loader" class="portfolio-loader" role="status" hidden>
       <span class="portfolio-loader__announcement">Opening Khushang Singh’s portfolio</span>
-      <div class="portfolio-loader__frame" aria-hidden="true"></div>
-      <div class="portfolio-loader__orbits" aria-hidden="true"></div>
       <div class="portfolio-loader__reels" aria-hidden="true"></div>
-      <div class="portfolio-loader__progress" aria-hidden="true"></div>
+      <div class="portfolio-loader__progress" aria-hidden="true">0%</div>
+      <div class="portfolio-loader__glass" aria-hidden="true">
+        <div class="portfolio-loader__lens">
+          <span class="portfolio-loader__lens-clue">Look<br>closer</span>
+        </div>
+      </div>
     </div>
     <div id="root"></div>
     <script>
@@ -353,6 +312,8 @@
         const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         const spinLeadIn = 160;
         const lockInterval = 200;
+        const nameHold = 700;
+        const zoomDuration = 1100;
         const loader = document.getElementById('portfolio-loader');
         const reels = loader.querySelector('.portfolio-loader__reels');
         const app = document.getElementById('root');
@@ -403,15 +364,111 @@
           reels.append(group);
         }
 
+        const lockDuration = spinLeadIn + letterReels.length * lockInterval;
+        const progressText = loader.querySelector('.portfolio-loader__progress');
+        const glass = loader.querySelector('.portfolio-loader__glass');
+        const lens = glass.querySelector('.portfolio-loader__lens');
+        const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+        let magnifiedReels;
+        let magnifiedLetters = [];
+        let scanPoints = [];
+        let wordmark;
+        let glassSize;
+        let detailsFrame;
+
+        function measureScanPath() {
+          if (loader.dataset.phase) return;
+
+          wordmark = reels.getBoundingClientRect();
+          glassSize = glass.offsetWidth;
+          magnifiedReels.style.inlineSize = `${wordmark.width}px`;
+          const surnameInitial = letterReels.indexOf(reels.lastElementChild.firstElementChild);
+
+          scanPoints = letterReels.slice(0, surnameInitial + 1).map((reel) => {
+            const { left, top, width, height } = reel.getBoundingClientRect();
+            return { x: left + width / 2, y: top + height / 2 };
+          });
+        }
+
+        function drawGlass(elapsed) {
+          const growDuration = 320;
+          const approachEnd = 500;
+          const growth = Math.min(1, elapsed / growDuration);
+          const growEase = 1 - (1 - growth) ** 3;
+          const approach = Math.min(1, Math.max(0, (elapsed - growDuration) / (approachEnd - growDuration)));
+          const glide = approach * approach * (3 - 2 * approach);
+          const scanProgress = Math.min(1, Math.max(0, (elapsed - approachEnd) / (lockDuration - approachEnd)));
+          const last = scanPoints.length - 1;
+          const position = scanProgress * scanProgress * (3 - 2 * scanProgress) * last;
+          const segment = Math.min(Math.floor(position), last - 1);
+          const blend = position - segment;
+          const from = scanPoints[segment];
+          const to = scanPoints[segment + 1];
+          const x = from.x + (to.x - from.x) * blend;
+          const y = from.y + (to.y - from.y) * blend;
+          const startX = Math.max(glassSize * .5 + 4, scanPoints[0].x - glassSize * .72);
+          const centerX = x + (startX - scanPoints[0].x) * (1 - glide);
+          const hover = glassSize * (.28 + .055 * Math.sin(Math.PI * blend) ** 2);
+          const scale = .035 + .965 * growEase;
+          const zoom = 2.6;
+
+          glass.style.transform = `translate3d(${centerX}px, ${y - hover}px, 0) translate(-50%, -50%) scale(${scale})`;
+          magnifiedReels.style.transform = `translate3d(${(wordmark.left - centerX) * zoom}px, ${(wordmark.top - y) * zoom}px, 0) scale(${zoom})`;
+        }
+
+        function drawIntroDetails(now) {
+          const elapsed = Math.max(0, now - startTime);
+          const percent = Math.min(100, Math.floor(elapsed / lockDuration * 100));
+          const label = `${percent}%`;
+          if (progressText.textContent !== label) progressText.textContent = label;
+          if (scanPoints.length && !motionPreference.matches) drawGlass(elapsed);
+          if (elapsed < lockDuration) detailsFrame = requestAnimationFrame(drawIntroDetails);
+        }
+
         const lastReel = letterReels.at(-1);
-        let lockedReels = 0;
+        const zoomReel = letterReels.find((reel) => reel.dataset.letter === 'I');
         let introReady = false;
         let bootstrapReady = false;
         let readinessTimeout;
 
         function leave() {
           window.clearTimeout(readinessTimeout);
-          loader.dataset.phase = 'leaving';
+          if (loader.dataset.phase) return;
+          loader.dataset.phase = 'expanding';
+          window.setTimeout(expandName, nameHold);
+        }
+
+        function reveal() {
+          loader.dataset.phase = 'revealing';
+          document.dispatchEvent(new Event('portfolio-intro-finished'));
+        }
+
+        function expandName() {
+          if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || typeof reels.animate !== 'function') {
+            reveal();
+            return;
+          }
+
+          const wordmark = reels.getBoundingClientRect();
+          const letter = zoomReel.getBoundingClientRect();
+          const x = letter.left + letter.width / 2;
+          const y = letter.top + letter.height / 2;
+          const fontSize = Number.parseFloat(getComputedStyle(reels).fontSize);
+          // Even a thin I stem should extend well beyond the edges at full zoom.
+          const zoom = Math.max(32, Math.ceil(36 * Math.max(loader.clientWidth, loader.clientHeight) / fontSize));
+
+          reels.style.transformOrigin = `${x - wordmark.left}px ${y - wordmark.top}px`;
+          const shiftX = loader.clientWidth / 2 - x;
+          const shiftY = loader.clientHeight / 2 - y;
+          const steps = 72;
+          const frames = Array.from({ length: steps + 1 }, (_, index) => {
+            const time = index / steps;
+            const scale = Math.pow(zoom, time * time);
+            // Tie the pan to the zoom so the I approaches center without stopping between frames.
+            const pan = (1 - 1 / scale) / (1 - 1 / zoom);
+            return { transform: `translate(${shiftX * pan}px, ${shiftY * pan}px) scale(${scale})` };
+          });
+          reels.animate(frames, { duration: zoomDuration, fill: 'forwards' }).finished.then(reveal, reveal);
         }
 
         function handleBootstrapReady() {
@@ -423,8 +480,12 @@
           if ('locked' in reel.dataset) return;
           reel.querySelector('.portfolio-loader__rolling').remove();
           reel.dataset.locked = '';
-          lockedReels += 1;
-          loader.style.setProperty('--loader-progress', lockedReels / letterReels.length);
+
+          const sample = magnifiedLetters[letterReels.indexOf(reel)];
+          if (sample) {
+            sample.querySelector('.portfolio-loader__rolling').remove();
+            sample.dataset.locked = '';
+          }
 
           if (reel === lastReel) {
             introReady = true;
@@ -450,8 +511,9 @@
           if (event.target !== loader || event.animationName !== 'portfolio-loader-exit') return;
           document.removeEventListener('portfolio-bootstrap-ready', handleBootstrapReady);
           document.removeEventListener('visibilitychange', syncElapsedLocks);
+          window.removeEventListener('resize', measureScanPath);
+          cancelAnimationFrame(detailsFrame);
           loader.remove();
-          document.dispatchEvent(new Event('portfolio-intro-finished'));
         });
         reels.addEventListener('animationend', handleLetterLock);
         document.addEventListener('portfolio-bootstrap-ready', handleBootstrapReady, { once: true });
@@ -461,6 +523,17 @@
         app.dataset.introTheme = theme;
         const startTime = performance.now();
         loader.hidden = false;
+
+        if (!motionPreference.matches) {
+          magnifiedReels = reels.cloneNode(true);
+          magnifiedLetters = [...magnifiedReels.querySelectorAll('.portfolio-loader__reel')];
+          lens.prepend(magnifiedReels);
+          measureScanPath();
+          drawGlass(0);
+          glass.dataset.scanning = '';
+          window.addEventListener('resize', measureScanPath, { passive: true });
+        }
+        detailsFrame = requestAnimationFrame(drawIntroDetails);
       })();
     </script>
     <script type="module" src="/src/main.jsx"></script>

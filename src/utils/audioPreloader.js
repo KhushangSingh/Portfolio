@@ -1,3 +1,5 @@
+import { favoriteTrack } from '../constants/favoriteTrack';
+
 /**
  * Audio Preloader Utility
  * 
@@ -6,8 +8,7 @@
  */
 
 const PRELOAD_TRACKS = [
-  '/audio/bad_bunny_dtmf.m4a',
-  '/audio/bad_bunny_dtmf.mp3',
+  favoriteTrack.audioUrl,
   '/audio/shape_of_you.m4a'
 ];
 
@@ -18,18 +19,9 @@ export function initAudioPreload() {
 
   const startPreload = () => {
     PRELOAD_TRACKS.forEach((src) => {
-      // 1. Warm up browser HTTP cache via low-priority fetch
       try {
-        fetch(src, { cache: 'force-cache', priority: 'low' }).catch(() => {
-          // Silent fallback if browser doesn't support priority
-          fetch(src, { cache: 'force-cache' }).catch(() => {});
-        });
-      } catch (err) {
-        // Fallback for older environments
-      }
-
-      // 2. Warm up browser Media Pipeline / decoder metadata
-      try {
+        if (src.startsWith('/')) fetch(src, { cache: 'force-cache', priority: 'low' }).catch(() => {});
+        // Native media preload handles cross-origin preview sources.
         if (!preloadedAudioElements.has(src)) {
           const audio = new Audio();
           audio.preload = 'auto';
@@ -38,7 +30,7 @@ export function initAudioPreload() {
           audio.load();
           preloadedAudioElements.set(src, audio);
         }
-      } catch (err) {
+      } catch {
         // Ignore audio pipeline restrictions
       }
     });

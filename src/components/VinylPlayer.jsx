@@ -1,103 +1,9 @@
+import { playCustomEffect } from '../utils/soundEffects';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence, useAnimationControls, useMotionValue, useSpring } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { useMusic } from '../context/MusicContext';
-import { designData } from '../constants/data';
-
-// --- BUILT-IN CHILL LO-FI AUDIO ENGINE (Fallback if streaming is blocked) ---
-class VinylAudioEngine {
-  constructor() {
-    this.ctx = null;
-    this.masterGain = null;
-    this.noiseNode = null;
-    this.noiseGain = null;
-    this.isPlaying = false;
-  }
-
-  init() {
-    if (this.ctx) return;
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    if (!AudioCtx) return;
-    this.ctx = new AudioCtx();
-    this.masterGain = this.ctx.createGain();
-    this.masterGain.gain.setValueAtTime(0.2, this.ctx.currentTime);
-    this.masterGain.connect(this.ctx.destination);
-  }
-
-  playNeedleDrop() {
-    if (!this.ctx) this.init();
-    if (!this.ctx) return;
-
-    try {
-      const now = this.ctx.currentTime;
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(95, now);
-      osc.frequency.exponentialRampToValueAtTime(28, now + 0.1);
-      gain.gain.setValueAtTime(0.28, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-      osc.connect(gain);
-      gain.connect(this.masterGain);
-      osc.start(now);
-      osc.stop(now + 0.12);
-    } catch {}
-  }
-
-  startVinylCrackle() {
-    if (!this.ctx) return;
-    const bufferSize = this.ctx.sampleRate * 2;
-    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = (Math.random() * 2 - 1) * (Math.random() > 0.985 ? 0.35 : 0.02);
-    }
-
-    const noise = this.ctx.createBufferSource();
-    noise.buffer = buffer;
-    noise.loop = true;
-
-    const filter = this.ctx.createBiquadFilter();
-    filter.type = 'bandpass';
-    filter.frequency.value = 1800;
-    filter.Q.value = 1.2;
-
-    this.noiseGain = this.ctx.createGain();
-    this.noiseGain.gain.setValueAtTime(0.04, this.ctx.currentTime);
-
-    noise.connect(filter);
-    filter.connect(this.noiseGain);
-    this.noiseGain.connect(this.masterGain);
-
-    noise.start();
-    this.noiseNode = noise;
-  }
-
-  start() {
-    this.init();
-    if (!this.ctx) return;
-    if (this.ctx.state === 'suspended') {
-      this.ctx.resume();
-    }
-
-    this.isPlaying = true;
-    this.playNeedleDrop();
-    this.startVinylCrackle();
-  }
-
-  stop() {
-    this.isPlaying = false;
-    if (this.noiseNode) {
-      try {
-        this.noiseNode.stop();
-        this.noiseNode.disconnect();
-      } catch {}
-      this.noiseNode = null;
-    }
-  }
-}
-
-const audioEngine = new VinylAudioEngine();
+import { favoriteTrack } from '../constants/favoriteTrack';
 
 // --- TONAL ROTATION ANGLES FOR HORIZONTAL TONEARM STICK ---
 // Fixed hinge is anchored at (HINGE_X = 126, HINGE_Y = 22) near the top-right cut-off boundary.
@@ -125,18 +31,18 @@ const DRAWER_TRANSITION = {
 export const VinylPlayer = () => {
   const { isDark } = useTheme();
   const { 
-    isPlaying, 
-    setIsPlaying, 
-    isPlayerOpen, 
-    setIsPlayerOpen, 
-    registerPlayerControls 
+    isPlaying,
+    isPlayerOpen,
+    setIsPlayerOpen,
+    playMusic,
+    pauseMusic
   } = useMusic();
+  const [initialAngle] = useState(() => isPlaying ? ANGLE_PLAYING : ANGLE_PARKED);
   const [isDragging, setIsDragging] = useState(false);
-  const [tonearmAngle, setTonearmAngle] = useState(ANGLE_PARKED);
   const [isTabHovered, setIsTabHovered] = useState(false);
 
   // Framer Motion spring physics for realistic mechanical tonearm damping
-  const angleMotion = useMotionValue(ANGLE_PARKED);
+  const angleMotion = useMotionValue(initialAngle);
   const smoothAngle = useSpring(angleMotion, { stiffness: 220, damping: 24, mass: 0.8 });
   const tonearmRef = useRef(null);
 
@@ -168,11 +74,7 @@ export const VinylPlayer = () => {
 
   // Subtle mechanical latch click synthesis
   const playDrawerLatchSound = useCallback((isOpen) => {
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
-      const ctx = new AudioCtx();
-      const t = ctx.currentTime;
+    playCustomEffect(.05, (ctx, output, t) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'triangle';
@@ -181,68 +83,39 @@ export const VinylPlayer = () => {
       gain.gain.setValueAtTime(0.12, t);
       gain.gain.exponentialRampToValueAtTime(0.001, t + 0.045);
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(output);
       osc.start(t);
       osc.stop(t + 0.05);
-    } catch {}
+    });
   }, []);
 
-  const customAudioRef = useRef(null);
-  const customMusicUrl = designData?.favoriteMusic?.audioUrl || "/audio/bad_bunny_dtmf.mp3";
   const pivotPointRef = useRef(null);
-  const currentAngleRef = useRef(ANGLE_PARKED);
+  const currentAngleRef = useRef(initialAngle);
   const isDraggingRef = useRef(false);
   const dragMovedRef = useRef(false);
   const startPointerRef = useRef({ x: 0, y: 0 });
 
-  // Handle Playback strictly linked to needle on vinyl
-  const startPlayback = useCallback(() => {
-    currentAngleRef.current = ANGLE_PLAYING;
-    angleMotion.set(ANGLE_PLAYING);
-    setTonearmAngle(ANGLE_PLAYING);
-    setIsPlaying(true);
+  function moveTonearm(angle) {
+    currentAngleRef.current = angle;
+    angleMotion.set(angle);
+  }
 
-    if (customAudioRef.current) {
-      customAudioRef.current.playbackRate = 1.0;
-      customAudioRef.current.volume = 0.85;
-      const playPromise = customAudioRef.current.play();
-      if (playPromise !== undefined) {
-        playPromise.catch((err) => {
-          console.warn("Audio play blocked by browser policy:", err);
-          audioEngine.start();
-        });
-      }
-    } else {
-      audioEngine.start();
-    }
-  }, [setIsPlaying, angleMotion]);
+  function startPlayback() {
+    moveTonearm(ANGLE_PLAYING);
+    playMusic();
+  }
 
-  const stopPlayback = useCallback(() => {
-    currentAngleRef.current = ANGLE_PARKED;
-    angleMotion.set(ANGLE_PARKED);
-    setTonearmAngle(ANGLE_PARKED);
-    setIsPlaying(false);
+  function stopPlayback() {
+    moveTonearm(ANGLE_PARKED);
+    pauseMusic();
+  }
 
-    if (customAudioRef.current) {
-      customAudioRef.current.pause();
-    }
-    audioEngine.stop();
-  }, [setIsPlaying, angleMotion]);
-
-  // Register playback controls with MusicContext for top header "Play Music" button
   useEffect(() => {
-    registerPlayerControls({
-      play: startPlayback,
-      pause: stopPlayback,
-      toggle: () => {
-        if (isPlaying) {
-          stopPlayback();
-        } else {
-          startPlayback();
-        }
-      }
-    });
-  }, [isPlaying, startPlayback, stopPlayback, registerPlayerControls]);
+    if (isDraggingRef.current) return;
+    const angle = isPlaying ? ANGLE_PLAYING : ANGLE_PARKED;
+    currentAngleRef.current = angle;
+    angleMotion.set(angle);
+  }, [angleMotion, isPlaying]);
 
   // On mount inside hero section: start tucked, then smoothly slide open (gentle, relaxed pace)
   useEffect(() => {
@@ -276,7 +149,6 @@ export const VinylPlayer = () => {
         if (isOpenRef.current) {
           setIsPlayerOpen(false);
           currentDrawerXRef.current = getTuckedOffset();
-          playDrawerLatchSound(false);
           controls.start({
             x: getTuckedOffset(),
             opacity: 1,
@@ -290,7 +162,6 @@ export const VinylPlayer = () => {
         if (!isOpenRef.current) {
           setIsPlayerOpen(true);
           currentDrawerXRef.current = 0;
-          playDrawerLatchSound(true);
           controls.start({
             x: 0,
             opacity: 1,
@@ -302,7 +173,7 @@ export const VinylPlayer = () => {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [controls, playDrawerLatchSound, setIsPlayerOpen]);
+  }, [controls, setIsPlayerOpen]);
 
   // Tab toggle handler (luxurious, slower spring motion)
   const handleToggleTab = useCallback(() => {
@@ -456,13 +327,8 @@ export const VinylPlayer = () => {
       if (typeof smoothAngle.jump === 'function') {
         smoothAngle.jump(svgAngle);
       }
-      setTonearmAngle(svgAngle);
-
-      // Live physical audio feedback
-      if (clampedDown < THRESHOLD_VINYL && isPlaying) {
-        if (customAudioRef.current) customAudioRef.current.pause();
-        audioEngine.stop();
-      }
+      // Lift the needle as soon as it leaves the record.
+      if (clampedDown < THRESHOLD_VINYL && isPlaying) pauseMusic();
     };
 
     const onPointerUp = () => {
@@ -498,20 +364,6 @@ export const VinylPlayer = () => {
 
   return (
     <>
-      {/* Official Bad Bunny DTMF Master Audio Element */}
-      <audio 
-        ref={customAudioRef} 
-        loop 
-        preload="auto" 
-        playsInline
-      >
-        <source src={customMusicUrl} type="audio/mpeg" />
-        <source src={customMusicUrl} type="audio/mp4" />
-        {designData?.favoriteMusic?.cdnUrl && (
-          <source src={designData.favoriteMusic.cdnUrl} type="audio/mpeg" />
-        )}
-      </audio>
-
       {/* Main Turntable Slide-in Dock on Right Border (Physically positioned inside Hero Section) */}
       <motion.div
         animate={controls}
@@ -748,12 +600,12 @@ export const VinylPlayer = () => {
                   y="106" 
                   textAnchor="middle" 
                   fill="#ffffff" 
-                  fontSize="4.8" 
+                  fontSize="3.3"
                   fontFamily="'Bricolage Grotesque', sans-serif" 
                   fontWeight="800" 
                   letterSpacing="0.7"
                 >
-                  BAD BUNNY
+                  {favoriteTrack.artist.toUpperCase()}
                 </text>
 
                 <text 
@@ -761,12 +613,12 @@ export const VinylPlayer = () => {
                   y="116" 
                   textAnchor="middle" 
                   fill="#ffffff" 
-                  fontSize="7.2" 
+                  fontSize="5.1"
                   fontFamily="'Bricolage Grotesque', sans-serif" 
                   fontWeight="800" 
                   letterSpacing="0.4"
                 >
-                  DTMF
+                  {favoriteTrack.title.toUpperCase()}
                 </text>
 
                 {/* Vintage Vinyl Center Divider Line */}
@@ -827,7 +679,7 @@ export const VinylPlayer = () => {
               */}
               <g
                 ref={tonearmRef}
-                transform={`rotate(${ANGLE_PARKED} ${HINGE_X} ${HINGE_Y})`}
+                transform={`rotate(${initialAngle} ${HINGE_X} ${HINGE_Y})`}
                 onPointerDown={handlePointerDown}
                 data-no-cursor="true"
                 className="cursor-grab active:cursor-grabbing select-none"

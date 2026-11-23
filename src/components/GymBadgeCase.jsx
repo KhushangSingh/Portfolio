@@ -1,3 +1,4 @@
+import { playCustomEffect } from '../utils/soundEffects';
 import React, { useState, useRef, useEffect } from 'react';
 import BrandMark from './BrandMark';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
@@ -206,11 +207,7 @@ export const GymBadgeCase = () => {
 
   // Sound synthesis for tactile latch snap
   const playLatchSound = (closing) => {
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
-      const ctx = new AudioCtx();
-      const now = ctx.currentTime;
+    playCustomEffect(.08, (ctx, output, now) => {
       
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -222,12 +219,10 @@ export const GymBadgeCase = () => {
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
       
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(output);
       osc.start(now);
       osc.stop(now + 0.08);
-    } catch {
-      // Audio context silently ignored if blocked
-    }
+    });
   };
 
   const toggleLid = () => {

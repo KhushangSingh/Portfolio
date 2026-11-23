@@ -282,7 +282,7 @@ export default function BookshelfZone({ onCloseZone }) {
         </div>
 
         {/* Shelf Plinth Base */}
-        <div className="relative w-full h-5 rounded-md bg-gradient-to-r from-[#2c2d38] via-[#434658] to-[#2c2d38] border-t-2 border-[#ff5e1a] shadow-[0_15px_35px_rgba(0,0,0,0.9)] flex items-center justify-between px-6 z-20">
+        <div className="relative w-full h-5 rounded-md bg-gradient-to-r from-[#2c2d38] via-[#434658] to-[#2c2d38] shadow-[0_15px_35px_rgba(0,0,0,0.9)] flex items-center justify-between px-6 z-20">
           <span className="w-3 h-1.5 rounded-sm bg-white/20" />
           <span className="font-mono text-[8px] uppercase tracking-widest text-[#ff5e1a]/80">
             SOLID OAK &amp; BRUSHED ANODIZED ALUMINUM SHELF
@@ -360,7 +360,7 @@ export default function BookshelfZone({ onCloseZone }) {
               </div>
 
               {/* Core Quote */}
-              <div className="p-4 rounded-xl bg-white/5 border border-white/10 italic text-xs sm:text-sm text-gray-200 border-l-4" style={{ borderLeftColor: selectedBook.accentColor }}>
+              <div className="p-4 rounded-xl bg-white/5 border border-white/10 italic text-xs sm:text-sm text-gray-200">
                 "{selectedBook.quote}"
               </div>
 

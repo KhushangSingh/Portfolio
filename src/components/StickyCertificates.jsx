@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { CERTIFICATES_DATA } from '../constants/credentialsData';
+import { playSoundEffect } from '../utils/soundEffects';
 
 const slideTransition = { duration: 0.72, ease: [0.42, 0, 0.32, 1] };
 const returnTransition = { duration: 0.82, ease: [0.42, 0, 0.24, 1] };
@@ -48,6 +49,8 @@ export const StickyCertificates = () => {
   }, [selectedCert, previewTrigger]);
 
   const closePreview = () => {
+    if (!preview || preview.closing) return;
+    playSoundEffect('close');
     setPreview((current) => {
       if (!current || current.closing) return current;
       return { ...current, closing: true };
@@ -60,6 +63,7 @@ export const StickyCertificates = () => {
 
   const handleCycle = (event) => {
     if (shuffle) return;
+    playSoundEffect('shuffle');
     if (prefersReducedMotion) {
       cycleDeck();
       return;
@@ -187,7 +191,10 @@ export const StickyCertificates = () => {
                       tabIndex={canShuffle ? 0 : -1}
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (canShuffle) setPreview({ certificate: cert, trigger: e.currentTarget, closing: false });
+                        if (canShuffle) {
+                          playSoundEffect('open');
+                          setPreview({ certificate: cert, trigger: e.currentTarget, closing: false });
+                        }
                       }}
                       className="px-4 py-1.5 rounded-lg text-xs font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all flex items-center gap-1.5 shadow-sm hover:scale-[1.03] active:scale-[0.97] cursor-pointer shrink-0"
                       title="View full certificate details"

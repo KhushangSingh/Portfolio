@@ -293,7 +293,7 @@ export default function MonitorOS({ onCloseZone }) {
                               onClick={() => setCodeFile(tab)}
                               className={`px-2.5 py-1 rounded-t flex items-center gap-1.5 ${
                                 codeFile === tab 
-                                  ? 'bg-[#ff5e1a]/20 text-[#ff5e1a] font-bold border-b-2 border-[#ff5e1a]' 
+                                  ? 'bg-[#ff5e1a]/20 text-[#ff5e1a] font-bold rounded-md'
                                   : 'opacity-60 hover:opacity-100'
                               }`}
                             >
@@ -407,7 +407,7 @@ export default function MonitorOS({ onCloseZone }) {
                           <div className="flex flex-col">
                             <span className="text-[#1DB954] font-mono text-[10px] font-bold uppercase tracking-wider">NOW PLAYING · FLOW STATE</span>
                             <span className="font-bold text-sm sm:text-base">Tokyo Twilight Chill Beats</span>
-                            <span className="text-gray-400 text-xs">Japanese City Pop &amp; Bad Bunny Lo-Fi Reworks</span>
+                            <span className="text-gray-400 text-xs">Japanese city pop and indie R&amp;B</span>
                           </div>
                         </div>
                         <div className="w-full bg-black/40 rounded-xl p-3 flex flex-col gap-2">
