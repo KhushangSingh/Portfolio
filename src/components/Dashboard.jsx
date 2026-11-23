@@ -20,7 +20,7 @@ import {
 } from '../utils/visitorTracker';
 import { playSoundEffect } from '../utils/soundEffects';
 
-const DEFAULT_STUDIO_PIN = '2026';
+const DEFAULT_STUDIO_PIN = import.meta.env.VITE_STUDIO_PASSCODE || '2026';
 
 export default function Dashboard() {
   const { isDark, toggleTheme } = useTheme();
@@ -310,7 +310,7 @@ export default function Dashboard() {
                 type="password"
                 value={enteredPin}
                 onChange={(e) => setEnteredPin(e.target.value)}
-                placeholder="Enter studio PIN (default: 2026)"
+                placeholder="Enter private studio passcode"
                 autoFocus
                 className={`w-full px-4 py-3 rounded-xl text-sm font-mono border outline-none text-center tracking-widest ${
                   isDark 
@@ -330,7 +330,6 @@ export default function Dashboard() {
                 />
                 <span>Remember this device</span>
               </label>
-              <span className="text-[11px] opacity-75">PIN: 2026</span>
             </div>
 
             <button
@@ -1221,7 +1220,7 @@ export default function Dashboard() {
                   Update Studio Passcode
                 </h3>
                 <p className="text-xs sm:text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
-                  Change the passcode required to unlock this dashboard. Currently set to: <span className="font-mono font-bold text-[#ff5e1a]">{customPasscode}</span>.
+                  Update the confidential passcode required to unlock this dashboard from any browser.
                 </p>
 
                 {passcodeSuccessMsg && (
@@ -1232,7 +1231,7 @@ export default function Dashboard() {
 
                 <form onSubmit={handleSaveNewPasscode} className="space-y-3 pt-2">
                   <input
-                    type="text"
+                    type="password"
                     value={newPasscodeInput}
                     onChange={(e) => setNewPasscodeInput(e.target.value)}
                     placeholder="Enter new 4+ character passcode"
