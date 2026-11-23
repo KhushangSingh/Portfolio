@@ -206,6 +206,7 @@ export default function Dashboard() {
   const activeMessages = messages.filter((m) => !m.archived);
   const archivedMessages = messages.filter((m) => m.archived);
   const activeUnreadCount = activeMessages.filter((m) => m.status === 'unread').length;
+  const unreadCount = activeUnreadCount;
   const activeStarredCount = activeMessages.filter((m) => m.starred).length;
   const activeRepliedCount = activeMessages.filter((m) => m.status === 'replied').length;
 
