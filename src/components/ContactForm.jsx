@@ -212,24 +212,24 @@ export default function ContactForm({ className = '', onSubmitted }) {
         {isTyping && !showThumbsUp && (
           <motion.div
             key="peeking-spiderman"
-            initial={{ x: -65, opacity: 0 }}
+            initial={{ x: -140, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -65, opacity: 0 }}
+            exit={{ x: -140, opacity: 0 }}
             transition={{
               type: 'spring',
-              stiffness: 120,
+              stiffness: 105,
               damping: 14,
-              mass: 0.8
+              mass: 0.85
             }}
-            className="absolute left-full top-28 sm:top-36 z-20 pointer-events-none select-none -ml-1 sm:-ml-1.5 hidden md:block"
+            className="absolute left-full top-20 sm:top-24 md:top-28 z-20 pointer-events-none select-none -ml-2 sm:-ml-3"
             style={{
-              clipPath: 'inset(-30px -140px -30px 0px)'
+              clipPath: 'inset(-40px -280px -40px 0px)'
             }}
           >
             <img
-              src="/images/spiderman_peeking.png"
+              src="/images/spiderman_peeking.svg"
               alt="Spider-Man peeking from side border"
-              className="w-18 sm:w-22 md:w-26 h-auto object-contain drop-shadow-[0_6px_16px_rgba(0,0,0,0.35)]"
+              className="w-32 sm:w-40 md:w-52 lg:w-60 h-auto object-contain drop-shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
             />
           </motion.div>
         )}
@@ -522,32 +522,32 @@ export default function ContactForm({ className = '', onSubmitted }) {
       <AnimatePresence>
         {showThumbsUp && (
           <div 
-            className="absolute right-4 sm:right-8 md:right-12 bottom-0 z-30 pointer-events-auto select-none flex flex-col items-end"
+            className="absolute right-2 sm:right-6 md:right-8 bottom-0 z-30 pointer-events-auto select-none flex flex-col items-end"
             style={{
-              clipPath: 'inset(-160px -50px 0px -50px)'
+              clipPath: 'inset(-260px -80px 0px -80px)'
             }}
           >
             {/* Dialogue Cloud saying "Congrats, message sent!" */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.6, y: 15 }}
+              initial={{ opacity: 0, scale: 0.65, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.6, y: 15 }}
+              exit={{ opacity: 0, scale: 0.65, y: 20 }}
               transition={{ delay: 0.22, type: 'spring', stiffness: 220, damping: 18 }}
               onClick={() => {
                 setShowThumbsUp(false);
                 setIsSuccess(false);
               }}
               title="Click to dismiss"
-              className={`relative mb-2 px-4 py-2 rounded-2xl border shadow-xl font-sans text-xs sm:text-sm font-bold flex items-center gap-1.5 whitespace-nowrap cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-transform ${
+              className={`relative mb-3 px-4 py-2.5 sm:px-5 sm:py-3 rounded-2xl border shadow-2xl font-sans text-xs sm:text-sm md:text-base font-bold flex items-center gap-1.5 whitespace-nowrap cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-transform ${
                 isDark 
-                  ? 'bg-[#18191f] text-white border-white/20 shadow-black/70' 
-                  : 'bg-white text-neutral-900 border-black/15 shadow-neutral-300/60'
+                  ? 'bg-[#18191f] text-white border-white/20 shadow-black/80' 
+                  : 'bg-white text-neutral-900 border-black/15 shadow-neutral-300/70'
               }`}
             >
               <span>Congrats, message sent!</span>
               {/* Dialogue Cloud Beak */}
               <div 
-                className={`absolute -bottom-1.5 right-10 sm:right-14 w-3 h-3 rotate-45 border-r border-b ${
+                className={`absolute -bottom-2 right-12 sm:right-20 md:right-24 w-3.5 h-3.5 rotate-45 border-r border-b ${
                   isDark ? 'bg-[#18191f] border-white/20' : 'bg-white border-black/15'
                 }`} 
               />
@@ -555,9 +555,9 @@ export default function ContactForm({ className = '', onSubmitted }) {
 
             {/* Spider-Man rising smoothly upwards from the form bottom border */}
             <motion.div
-              initial={{ y: 140, opacity: 0 }}
+              initial={{ y: 260, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 140, opacity: 0 }}
+              exit={{ y: 260, opacity: 0 }}
               transition={{
                 type: 'spring',
                 stiffness: 85,
@@ -571,9 +571,9 @@ export default function ContactForm({ className = '', onSubmitted }) {
               }}
             >
               <img
-                src="/images/spiderman_thumbsup.png"
+                src="/images/spiderman_thumbsup.svg"
                 alt="Spider-Man giving thumbs up"
-                className="h-26 sm:h-30 md:h-34 w-auto object-contain drop-shadow-[0_10px_24px_rgba(0,0,0,0.45)]"
+                className="h-40 sm:h-48 md:h-56 lg:h-64 w-auto object-contain drop-shadow-[0_12px_32px_rgba(0,0,0,0.5)]"
               />
             </motion.div>
           </div>
