@@ -14,7 +14,6 @@ import { GymBadgeCase } from './GymBadgeCase';
 import { StickyCertificates } from './StickyCertificates';
 import { ScrollWordReveal } from './ScrollWordReveal';
 import LiquidPortraitReveal from './LiquidPortraitReveal';
-import HangingSpiderman from './HangingSpiderman';
 import { VinylPlayer } from './VinylPlayer';
 import ContactSection from './ContactSection';
 
@@ -698,51 +697,7 @@ const InfoSection = ({ onCertClick }) => {
 
 const Footer = () => {
     const { isDark } = useTheme();
-    const linkedInUrl = "https://www.linkedin.com/in/khushangsingh2004";
     const resumeUrl = designData.about?.resumeUrl || "/images/designResume.pdf";
-    const footerRef = useRef(null);
-    const [isFooterNinetyPercentVisible, setIsFooterNinetyPercentVisible] = useState(false);
-
-    // Trigger Spider-Man descent ONLY when 90% of the footer is visible in viewport
-    useEffect(() => {
-        const el = footerRef.current;
-        if (!el) return;
-
-        const checkVisibility = () => {
-            const rect = el.getBoundingClientRect();
-            const vh = window.innerHeight || document.documentElement.clientHeight;
-            const visibleHeight = Math.min(rect.bottom, vh) - Math.max(rect.top, 0);
-            const ratio = visibleHeight / rect.height;
-
-            // When 90% of footer height is visible OR footer fills >= 90% of screen viewport
-            if (ratio >= 0.9 || visibleHeight >= vh * 0.9 || rect.top <= vh * 0.1) {
-                setIsFooterNinetyPercentVisible(true);
-            }
-        };
-
-        const observer = new IntersectionObserver(([entry]) => {
-            if (entry.intersectionRatio >= 0.9) {
-                setIsFooterNinetyPercentVisible(true);
-            }
-        }, { threshold: [0, 0.25, 0.5, 0.75, 0.9, 1.0] });
-
-        observer.observe(el);
-        window.addEventListener('scroll', checkVisibility, { passive: true });
-        window.addEventListener('resize', checkVisibility, { passive: true });
-        if (window.__lenis) {
-            window.__lenis.on('scroll', checkVisibility);
-        }
-        checkVisibility();
-
-        return () => {
-            observer.disconnect();
-            window.removeEventListener('scroll', checkVisibility);
-            window.removeEventListener('resize', checkVisibility);
-            if (window.__lenis) {
-                window.__lenis.off('scroll', checkVisibility);
-            }
-        };
-    }, []);
 
     const scrollToTop = () => {
         if (window.__lenis) {
@@ -753,59 +708,12 @@ const Footer = () => {
     };
 
     return (
-        <footer ref={footerRef} className={`relative z-20 min-h-screen lg:h-screen lg:max-h-screen flex flex-col justify-between pt-24 sm:pt-28 md:pt-32 lg:pt-36 pb-6 sm:pb-8 md:pb-10 px-6 md:px-12 border-t overflow-hidden transition-colors duration-500 ${
+        <footer className={`relative z-20 py-14 sm:py-16 md:py-20 px-6 md:px-12 border-t overflow-hidden transition-colors duration-500 ${
           isDark ? 'bg-black text-white border-white/10' : 'bg-[#EAEAE5] text-neutral-900 border-black/10'
         }`}>
-            <div className="max-w-[1400px] w-full mx-auto flex-1 flex flex-col justify-between">
-                {/* 1. TOP ROW: "Let's Create." with LinkedIn control & Hanging Spider-Man */}
-                <div className="mb-2 sm:mb-3 lg:mb-4 relative">
-                    <div className="pl-4 sm:pl-8 md:pl-14 lg:pl-20">
-                        <motion.h2 
-                            initial={{ opacity: 0, y: 35, filter: 'blur(14px)' }}
-                            whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                            viewport={{ once: true, margin: '-40px' }}
-                            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-                            className="z-10 relative pb-1 sm:pb-2 pr-4 will-change-[transform,opacity,filter]"
-                        >
-                            <span className={`block text-4xl sm:text-5xl md:text-6xl lg:text-[5vw] xl:text-[5.4vw] font-bold sm:font-black leading-[0.96] tracking-tight ${
-                              isDark ? 'text-white/90' : 'text-neutral-900'
-                            }`}>
-                              Let's
-                            </span>
-                            <span className="block text-5xl sm:text-7xl md:text-8xl lg:text-[7.6vw] xl:text-[8.4vw] font-black leading-[0.88] tracking-tighter text-[#ff5e1a] -mt-0.5 sm:-mt-1">
-                              Create.
-                            </span>
-                        </motion.h2>
-                    </div>
-                    
-                    <motion.div 
-                        initial={{ opacity: 0, scale: 0.6, rotate: -45, filter: 'blur(10px)' }}
-                        whileInView={{ opacity: 1, scale: 1, rotate: 0, filter: 'blur(0px)' }}
-                        viewport={{ once: true, margin: '-40px' }}
-                        transition={{ duration: 0.9, delay: 0.15, type: 'spring', stiffness: 200, damping: 20 }}
-                        className="absolute right-0 top-1/2 -translate-y-1/2 hidden md:block will-change-[transform,opacity,filter]"
-                    >
-                        <div className="relative group">
-                            <a 
-                                href={linkedInUrl} 
-                                target="_blank" 
-                                rel="noreferrer" 
-                                data-cursor="CONNECT"
-                                className="relative z-10 w-24 h-24 lg:w-28 lg:h-28 rounded-full bg-[#ff4d00] flex items-center justify-center text-black transition-all duration-500 hover:scale-110 shadow-[0_0_25px_rgba(255,77,0,0.45)] cursor-pointer"
-                            >
-                                <span className="text-sm font-bold">LinkedIn</span>
-                            </a>
-
-                            {/* Spiderman hanging upside down stuck to the circle */}
-                            <HangingSpiderman isDark={isDark} shouldDescend={isFooterNinetyPercentVisible} />
-                        </div>
-                    </motion.div>
-                </div>
-
-                {/* 2. MIDDLE ROW: Contact, Socials, Links 4-column Grid */}
-                <div className={`grid grid-cols-1 md:grid-cols-4 gap-6 sm:gap-8 lg:gap-10 border-t pt-5 sm:pt-6 lg:pt-8 ${
-                  isDark ? 'border-white/10' : 'border-black/10'
-                }`}>
+            <div className="max-w-[1400px] w-full mx-auto space-y-10 sm:space-y-12">
+                {/* Contact, Socials, Links 4-column Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 sm:gap-8 lg:gap-10">
                     <motion.div 
                         initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
                         whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}

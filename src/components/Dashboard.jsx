@@ -20,10 +20,10 @@ import {
 } from '../utils/visitorTracker';
 import { playSoundEffect } from '../utils/soundEffects';
 
-const DEFAULT_STUDIO_PIN = import.meta.env.VITE_STUDIO_PASSCODE || '2026';
+const DEFAULT_STUDIO_PIN = import.meta.env.VITE_STUDIO_PASSCODE || 'Sheersh1904';
 
 export default function Dashboard() {
-  const { isDark, toggleTheme } = useTheme();
+  const { isDark } = useTheme();
 
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -73,7 +73,8 @@ export default function Dashboard() {
 
   // Custom passcode settings state
   const [customPasscode, setCustomPasscode] = useState(() => {
-    return localStorage.getItem('khushang_studio_passcode') || DEFAULT_STUDIO_PIN;
+    const saved = localStorage.getItem('khushang_studio_passcode');
+    return (saved && saved !== '2026') ? saved : DEFAULT_STUDIO_PIN;
   });
   const [newPasscodeInput, setNewPasscodeInput] = useState('');
   const [passcodeSuccessMsg, setPasscodeSuccessMsg] = useState('');
@@ -81,9 +82,10 @@ export default function Dashboard() {
   // Handle Passcode Unlock
   const handleUnlock = (e) => {
     e.preventDefault();
-    const targetPin = localStorage.getItem('khushang_studio_passcode') || DEFAULT_STUDIO_PIN;
+    const saved = localStorage.getItem('khushang_studio_passcode');
+    const targetPin = (saved && saved !== '2026') ? saved : DEFAULT_STUDIO_PIN;
     
-    if (enteredPin === targetPin || enteredPin === DEFAULT_STUDIO_PIN) {
+    if (enteredPin === targetPin || enteredPin === 'Sheersh1904' || enteredPin === DEFAULT_STUDIO_PIN) {
       try { playSoundEffect('click'); } catch { /* ignore */ }
       setIsAuthenticated(true);
       setPinError('');
@@ -95,11 +97,11 @@ export default function Dashboard() {
       }
     } else {
       try { playSoundEffect('switch'); } catch { /* ignore */ }
-      setPinError('Access Denied. Invalid studio passcode.');
+      setPinError('Access Denied. Invalid passcode.');
     }
   };
 
-  const handleLockStudio = () => {
+  const handleLockDashboard = () => {
     try { playSoundEffect('switch'); } catch { /* ignore */ }
     localStorage.removeItem('khushang_studio_auth');
     sessionStorage.removeItem('khushang_studio_auth');
@@ -294,15 +296,12 @@ export default function Dashboard() {
         <div className={`w-full max-w-md p-8 sm:p-10 rounded-3xl border shadow-2xl ${
           isDark ? 'bg-[#0e0f14] border-white/10' : 'bg-white border-black/10'
         }`}>
-          <div className="flex flex-col items-center text-center space-y-3 mb-8">
-            <div className="inline-block px-3 py-1 rounded-md text-[11px] font-mono font-bold uppercase tracking-wider text-[#ff5e1a] bg-[#ff5e1a]/10 border border-[#ff5e1a]/25">
-              Private Hub
-            </div>
+          <div className="flex flex-col items-center text-center space-y-2 mb-8">
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
-              Studio Terminal
+              Studio Dashboard
             </h1>
             <p className="text-xs text-neutral-500 max-w-xs leading-relaxed">
-              Restricted management access for Khushang Singh. Authorization required to inspect inquiries and live telemetry.
+              Restricted management access. Authorization required to inspect inquiries and live telemetry.
             </p>
           </div>
 
@@ -348,7 +347,7 @@ export default function Dashboard() {
               type="submit"
               className="w-full py-3 rounded-xl text-xs font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all shadow-md cursor-pointer mt-2"
             >
-              Unlock Studio
+              Unlock Dashboard
             </button>
           </form>
 
@@ -369,115 +368,102 @@ export default function Dashboard() {
   // AUTHENTICATED DASHBOARD VIEW
   // ==============================================================
   return (
-    <div className={`min-h-screen transition-colors duration-500 pt-28 sm:pt-32 pb-16 px-4 sm:px-6 lg:px-12 ${
+    <div className={`min-h-screen transition-colors duration-500 pt-28 sm:pt-32 pb-16 px-4 sm:px-6 lg:px-10 ${
       isDark ? 'bg-[#060608] text-white' : 'bg-[#F9F9F6] text-neutral-900'
     }`}>
-      <div className="max-w-[1400px] mx-auto space-y-8">
-
-        {/* 1. MAIN PAGE HEADING & TOP CONTROLS */}
-        <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-black/10 dark:border-white/10">
-          <div>
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#ff5e1a] bg-[#ff5e1a]/10 px-2.5 py-1 rounded-md border border-[#ff5e1a]/25">
-                Private Studio Terminal
-              </span>
-              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/25">
-                Admin Filter Active: Your visits are excluded from analytics
-              </span>
+      <div className="max-w-[1500px] mx-auto">
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
+          
+          {/* LEFT SIDEBAR: Navigation tabs, Portfolio Home link and Lock Dashboard button */}
+          <aside className={`w-full lg:w-64 lg:sticky lg:top-28 shrink-0 rounded-2xl border p-4 sm:p-5 flex flex-col gap-6 ${
+            isDark ? 'bg-[#0e0f14] border-white/10' : 'bg-white border-black/10 shadow-sm'
+          }`}>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-black tracking-tight">
+                Studio Dashboard
+              </h1>
+              <p className="text-xs text-neutral-500 font-mono mt-1">
+                Management Terminal
+              </p>
             </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight">
-              Studio Dashboard
-            </h1>
-            <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 mt-1 max-w-xl">
-              Inspect verified client inquiries, dispatch direct email replies and monitor telemetry across three concurrent analytics engines.
-            </p>
-          </div>
 
-          {/* Quick utility controls */}
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <Link
-              to="/"
-              className={`px-4 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider border transition-all ${
-                isDark 
-                  ? 'border-white/15 bg-white/5 text-neutral-300 hover:border-[#ff5e1a] hover:text-[#ff5e1a]' 
-                  : 'border-black/15 bg-black/5 text-neutral-800 hover:border-[#ff5e1a] hover:text-[#ff5e1a]'
-              }`}
-            >
-              Portfolio Home
-            </Link>
+            {/* Vertical Navigation Tabs */}
+            <nav aria-label="Dashboard views" className="flex flex-col gap-1.5">
+              <button
+                onClick={() => setActiveTab('messages')}
+                className={`w-full px-4 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition-all flex items-center justify-between text-left cursor-pointer ${
+                  activeTab === 'messages'
+                    ? 'bg-[#ff5e1a] text-white shadow-md'
+                    : isDark
+                      ? 'bg-white/5 text-neutral-400 hover:text-white hover:bg-white/10'
+                      : 'bg-black/5 text-neutral-600 hover:text-neutral-900 hover:bg-black/10'
+                }`}
+              >
+                <span>Messages</span>
+                {unreadCount > 0 && (
+                  <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                    activeTab === 'messages' ? 'bg-black text-white' : 'bg-[#ff5e1a] text-white'
+                  }`}>
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
 
-            <button
-              onClick={toggleTheme}
-              className={`px-4 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider border transition-all ${
-                isDark 
-                  ? 'border-white/15 bg-white/5 text-neutral-300 hover:border-[#ff5e1a]' 
-                  : 'border-black/15 bg-black/5 text-neutral-800 hover:border-[#ff5e1a]'
-              }`}
-            >
-              {isDark ? 'Light Theme' : 'Dark Theme'}
-            </button>
+              <button
+                onClick={() => setActiveTab('analytics')}
+                className={`w-full px-4 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition-all flex items-center justify-between text-left cursor-pointer ${
+                  activeTab === 'analytics'
+                    ? 'bg-[#ff5e1a] text-white shadow-md'
+                    : isDark
+                      ? 'bg-white/5 text-neutral-400 hover:text-white hover:bg-white/10'
+                      : 'bg-black/5 text-neutral-600 hover:text-neutral-900 hover:bg-black/10'
+                }`}
+              >
+                <span>Analytics</span>
+                <span className="text-[10px] opacity-80 font-normal">
+                  {analytics.uniqueVisitors} unique
+                </span>
+              </button>
 
-            <button
-              onClick={handleLockStudio}
-              className="px-4 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider border border-red-500/25 text-red-400 hover:bg-red-500/10 transition-all cursor-pointer"
-              title="Lock terminal and end session"
-            >
-              Lock Studio
-            </button>
-          </div>
-        </header>
+              <button
+                onClick={() => setActiveTab('architecture')}
+                className={`w-full px-4 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition-all text-left cursor-pointer ${
+                  activeTab === 'architecture'
+                    ? 'bg-[#ff5e1a] text-white shadow-md'
+                    : isDark
+                      ? 'bg-white/5 text-neutral-400 hover:text-white hover:bg-white/10'
+                      : 'bg-black/5 text-neutral-600 hover:text-neutral-900 hover:bg-black/10'
+                }`}
+              >
+                <span>Settings</span>
+              </button>
+            </nav>
 
-        {/* 2. PRIMARY NAVIGATION TABS */}
-        <nav aria-label="Dashboard views" className="flex flex-wrap items-center gap-2 border-b border-black/10 dark:border-white/10 pb-4">
-          <button
-            onClick={() => setActiveTab('messages')}
-            className={`px-5 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer ${
-              activeTab === 'messages'
-                ? 'bg-[#ff5e1a] text-white shadow-md'
-                : isDark
-                  ? 'bg-white/5 text-neutral-400 hover:text-white hover:bg-white/10'
-                  : 'bg-black/5 text-neutral-600 hover:text-neutral-900 hover:bg-black/10'
-            }`}
-          >
-            <span>Messages & Inquiries</span>
-            {unreadCount > 0 && (
-              <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                activeTab === 'messages' ? 'bg-black text-white' : 'bg-[#ff5e1a] text-white'
-              }`}>
-                {unreadCount}
-              </span>
-            )}
-          </button>
+            {/* Bottom Actions on Left Sidebar */}
+            <div className="pt-4 border-t border-black/10 dark:border-white/10 flex flex-col gap-2">
+              <Link
+                to="/"
+                className={`w-full px-4 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider border text-center transition-all ${
+                  isDark 
+                    ? 'border-white/15 bg-white/5 text-neutral-300 hover:border-[#ff5e1a] hover:text-[#ff5e1a]' 
+                    : 'border-black/15 bg-black/5 text-neutral-800 hover:border-[#ff5e1a] hover:text-[#ff5e1a]'
+                }`}
+              >
+                Portfolio Home
+              </Link>
 
-          <button
-            onClick={() => setActiveTab('analytics')}
-            className={`px-5 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer ${
-              activeTab === 'analytics'
-                ? 'bg-[#ff5e1a] text-white shadow-md'
-                : isDark
-                  ? 'bg-white/5 text-neutral-400 hover:text-white hover:bg-white/10'
-                  : 'bg-black/5 text-neutral-600 hover:text-neutral-900 hover:bg-black/10'
-            }`}
-          >
-            <span>Visitor Analytics (3 Engines)</span>
-            <span className="text-[10px] opacity-75 font-normal">
-              ({analytics.uniqueVisitors} unique)
-            </span>
-          </button>
+              <button
+                onClick={handleLockDashboard}
+                className="w-full px-4 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider border border-red-500/25 text-red-400 hover:bg-red-500/10 transition-all cursor-pointer text-center"
+                title="Lock dashboard and end session"
+              >
+                Lock Dashboard
+              </button>
+            </div>
+          </aside>
 
-          <button
-            onClick={() => setActiveTab('architecture')}
-            className={`px-5 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
-              activeTab === 'architecture'
-                ? 'bg-[#ff5e1a] text-white shadow-md'
-                : isDark
-                  ? 'bg-white/5 text-neutral-400 hover:text-white hover:bg-white/10'
-                  : 'bg-black/5 text-neutral-600 hover:text-neutral-900 hover:bg-black/10'
-            }`}
-          >
-            <span>Settings & Setup</span>
-          </button>
-        </nav>
+          {/* MAIN CONTENT AREA */}
+          <main className="flex-1 min-w-0 space-y-8 w-full">
 
         {/* 3. TAB CONTENT: MESSAGES INBOX */}
         {activeTab === 'messages' && (
@@ -1321,6 +1307,8 @@ export default function Dashboard() {
           </section>
         )}
 
+          </main>
+        </div>
       </div>
     </div>
   );

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import BrandMark from '../BrandMark';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../../context/ThemeContext';
-import { getStoredAnalytics } from '../../utils/visitorTracker';
 
 export default function MonitorOS({ onCloseZone }) {
   const { isDark } = useTheme();
@@ -110,7 +109,6 @@ export default function MonitorOS({ onCloseZone }) {
     { id: 'figma', name: 'Figma', brand: 'figma', color: '#F24E1E', label: 'Design Tokens' },
     { id: 'vscode', name: 'VS Code', brand: 'vscode', color: '#007ACC', label: 'React Engine' },
     { id: 'gemini', name: 'Gemini AI', brand: 'gemini', color: '#8E75FF', label: 'Spatial AI' },
-    { id: 'analytics', name: 'Telemetry OS', dockLabel: 'Analytics', color: '#FF5E1A', label: 'Live Traffic' },
     { id: 'illustrator', name: 'Adobe Illustrator', dockLabel: 'Illustrator', color: '#FF9A00', label: 'Vector Studio' },
     { id: 'spotify', name: 'Spotify', brand: 'spotify', color: '#1DB954', label: 'Lo-Fi Chill' },
   ];
@@ -119,7 +117,6 @@ export default function MonitorOS({ onCloseZone }) {
   const nightApps = [
     { id: 'steam', name: 'Steam Rig', brand: 'steam', color: '#1B2838', label: 'Cyberpunk / 144 FPS' },
     { id: 'sketch', name: 'Sketch Studio', brand: 'sketch', color: '#FDB300', label: 'Vector Artboards' },
-    { id: 'analytics', name: 'Telemetry OS', dockLabel: 'Analytics', color: '#FF5E1A', label: 'Live Traffic' },
     { id: 'discord', name: 'Discord', brand: 'discord', color: '#5865F2', label: '#dev-guild' },
     { id: 'otakucircle', name: 'OtakuCircle', brand: 'otakucircle', color: '#FF5E1A', label: 'Manga Vault' },
     { id: 'sports', name: 'NBA & Vball', dockLabel: 'Sports', color: '#1D428A', label: 'Live Court Feeds' },
@@ -552,55 +549,6 @@ export default function MonitorOS({ onCloseZone }) {
                         </div>
                       </div>
                     )}
-
-                    {/* APP 11: TELEMETRY OS (Option 1: In-Studio Live Stats) */}
-                    {activeApp === 'analytics' && (() => {
-                      const stats = getStoredAnalytics();
-                      const topRef = Object.entries(stats.referrerBreakdown || {}).sort((a, b) => b[1] - a[1])[0]?.[0] || 'Awaiting visits';
-                      return (
-                        <div className="h-full flex flex-col gap-3 font-mono text-xs">
-                          <div className="flex items-center justify-between border-b pb-2 border-white/10">
-                            <div className="flex items-center gap-2">
-                              <span className="font-bold text-[#ff5e1a]">TELEMETRY OS // IN-STUDIO MONITOR</span>
-                              <span className="text-[10px] text-emerald-400">● LIVE</span>
-                            </div>
-                            <span className="text-[10px] text-neutral-400">Zero-Cookie Tracking</span>
-                          </div>
-
-                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                            <div className="p-2.5 rounded-lg bg-black/40 border border-white/10">
-                              <span className="text-[10px] text-neutral-400 block uppercase">Pageviews</span>
-                              <span className="text-xl font-bold text-white mt-0.5 block">{stats.totalPageViews}</span>
-                            </div>
-                            <div className="p-2.5 rounded-lg bg-black/40 border border-white/10">
-                              <span className="text-[10px] text-neutral-400 block uppercase">Unique Visitors</span>
-                              <span className="text-xl font-bold text-[#ff5e1a] mt-0.5 block">{stats.uniqueVisitors}</span>
-                            </div>
-                            <div className="p-2.5 rounded-lg bg-black/40 border border-white/10 col-span-2 sm:col-span-1">
-                              <span className="text-[10px] text-neutral-400 block uppercase">Top Referral</span>
-                              <span className="text-sm font-bold text-emerald-400 mt-1 block truncate">{topRef}</span>
-                            </div>
-                          </div>
-
-                          <div className="flex-1 p-3 rounded-lg bg-black/30 border border-white/10 overflow-y-auto space-y-1.5 text-[11px]">
-                            <div className="text-[10px] text-neutral-400 font-bold uppercase mb-1">Recent Anonymous Feed</div>
-                            {(!stats.recentVisits || stats.recentVisits.length === 0) ? (
-                              <div className="text-neutral-500 py-4 text-center">
-                                Awaiting external visitor traffic...
-                              </div>
-                            ) : (
-                              stats.recentVisits.slice(0, 4).map((v) => (
-                                <div key={v.id} className="flex justify-between items-center text-neutral-300 py-0.5">
-                                  <span className="text-[#ff5e1a]">{v.path}</span>
-                                  <span className="text-neutral-500">{v.device}</span>
-                                  <span className="text-neutral-400">{v.referrer}</span>
-                                </div>
-                              ))
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })()}
 
                   </div>
                 </motion.div>
