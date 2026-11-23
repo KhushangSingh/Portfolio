@@ -45,8 +45,8 @@ const ZONES = [
   },
   {
     id: 'vinyl',
-    title: 'Vinyl Deck & Crate',
-    subtitle: 'Turntable & Lo-Fi Record Library',
+    title: 'Left Side Table & Turntable',
+    subtitle: 'Audio-Technica Deck, Suzume Vinyl & Collectibles',
     x: '17%',
     y: '58%',
     originX: '17%',
@@ -475,11 +475,11 @@ export default function StudioCameraEngine({ onZoneStateChange }) {
               if (e.target === e.currentTarget) handleStepBack();
             }}
             className={`absolute inset-0 z-30 flex items-center justify-center bg-black/60 backdrop-blur-sm cursor-pointer ${
-              activeZone.id === 'window' || activeZone.id === 'monitor' ? 'p-0' : 'p-4'
+              activeZone.id === 'window' || activeZone.id === 'monitor' || activeZone.id === 'vinyl' ? 'p-0' : 'p-4'
             }`}
           >
-            {/* Minimalist Top-Right Close Button (for modal popup zones; window zone and monitor zone provide their own integrated controls) */}
-            {activeZone.id !== 'window' && activeZone.id !== 'monitor' && (
+            {/* Minimalist Top-Right Close Button (for modal popup zones; window, monitor and vinyl provide their own integrated controls) */}
+            {activeZone.id !== 'window' && activeZone.id !== 'monitor' && activeZone.id !== 'vinyl' && (
               <button
                 onClick={handleStepBack}
                 className="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 p-2.5 rounded-full bg-black/85 hover:bg-[#ff5e1a] text-white/80 hover:text-white border border-white/20 hover:border-transparent transition-all shadow-2xl cursor-pointer group"
