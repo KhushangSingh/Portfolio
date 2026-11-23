@@ -410,13 +410,13 @@ const HeroSection = () => {
                             ? 'bg-[#0e0f14]/85 hover:bg-[#151722] border-white/15 hover:border-[#ff5e1a] text-white shadow-black/40'
                             : 'bg-white/90 hover:bg-white border-black/15 hover:border-[#ff5e1a] text-neutral-900 shadow-black/8'
                     } backdrop-blur-xl`}
-                    title="Quick 5-minute portfolio overview and executive summary"
+                    title="Quick executive summary for visitors short on time"
                 >
                     <span className="px-2 py-0.5 rounded-md text-[10px] font-sans font-black bg-[#ff5e1a] text-white uppercase tracking-wider shrink-0 shadow-xs">
-                        5 Min
+                        Quick
                     </span>
                     <span className="font-sans font-extrabold tracking-tight">
-                        Have 5 Mins?
+                        Short on Time?
                     </span>
                     <span className="text-[#ff5e1a] text-xs font-bold transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden="true">
                         →
@@ -781,9 +781,9 @@ const Footer = () => {
                                                 ? 'border-white/15 bg-white/5 text-neutral-200 hover:border-[#ff5e1a] hover:text-[#ff5e1a]' 
                                                 : 'border-black/15 bg-black/5 text-neutral-800 hover:border-[#ff5e1a] hover:text-[#ff5e1a]'
                                         }`}
-                                        title="Quick 5-minute portfolio overview and executive summary"
+                                        title="Quick executive summary for visitors short on time"
                                     >
-                                        <span>Have 5 Mins?</span>
+                                        <span>Short on Time?</span>
                                     </Link>
 
                                     <a
@@ -848,7 +848,7 @@ const Footer = () => {
                             <li><a href="#projects" className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>Projects</a></li>
                             <li><a href="#about" className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>About</a></li>
                             <li><a href="#contact" className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>Contact Form</a></li>
-                            <li><Link to="/summary" className="inline-block w-fit text-xs sm:text-sm text-[#ff5e1a] font-medium hover:underline">Have 5 Mins?</Link></li>
+                            <li><Link to="/summary" className="inline-block w-fit text-xs sm:text-sm text-[#ff5e1a] font-medium hover:underline">Short on Time? (Summary)</Link></li>
                             <li><a href={resumeUrl} target="_blank" rel="noreferrer" className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>Resume (PDF)</a></li>
                         </ul>
                     </motion.div>
