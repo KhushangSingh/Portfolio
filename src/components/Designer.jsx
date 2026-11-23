@@ -697,9 +697,13 @@ const InfoSection = ({ onCertClick }) => {
                                                 target="_blank" 
                                                 rel="noreferrer" 
                                                 data-cursor="RESUME"
-                                                className="group inline-flex items-center gap-2 text-[#ff5e1a] hover:text-[#ff783b] transition-colors cursor-pointer"
+                                                className="group inline-flex items-center gap-1.5 text-[#ff5e1a] hover:text-[#ff783b] transition-colors cursor-pointer"
                                             >
-                                                <span className="text-sm font-bold uppercase tracking-widest underline decoration-[#ff5e1a]/70 underline-offset-4 group-hover:decoration-[#ff5e1a] transition-colors">Download Resume</span>
+                                                <span className="text-sm font-bold uppercase tracking-widest underline decoration-[#ff5e1a]/70 underline-offset-4 group-hover:decoration-[#ff5e1a] transition-colors">Resume</span>
+                                                <svg className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                                    <line x1="7" y1="17" x2="17" y2="7" />
+                                                    <polyline points="7 7 17 7 17 17" />
+                                                </svg>
                                             </a>
                                         </motion.div>
                                     )}
@@ -764,16 +768,8 @@ const Footer = () => {
                                     Open for freelance projects and internships. Based in India, working globally.
                                 </p>
 
-                                {/* Action Buttons: Direct Message, Visual Summary Brief & PDF Resume */}
+                                {/* Action Buttons: Visual Summary Brief & PDF Resume */}
                                 <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
-                                    <a
-                                        href="#contact"
-                                        className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all duration-300 shadow-md hover:shadow-[#ff5e1a]/25 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-                                        title="Send a direct message through website form"
-                                    >
-                                        <span>Direct Message</span>
-                                    </a>
-
                                     <Link
                                         to="/summary"
                                         className={`inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs font-sans font-bold uppercase tracking-wider border transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer ${
@@ -848,8 +844,6 @@ const Footer = () => {
                             <li><a href="#projects" className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>Projects</a></li>
                             <li><a href="#about" className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>About</a></li>
                             <li><a href="#contact" className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>Contact Form</a></li>
-                            <li><Link to="/summary" className="inline-block w-fit text-xs sm:text-sm text-[#ff5e1a] font-medium hover:underline">Short on Time? (Summary)</Link></li>
-                            <li><a href={resumeUrl} target="_blank" rel="noreferrer" className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>Resume (PDF)</a></li>
                         </ul>
                     </motion.div>
                 </div>
@@ -858,19 +852,32 @@ const Footer = () => {
                 <div className="pt-4 sm:pt-6 pb-2 border-t border-black/10 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div className="flex items-center gap-1.5 text-xs normal-case text-neutral-500 dark:text-neutral-400">
                         <span>&copy;</span>
-                        <span>2026 Khushang Singh. Designed and developed with care.</span>
+                        <span>2026 Khushang Singh. Designed and developed.</span>
                     </div>
 
                     <button
                         onClick={scrollToTop}
                         aria-label="Back to top of page"
-                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-xs font-mono font-bold uppercase tracking-wider transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] cursor-pointer ${
+                        title="Back to top"
+                        className={`group w-10 h-10 rounded-xl border flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer ${
                             isDark 
-                                ? 'border-white/15 bg-white/5 text-neutral-300 hover:border-[#ff5e1a] hover:text-[#ff5e1a]' 
-                                : 'border-black/15 bg-black/5 text-neutral-800 hover:border-[#ff5e1a] hover:text-[#ff5e1a]'
+                                ? 'border-white/15 bg-white/5 text-neutral-300 hover:border-[#ff5e1a] hover:text-[#ff5e1a] hover:bg-[#ff5e1a]/10' 
+                                : 'border-black/15 bg-black/5 text-neutral-800 hover:border-[#ff5e1a] hover:text-[#ff5e1a] hover:bg-[#ff5e1a]/10'
                         }`}
                     >
-                        <span>Back to Top</span>
+                        <svg 
+                            className="w-4 h-4 transition-transform duration-200 group-hover:-translate-y-0.5" 
+                            viewBox="0 0 24 24" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            strokeWidth="2.5" 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round" 
+                            aria-hidden="true"
+                        >
+                            <line x1="12" y1="19" x2="12" y2="5" />
+                            <polyline points="5 12 12 5 19 12" />
+                        </svg>
                     </button>
                 </div>
             </div>

@@ -469,14 +469,32 @@ export default function PortfolioSummary() {
       }`}>
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-10 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-neutral-500">
           <p className="normal-case text-[11px]">
-            © 2026 Khushang Singh. Designed and developed with care.
+            © 2026 Khushang Singh. Designed and developed.
           </p>
 
           <button
             onClick={scrollToTop}
-            className="inline-flex items-center gap-1.5 hover:text-[#ff5e1a] transition-colors cursor-pointer font-mono font-bold uppercase text-[10px]"
+            aria-label="Back to top of page"
+            title="Back to top"
+            className={`group w-8 h-8 rounded-lg border flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer ${
+              isDark
+                ? 'border-white/15 bg-white/5 text-neutral-300 hover:border-[#ff5e1a] hover:text-[#ff5e1a]'
+                : 'border-black/15 bg-black/5 text-neutral-700 hover:border-[#ff5e1a] hover:text-[#ff5e1a]'
+            }`}
           >
-            <span>Back to Top</span>
+            <svg 
+              className="w-3.5 h-3.5 transition-transform duration-200 group-hover:-translate-y-0.5" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2.5" 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              aria-hidden="true"
+            >
+              <line x1="12" y1="19" x2="12" y2="5" />
+              <polyline points="5 12 12 5 19 12" />
+            </svg>
           </button>
         </div>
       </footer>

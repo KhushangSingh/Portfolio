@@ -242,16 +242,13 @@ export default function ContactForm({ className = '', onSubmitted }) {
         className="flex flex-col gap-5"
       >
         <div>
-          <div className="inline-block px-3 py-1 rounded-md text-[11px] font-sans font-bold uppercase tracking-wider text-[#ff5e1a] bg-[#ff5e1a]/10 border border-[#ff5e1a]/25 mb-2">
-            Direct Contact
-          </div>
           <h3 className="text-xl sm:text-2xl font-black tracking-tight font-sans">
             Send a Message
           </h3>
           <p className={`text-xs sm:text-sm mt-1 leading-relaxed font-sans ${
             isDark ? 'text-neutral-400' : 'text-neutral-600'
           }`}>
-            Reach Khushang directly without leaving the website. Messages go straight to his personal studio inbox.
+            Reach Khushang directly without leaving the website.
           </p>
         </div>
 
