@@ -5,7 +5,7 @@ export const BADGE_CATEGORIES = [
     id: '3d-motion',
     label: '01 / 3D & Motion',
     shortLabel: '3D & Motion',
-    description: 'Three.js shaders, Blender 3D, GSAP scrubbed timelines and Framer Motion spring physics.'
+    description: 'Three.js shaders, GSAP scrubbed timelines and Framer Motion spring physics.'
   },
   {
     id: 'design',
@@ -33,13 +33,13 @@ export const BADGES_DATA = {
       icon: 'threejs'
     },
     {
-      id: 'blender',
-      name: 'Blender 3D',
-      level: 'Modeling',
-      tagline: 'Hard-Surface Modeling, UV Unwrapping & PBR Baking',
-      accent: '#E87D0D',
-      metalColor: '#e0c068',
-      icon: 'blender'
+      id: 'inkscape',
+      name: 'Inkscape',
+      level: 'Vector Tool',
+      tagline: 'Vector Paths, SVG Nodes & Precise Geometry',
+      accent: '#000000',
+      metalColor: '#c0c0c0',
+      icon: 'inkscape'
     },
     {
       id: 'gsap',
@@ -60,13 +60,13 @@ export const BADGES_DATA = {
       icon: 'framer'
     },
     {
-      id: 'spline',
-      name: 'Spline 3D',
-      level: 'Interactive 3D',
-      tagline: 'Real-time WebGL Scenes & Interactive Cameras',
-      accent: '#FF3366',
-      metalColor: '#c0c0c0',
-      icon: 'spline'
+      id: 'sketch',
+      name: 'Sketch App',
+      level: 'UI Design',
+      tagline: 'Artboards, Symbols & Vector Specification',
+      accent: '#FDB300',
+      metalColor: '#e0c068',
+      icon: 'sketch'
     },
     {
       id: 'webgl',

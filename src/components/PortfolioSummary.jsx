@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import BrandMark from './BrandMark';
+import LaptopPhoneMockup from './LaptopPhoneMockup';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
@@ -44,16 +45,17 @@ export default function PortfolioSummary() {
       isDark ? 'bg-[#08080a] text-white' : 'bg-[#F8F8F5] text-neutral-900'
     }`}>
       
-      {/* 1. TOP STICKY NAVIGATION BAR */}
-      <header className={`sticky top-0 z-50 w-full backdrop-blur-xl border-b transition-colors duration-500 ${
-        isDark ? 'bg-[#08080a]/85 border-white/10' : 'bg-[#F8F8F5]/85 border-black/10'
-      }`}>
-        <div className="max-w-[1200px] mx-auto px-6 md:px-12 h-16 flex items-center justify-between">
+      {/* 1. MAIN RESUME CONTENT CONTAINER */}
+      {/* Generous top clearance (pt-28 sm:pt-32 md:pt-36) keeps content safely below the fixed name bulb on the top-left and music button on the top-right */}
+      <main className="max-w-[1200px] mx-auto px-6 md:px-12 pt-28 sm:pt-32 md:pt-36 pb-16 md:pb-24 flex flex-col gap-14 md:gap-18">
+        
+        {/* Navigation & Action Bar: Positioned safely within page flow away from fixed header corners */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-8 border-b border-black/10 dark:border-white/10">
           <Link
             to="/"
             className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400 hover:text-[#ff5e1a] dark:hover:text-[#ff5e1a] transition-colors"
           >
-            <span>Interactive Portfolio</span>
+            <span>← Back to Interactive Portfolio</span>
           </Link>
 
           <div className="flex items-center gap-3">
@@ -61,16 +63,12 @@ export default function PortfolioSummary() {
               href={resumeUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all duration-300 shadow-sm hover:scale-[1.02] active:scale-[0.98]"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all duration-300 shadow-sm hover:scale-[1.02] active:scale-[0.98]"
             >
-              <span>Download PDF</span>
+              <span>Download PDF Resume</span>
             </a>
           </div>
         </div>
-      </header>
-
-      {/* 2. MAIN RESUME CONTENT CONTAINER */}
-      <main className="max-w-[1200px] mx-auto px-6 md:px-12 py-12 sm:py-16 md:py-20 flex flex-col gap-16 md:gap-20">
         
         {/* HEADER / IDENTITY SECTION */}
         <section className="flex flex-col gap-6 border-b pb-12 sm:pb-16 border-black/10 dark:border-white/10">
@@ -156,13 +154,13 @@ export default function PortfolioSummary() {
 
           <div className="flex flex-col gap-6">
             {/* Project 1: OtakuCircle */}
-            <div className={`p-6 sm:p-8 rounded-2xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-6 sm:gap-8 ${
+            <div className={`group p-6 sm:p-8 rounded-2xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-6 sm:gap-8 ${
               isDark ? 'bg-[#101115] border-white/10' : 'bg-white border-black/10 shadow-xs'
             }`}>
-              <div className="flex flex-col gap-2 max-w-2xl">
+              <div className="flex flex-col gap-2 max-w-xl">
                 <h3 className="text-2xl font-bold tracking-tight">OtakuCircle</h3>
                 <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                  <span className="px-2.5 py-0.5 rounded-md text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
                     SaaS Platform
                   </span>
                   <span className="text-xs font-mono text-neutral-500">2024</span>
@@ -186,24 +184,24 @@ export default function PortfolioSummary() {
                 </Link>
               </div>
 
-              <div className="w-full md:w-56 shrink-0 aspect-[16/10] rounded-xl overflow-hidden border border-black/10 dark:border-white/10 bg-neutral-900 shadow-md">
-                <img
-                  src="/images/otakucircle/landing.webp"
-                  alt="OtakuCircle Preview"
-                  className="w-full h-full object-cover object-top"
+              <div className="w-full md:w-72 lg:w-80 xl:w-96 shrink-0">
+                <LaptopPhoneMockup
+                  desktopSrc="/images/otakucircle/landing.webp"
+                  alt="OtakuCircle"
+                  className="transition-transform duration-300 ease-out group-hover:scale-[1.02] drop-shadow-md"
                   loading="lazy"
                 />
               </div>
             </div>
 
             {/* Project 2: SquadSync */}
-            <div className={`p-6 sm:p-8 rounded-2xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-6 sm:gap-8 ${
+            <div className={`group p-6 sm:p-8 rounded-2xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-6 sm:gap-8 ${
               isDark ? 'bg-[#101115] border-white/10' : 'bg-white border-black/10 shadow-xs'
             }`}>
-              <div className="flex flex-col gap-2 max-w-2xl">
+              <div className="flex flex-col gap-2 max-w-xl">
                 <h3 className="text-2xl font-bold tracking-tight">SquadSync</h3>
                 <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-pink-500/15 text-pink-600 dark:text-pink-400 border border-pink-500/30">
+                  <span className="px-2.5 py-0.5 rounded-md text-[10px] font-mono font-bold uppercase tracking-wider bg-pink-500/15 text-pink-600 dark:text-pink-400 border border-pink-500/30">
                     Product Suite
                   </span>
                   <span className="text-xs font-mono text-neutral-500">2024</span>
@@ -224,24 +222,24 @@ export default function PortfolioSummary() {
                 </div>
               </div>
 
-              <div className="w-full md:w-56 shrink-0 aspect-[16/10] rounded-xl overflow-hidden border border-black/10 dark:border-white/10 bg-neutral-900 shadow-md">
-                <img
-                  src="/images/squadsync_cover.jpg"
-                  alt="SquadSync Preview"
-                  className="w-full h-full object-cover object-top"
+              <div className="w-full md:w-72 lg:w-80 xl:w-96 shrink-0">
+                <LaptopPhoneMockup
+                  desktopSrc="/images/squadsync_cover.jpg"
+                  alt="SquadSync"
+                  className="transition-transform duration-300 ease-out group-hover:scale-[1.02] drop-shadow-md"
                   loading="lazy"
                 />
               </div>
             </div>
 
             {/* Project 3: Ledgerly */}
-            <div className={`p-6 sm:p-8 rounded-2xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-6 sm:gap-8 ${
+            <div className={`group p-6 sm:p-8 rounded-2xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-6 sm:gap-8 ${
               isDark ? 'bg-[#101115] border-white/10' : 'bg-white border-black/10 shadow-xs'
             }`}>
-              <div className="flex flex-col gap-2 max-w-2xl">
+              <div className="flex flex-col gap-2 max-w-xl">
                 <h3 className="text-2xl font-bold tracking-tight">Ledgerly</h3>
                 <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-orange-500/15 text-orange-600 dark:text-orange-400 border border-orange-500/30">
+                  <span className="px-2.5 py-0.5 rounded-md text-[10px] font-mono font-bold uppercase tracking-wider bg-orange-500/15 text-orange-600 dark:text-orange-400 border border-orange-500/30">
                     Design Engineering
                   </span>
                   <span className="text-xs font-mono text-neutral-500">2024</span>
@@ -262,11 +260,11 @@ export default function PortfolioSummary() {
                 </div>
               </div>
 
-              <div className="w-full md:w-56 shrink-0 aspect-[16/10] rounded-xl overflow-hidden border border-black/10 dark:border-white/10 bg-neutral-900 shadow-md">
-                <img
-                  src="/images/ledgerly_cover.jpg"
-                  alt="Ledgerly Preview"
-                  className="w-full h-full object-cover object-top"
+              <div className="w-full md:w-72 lg:w-80 xl:w-96 shrink-0">
+                <LaptopPhoneMockup
+                  desktopSrc="/images/ledgerly_cover.jpg"
+                  alt="Ledgerly"
+                  className="transition-transform duration-300 ease-out group-hover:scale-[1.02] drop-shadow-md"
                   loading="lazy"
                 />
               </div>
@@ -363,9 +361,9 @@ export default function PortfolioSummary() {
                 Creative Tech & Tools
               </h3>
               <ul className="space-y-2 text-xs sm:text-sm text-neutral-700 dark:text-neutral-300">
-                <li>• Spline 3D & Blender Modeling</li>
+                <li>• Sketch & Inkscape Vector Tooling</li>
                 <li>• Adobe Creative Cloud (Illustrator, Photoshop)</li>
-                <li>• DaVinci Resolve & Motion Asset Pipelines</li>
+                <li>• Design Systems & Component Governance</li>
                 <li>• Git, GitHub & CI/CD Deployment</li>
                 <li>• LLM Integration & Agentic Product Flows</li>
               </ul>
@@ -390,7 +388,7 @@ export default function PortfolioSummary() {
                 {designData.about.education.college}
               </p>
             </div>
-            <span className="px-3.5 py-1 rounded-full text-xs font-mono font-bold border border-[#ff5e1a]/30 text-[#ff5e1a] bg-[#ff5e1a]/10 shrink-0">
+            <span className="px-3 py-1 rounded-md text-xs font-mono font-bold border border-[#ff5e1a]/30 text-[#ff5e1a] bg-[#ff5e1a]/10 shrink-0">
               {designData.about.education.year}
             </span>
           </div>
@@ -414,14 +412,14 @@ export default function PortfolioSummary() {
           <div className="flex flex-wrap items-center justify-center gap-3 shrink-0">
             <a
               href={`mailto:${email}`}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all shadow-md hover:scale-[1.02] active:scale-[0.98]"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all shadow-md hover:scale-[1.02] active:scale-[0.98]"
             >
               <span>Get In Touch</span>
             </a>
 
             <Link
               to="/"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs font-mono font-bold uppercase tracking-wider border border-black/15 dark:border-white/15 hover:border-[#ff5e1a] text-neutral-800 dark:text-neutral-200 hover:text-[#ff5e1a] transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-mono font-bold uppercase tracking-wider border border-black/15 dark:border-white/15 hover:border-[#ff5e1a] text-neutral-800 dark:text-neutral-200 hover:text-[#ff5e1a] transition-all"
             >
               <span>Back to Portfolio</span>
             </Link>

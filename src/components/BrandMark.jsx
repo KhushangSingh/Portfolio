@@ -4,7 +4,6 @@ const brandSources = {
   otakucircle: '/images/otakucircle/logo.png',
   motion: '/images/brands/motion.png',
   procreate: '/images/brands/procreate.jpg',
-  spline: '/images/brands/spline.png',
 };
 
 export default function BrandMark({ brand, className }) {

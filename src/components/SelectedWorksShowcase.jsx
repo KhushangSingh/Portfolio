@@ -358,12 +358,12 @@ function ProjectHorizontalCard({ project, previewActive, onOpenCaseStudy }) {
             {project.desc}
           </p>
 
-          {/* 5. Minimal Horizontal Tag Pills */}
+          {/* 5. Minimal Horizontal Tags */}
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-3.5 sm:mb-5">
             {project.tags.map((tag, idx) => (
               <span
                 key={idx}
-                className="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-[11px] font-medium border border-neutral-300/80 bg-neutral-100/90 text-neutral-700 shadow-xs"
+                className="px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-md text-[10px] sm:text-[11px] font-mono border border-neutral-300/80 bg-neutral-100/90 text-neutral-700 shadow-xs"
               >
                 {tag}
               </span>

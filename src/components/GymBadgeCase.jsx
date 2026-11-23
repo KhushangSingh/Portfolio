@@ -233,7 +233,7 @@ export const GymBadgeCase = () => {
   // 18 Badges in the exact 5 - 6 - 7 row distribution matching reference images
   const row1Badges = [
     { id: 'figma', brand: 'figma', name: 'Figma', work: 'UI Systems & Multi-Brand Libraries' },
-    { id: 'creative-cloud', name: 'Adobe Creative Cloud', work: 'Vector & Motion Asset Pipelines' },
+    { id: 'creative-cloud', name: 'Adobe Creative Cloud', work: 'Vector Design & Asset Production' },
     { id: 'adobe', name: 'Adobe Suite', work: 'Visual Design & Layout Production' },
     { id: 'react', brand: 'react', name: 'React 19', work: 'Web Apps & State Architecture' },
     { id: 'tailwind', brand: 'tailwind', name: 'Tailwind CSS', work: 'Design Tokens & Utility Styling' }
@@ -241,16 +241,16 @@ export const GymBadgeCase = () => {
 
   const row2Badges = [
     { id: 'openai', brand: 'openai', name: 'OpenAI', work: 'LLM Pipelines & Agentic Workflows' },
-    { id: 'spline', brand: 'spline', name: 'Spline 3D', work: 'Interactive WebGL Scenes & Cameras' },
+    { id: 'inkscape', brand: 'inkscape', name: 'Inkscape', work: 'Vector Paths & SVG Geometry' },
     { id: 'midjourney', name: 'Prototyping', work: 'High-Fidelity Interaction Flows' },
     { id: 'notion', brand: 'notion', name: 'Notion', work: 'Documentation & Knowledge Systems' },
     { id: 'framer', brand: 'motion', name: 'Framer Motion', work: 'Spring Physics & Layout Animations' },
-    { id: 'blender', brand: 'blender', name: 'Blender 3D', work: '3D Modeling & PBR Baking' }
+    { id: 'git', brand: 'git', name: 'Git & GitHub', work: 'Version Control & Releases' }
   ];
 
   const row3Badges = [
     { id: 'vscode', brand: 'vscode', name: 'VS Code', work: 'Code Editing & TypeScript' },
-    { id: 'davinci', brand: 'davinci', name: 'DaVinci Resolve', work: 'Motion Graphics & Color Grading' },
+    { id: 'storybook', brand: 'storybook', name: 'Storybook', work: 'Component Isolation & Docs' },
     { id: 'threejs', brand: 'threejs', name: 'Three.js', work: 'Custom Shaders & 3D Math' },
     { id: 'design-systems', name: 'Design Systems', work: 'Component Governance & Specs' },
     { id: 'procreate', brand: 'procreate', name: 'Procreate', work: 'Digital Art & Storyboards' },

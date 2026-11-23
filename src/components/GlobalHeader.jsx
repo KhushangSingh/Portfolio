@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { useMusic } from '../context/MusicContext';
@@ -6,6 +7,8 @@ import { designData } from '../constants/data';
 import { LampPullRope } from './LampPullRope';
 
 const GlobalHeader = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const { isDark, isBulbBroken } = useTheme();
   const { isPlaying, isPastHero, handleHeaderPlayClick } = useMusic();
   const [textIndex, setTextIndex] = useState(0);
@@ -236,7 +239,11 @@ const GlobalHeader = () => {
           id="khushang-bulb-button"
           onClick={() => {
             window.dispatchEvent(new CustomEvent('close-studio-zone'));
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (location.pathname !== '/') {
+              navigate('/');
+            } else {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
           }}
           data-cursor="TOP"
           animate={isExploding ? {

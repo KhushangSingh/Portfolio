@@ -9,7 +9,7 @@ export default function MonitorOS({ onCloseZone }) {
   const [isPoweringOff, setIsPoweringOff] = useState(false);
   
   // Day apps: figma, vscode, gemini, illustrator, spotify
-  // Night apps: steam, blender, discord, otakucircle, sports
+  // Night apps: steam, sketch, discord, otakucircle, sports
   const defaultApp = isDark ? 'steam' : 'vscode';
   const [activeApp, setActiveApp] = useState(defaultApp);
   const [openApps, setOpenApps] = useState([defaultApp]);
@@ -98,7 +98,7 @@ export default function MonitorOS({ onCloseZone }) {
       if (userText.toLowerCase().includes('color') || userText.toLowerCase().includes('orange')) {
         reply = "Recommended palette token: #FF5E1A for laser accents against #121319 obsidian ground. High contrast, WCAG AA compliant.";
       } else if (userText.toLowerCase().includes('anime') || userText.toLowerCase().includes('manga')) {
-        reply = "OtakuCircle database sync: Jujutsu Kaisen chapter 271 cached. Blender 3D rigged model ready for animation render.";
+        reply = "OtakuCircle database sync: Jujutsu Kaisen chapter 271 cached. Vector layout ready for review.";
       }
       setGeminiMessages(prev => [...prev, { role: 'assistant', text: reply }]);
     }, 700);
@@ -116,7 +116,7 @@ export default function MonitorOS({ onCloseZone }) {
   // Night App Definitions
   const nightApps = [
     { id: 'steam', name: 'Steam Rig', brand: 'steam', color: '#1B2838', label: 'Cyberpunk / 144 FPS' },
-    { id: 'blender', name: 'Blender 3D', brand: 'blender', color: '#EA7600', label: 'Viewport Shading' },
+    { id: 'sketch', name: 'Sketch Studio', brand: 'sketch', color: '#FDB300', label: 'Vector Artboards' },
     { id: 'discord', name: 'Discord', brand: 'discord', color: '#5865F2', label: '#dev-guild' },
     { id: 'otakucircle', name: 'OtakuCircle', brand: 'otakucircle', color: '#FF5E1A', label: 'Manga Vault' },
     { id: 'sports', name: 'NBA & Vball', dockLabel: 'Sports', color: '#1D428A', label: 'Live Court Feeds' },
@@ -464,18 +464,18 @@ export default function MonitorOS({ onCloseZone }) {
                       </div>
                     )}
 
-                    {/* APP 7: BLENDER 3D (Night) */}
-                    {activeApp === 'blender' && (
+                    {/* APP 7: SKETCH STUDIO (Night) */}
+                    {activeApp === 'sketch' && (
                       <div className="h-full flex flex-col gap-2">
                         <div className="flex items-center justify-between border-b pb-1.5 border-white/10">
-                          <span className="font-mono font-bold text-[#EA7600]">BLENDER 4.2 // Turntable_Shader.blend</span>
-                          <span className="font-mono text-[10px] text-gray-400">Cycles Render · 512 Samples</span>
+                          <span className="font-mono font-bold text-[#FDB300]">SKETCH // Mobile_Tokens.sketch</span>
+                          <span className="font-mono text-[10px] text-gray-400">Vector Artboards · 1x Specs</span>
                         </div>
                         <div className="flex-1 rounded-lg bg-black/50 border border-white/10 flex flex-col items-center justify-center p-3 relative overflow-hidden">
                           <div className="text-center space-y-1">
-                            <BrandMark brand="blender" className="w-12 h-12 mx-auto" />
-                            <div className="font-mono text-xs text-white font-bold">Viewport Shading: Metallic Roughness 0.12</div>
-                            <div className="font-mono text-[10px] text-gray-400">Anisotropic reflections mapped to vinyl turntable spindle</div>
+                            <BrandMark brand="sketch" className="w-12 h-12 mx-auto" />
+                            <div className="font-mono text-xs text-white font-bold">Vector Artboards: Mobile UI Components</div>
+                            <div className="font-mono text-[10px] text-gray-400">Precision bezier curves and SVG symbol libraries</div>
                           </div>
                         </div>
                       </div>

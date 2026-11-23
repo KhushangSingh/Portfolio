@@ -81,7 +81,7 @@ const CertModal = ({ cert, onClose }) => {
             >
                 <button 
                     onClick={onClose} 
-                    className={`absolute top-4 right-4 z-30 p-2 rounded-full transition-colors border ${
+                    className={`absolute top-4 right-4 z-30 p-2 rounded-lg transition-colors border ${
                       isDark ? 'bg-black/50 hover:bg-white/10 text-white border-white/10' : 'bg-black/5 hover:bg-black/10 text-neutral-800 border-black/10'
                     }`}
                 >
@@ -102,7 +102,7 @@ const CertModal = ({ cert, onClose }) => {
                     {cert.skills && cert.skills.length > 0 && (
                         <div className="flex flex-wrap gap-2 mb-8">
                             {cert.skills.map(skill => (
-                                <span key={skill} className={`px-3 py-1 border rounded-full text-xs ${
+                                <span key={skill} className={`px-2.5 py-1 border rounded-md text-xs ${
                                   isDark ? 'border-white/10 text-gray-300' : 'border-black/10 text-gray-700 bg-black/5'
                                 }`}>
                                     {skill}
@@ -835,7 +835,7 @@ const Footer = () => {
                                 <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
                                     <Link
                                         to="/summary"
-                                        className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all duration-300 shadow-md hover:shadow-[#ff5e1a]/25 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                                        className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all duration-300 shadow-md hover:shadow-[#ff5e1a]/25 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
                                         title="View condensed portfolio summary & visual resume"
                                     >
                                         <span>Visual Summary</span>
@@ -845,7 +845,7 @@ const Footer = () => {
                                         href={resumeUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className={`inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider border transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer ${
+                                        className={`inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider border transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer ${
                                             isDark 
                                                 ? 'border-white/15 bg-white/5 text-neutral-200 hover:border-[#ff5e1a] hover:text-[#ff5e1a]' 
                                                 : 'border-black/15 bg-black/5 text-neutral-800 hover:border-[#ff5e1a] hover:text-[#ff5e1a]'
@@ -918,7 +918,7 @@ const Footer = () => {
                     <button
                         onClick={scrollToTop}
                         aria-label="Back to top of page"
-                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-mono font-bold uppercase tracking-wider transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] cursor-pointer ${
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-xs font-mono font-bold uppercase tracking-wider transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] cursor-pointer ${
                             isDark 
                                 ? 'border-white/15 bg-white/5 text-neutral-300 hover:border-[#ff5e1a] hover:text-[#ff5e1a]' 
                                 : 'border-black/15 bg-black/5 text-neutral-800 hover:border-[#ff5e1a] hover:text-[#ff5e1a]'
@@ -1008,7 +1008,7 @@ const Designer = () => {
               />
 
               <div className="relative z-10 max-w-2xl mx-auto flex flex-col items-center">
-                <span className="text-[11px] font-mono uppercase tracking-[0.22em] font-bold text-[#ff5e1a] mb-3 px-3.5 py-1 rounded-full bg-[#ff5e1a]/10 border border-[#ff5e1a]/20">
+                <span className="text-[11px] font-mono uppercase tracking-[0.22em] font-bold text-[#ff5e1a] mb-3 px-3 py-1 rounded-md bg-[#ff5e1a]/10 border border-[#ff5e1a]/20">
                   Project Archive
                 </span>
 
@@ -1027,7 +1027,7 @@ const Designer = () => {
                 {/* Button that reveals secondary design */}
                 <button
                   onClick={() => { playSoundEffect('open'); setShowSecondaryCatalog(true); }}
-                  className="group relative inline-flex items-center gap-3 px-7 py-3.5 rounded-full text-xs sm:text-sm font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] shadow-lg hover:shadow-[#ff5e1a]/25 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                  className="group relative inline-flex items-center gap-3 px-7 py-3.5 rounded-xl text-xs sm:text-sm font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] shadow-lg hover:shadow-[#ff5e1a]/25 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
                 >
                   <span>View All Projects</span>
                 </button>
@@ -1041,84 +1041,76 @@ const Designer = () => {
              ============================================================== */
           <div>
             {/* Top Bar with button to collapse secondary view */}
-            <div className="max-w-[1400px] mx-auto px-6 md:px-12 mb-6 flex justify-between items-center">
+            <div className="max-w-[1400px] mx-auto px-6 md:px-12 mb-8 flex justify-between items-center">
               <span className="text-xs font-mono uppercase tracking-wider text-neutral-400">
-                All Projects // Secondary Archive Layout
+                All Projects / Archive Catalog
               </span>
               <button
                 onClick={() => { playSoundEffect('close'); setShowSecondaryCatalog(false); }}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider border border-black/10 dark:border-white/10 hover:border-[#ff5e1a] text-neutral-600 dark:text-neutral-300 hover:text-[#ff5e1a] transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-mono font-bold uppercase tracking-wider border border-black/10 dark:border-white/10 hover:border-[#ff5e1a] text-neutral-600 dark:text-neutral-300 hover:text-[#ff5e1a] transition-colors cursor-pointer"
               >
                 <span>Collapse</span>
               </button>
             </div>
 
-            {/* 4. STICKY FLOATING TAB NAVIGATION */}
-            {designData?.sections?.length > 0 && (
-              <div className="sticky top-6 sm:top-8 z-50 flex justify-center px-4 mb-8 pointer-events-none">
-                <div className={`backdrop-blur-xl border rounded-full p-1.5 md:p-2 flex gap-1 md:gap-2 pointer-events-auto shadow-2xl ring-1 transition-all duration-300 max-w-full overflow-x-auto scrollbar-hide ${
-                  isDark ? 'bg-[#0f0f0f]/80 border-white/10 ring-white/5' : 'bg-white/80 border-black/10 ring-black/5 shadow-md'
-                }`}>
-                    {designData.sections.map((section) => {
-                        const isActive = activeSection?.id === section.id;
-                        return (
-                            <button
-                                key={section.id}
-                                onClick={() => {
-                                    setActiveSection(section);
-                                    setActiveFilter("All");
-                                }}
-                                className={`relative px-4 md:px-6 py-2 md:py-2.5 rounded-full text-[11px] md:text-xs font-bold uppercase tracking-wider md:tracking-widest whitespace-nowrap transition-all duration-300 ${
-                                  isActive 
-                                    ? (isDark ? 'text-black' : 'text-white') 
-                                    : (isDark ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-black')
-                                }`}
-                            >
-                                {isActive && (
-                                    <motion.div 
-                                        layoutId="activeTab"
-                                        className={`absolute inset-0 backdrop-blur-md rounded-full ${
-                                          isDark ? 'bg-white/90 shadow-[0_0_15px_rgba(255,255,255,0.3)]' : 'bg-neutral-900 shadow-[0_2px_8px_rgba(0,0,0,0.2)]'
-                                        }`}
-                                        transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
-                                    />
-                                )}
-                                <span className="relative z-10">{section.label}</span>
-                            </button>
-                        );
-                    })}
+            {/* 4. GROUNDED EDITORIAL ARCHIVE HEADER & FILTERS */}
+            <div className="max-w-[1400px] mx-auto px-6 md:px-12 mb-12">
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-black/10 dark:border-white/10">
+                {/* Discipline Navigation */}
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                  {designData?.sections?.map((section) => {
+                    const isActive = activeSection?.id === section.id;
+                    return (
+                      <button
+                        key={section.id}
+                        onClick={() => {
+                          setActiveSection(section);
+                          setActiveFilter("All");
+                        }}
+                        className={`px-4 py-2 rounded-lg text-xs font-mono font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+                          isActive
+                            ? 'bg-[#ff5e1a] text-white shadow-sm'
+                            : isDark
+                              ? 'bg-white/5 hover:bg-white/10 text-neutral-300 border border-white/10'
+                              : 'bg-black/5 hover:bg-black/10 text-neutral-700 border border-black/10'
+                        }`}
+                      >
+                        <span>{section.label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
-              </div>
-          )}
 
-          {/* 5. STICKY FILTER BAR */}
-          {activeSection?.filters?.length > 0 && (
-              <div className="sticky top-20 sm:top-24 z-40 flex justify-center w-full mb-16 pointer-events-none">
-                 <div className={`backdrop-blur-xl px-8 py-2 rounded-full pointer-events-auto border shadow-lg ${
-                   isDark ? 'bg-[#050505]/40 border-white/5' : 'bg-white/70 border-black/5 shadow-sm'
-                 }`}>
-                    <div className="flex justify-center flex-wrap gap-6">
-                        {activeSection.filters.map((filter) => (
-                            <button
-                                key={filter}
-                                onClick={() => setActiveFilter(filter)}
-                                data-cursor="FILTER"
-                                className={`text-[10px] tracking-[0.2em] uppercase font-bold transition-all duration-300 relative py-1 group ${
-                                    activeFilter === filter 
-                                      ? 'text-[#ff4d00]' 
-                                      : (isDark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-500 hover:text-black')
-                                }`}
-                            >
-                                {filter}
-                                {activeFilter === filter && (
-                                    <motion.div layoutId="filterDot" className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#ff4d00] rounded-full" />
-                                )}
-                            </button>
-                        ))}
-                    </div>
-                 </div>
+                {/* Sub-category Filter Bar */}
+                {activeSection?.filters?.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-neutral-400 mr-1">
+                      Filter:
+                    </span>
+                    {activeSection.filters.map((filter) => {
+                      const isFilterActive = activeFilter === filter;
+                      return (
+                        <button
+                          key={filter}
+                          onClick={() => setActiveFilter(filter)}
+                          className={`px-2.5 py-1 rounded-md text-[11px] font-mono font-semibold transition-colors cursor-pointer ${
+                            isFilterActive
+                              ? isDark
+                                ? 'bg-white/15 text-white border border-white/20'
+                                : 'bg-black/10 text-black border border-black/15'
+                              : isDark
+                                ? 'text-neutral-400 hover:text-white'
+                                : 'text-neutral-500 hover:text-black'
+                          }`}
+                        >
+                          {filter}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-          )}
+            </div>
 
           {/* 6. DYNAMIC CONTENT AREA */}
           <div className="max-w-[1400px] mx-auto px-6 md:px-12">
