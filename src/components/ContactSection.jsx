@@ -54,11 +54,11 @@ export default function ContactSection() {
       id="contact" 
       ref={sectionRef}
       aria-labelledby="contact-heading"
-      className={`relative z-10 py-20 sm:py-24 lg:py-28 px-6 md:px-12 border-t transition-colors duration-500 overflow-hidden ${
+      className={`relative z-10 py-20 sm:py-24 lg:py-28 px-6 sm:px-10 md:px-16 lg:px-20 border-t transition-colors duration-500 overflow-hidden ${
         isDark ? 'bg-[#08080a] text-white border-white/10' : 'bg-[#F4F4F0] text-neutral-900 border-black/10'
       }`}
     >
-      <div className="max-w-[1400px] w-full mx-auto">
+      <div className="max-w-[1040px] xl:max-w-[1100px] w-full mx-auto">
         
         {/* 1. TOP ROW: "Let's Connect." heading with LinkedIn button and Hanging Spider-Man */}
         <div className="mb-12 sm:mb-16 relative">
@@ -71,12 +71,12 @@ export default function ContactSection() {
               transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
               className="z-10 relative pb-1 sm:pb-2 will-change-[transform,opacity,filter]"
             >
-              <span className={`block text-4xl sm:text-5xl md:text-6xl lg:text-[5vw] xl:text-[5.4vw] font-bold sm:font-black leading-[0.96] tracking-tight ${
+              <span className={`block text-4xl sm:text-5xl md:text-6xl font-bold sm:font-black leading-[0.96] tracking-tight ${
                 isDark ? 'text-white/90' : 'text-neutral-900'
               }`}>
                 Let's
               </span>
-              <span className="block text-5xl sm:text-7xl md:text-8xl lg:text-[7.6vw] xl:text-[8.4vw] font-black leading-[0.88] tracking-tighter text-[#ff5e1a] -mt-0.5 sm:-mt-1">
+              <span className="block text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-[0.88] tracking-tighter text-[#ff5e1a] -mt-0.5 sm:-mt-1">
                 Connect.
               </span>
             </motion.h2>
