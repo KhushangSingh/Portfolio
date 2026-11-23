@@ -6,11 +6,18 @@ import {
   markAsRead, 
   markAsUnread, 
   toggleStar, 
+  archiveMessage,
+  unarchiveMessage,
   deleteMessage, 
   sendReply, 
   generateMailtoLink,
   exportMessagesJSON,
-  resetMessages 
+  resetMessages,
+  getReadableDisplayId,
+  isBackupActive,
+  setBackupActive,
+  getBackupResponses,
+  exportBackupJSON
 } from '../utils/messageService';
 import { 
   getStoredAnalytics, 
@@ -46,8 +53,12 @@ export default function Dashboard() {
   // Messages state
   const [messages, setMessages] = useState([]);
   const [selectedMessageId, setSelectedMessageId] = useState(null);
-  const [messageFilter, setMessageFilter] = useState('all'); // 'all' | 'unread' | 'starred' | 'replied'
+  const [messageFilter, setMessageFilter] = useState('all'); // 'all' (active) | 'unread' | 'starred' | 'replied' | 'archived'
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Analytics Backup Vault state (Testing mode default: skips backing up test submissions)
+  const [isBackupEnabled, setIsBackupEnabled] = useState(() => isBackupActive());
+  const [backupCount, setBackupCount] = useState(() => getBackupResponses().length);
   
   // Reply composer state
   const [replyText, setReplyText] = useState('');
@@ -131,10 +142,9 @@ export default function Dashboard() {
     const refreshData = () => {
       const list = getMessages();
       setMessages(list);
-      if (list.length > 0 && !selectedMessageId) {
-        setSelectedMessageId(list[0].id);
-      }
+      // Notice: DO NOT auto-select the top message on open. User clicks explicitly.
       setAnalytics(getStoredAnalytics());
+      setBackupCount(getBackupResponses().length);
     };
 
     refreshData();
@@ -156,17 +166,29 @@ export default function Dashboard() {
       else setAnalytics(getStoredAnalytics());
     };
 
+    const handleBackupUpdate = (e) => {
+      setBackupCount(e.detail ? e.detail.length : getBackupResponses().length);
+    };
+
+    const handleBackupConfig = (e) => {
+      setIsBackupEnabled(typeof e.detail === 'boolean' ? e.detail : isBackupActive());
+    };
+
     window.addEventListener('portfolio_messages_updated', handleMessagesUpdate);
     window.addEventListener('portfolio_analytics_updated', handleAnalyticsUpdate);
+    window.addEventListener('portfolio_backup_updated', handleBackupUpdate);
+    window.addEventListener('portfolio_backup_config_changed', handleBackupConfig);
 
     return () => {
       window.removeEventListener('portfolio_messages_updated', handleMessagesUpdate);
       window.removeEventListener('portfolio_analytics_updated', handleAnalyticsUpdate);
+      window.removeEventListener('portfolio_backup_updated', handleBackupUpdate);
+      window.removeEventListener('portfolio_backup_config_changed', handleBackupConfig);
     };
-  }, [isAuthenticated, selectedMessageId]);
+  }, [isAuthenticated]);
 
-  // Selected message object
-  const selectedMessage = messages.find((m) => m.id === selectedMessageId) || messages[0] || null;
+  // Selected message object - strictly null if not chosen by user
+  const selectedMessage = messages.find((m) => m.id === selectedMessageId) || null;
 
   // Initialize reply subject when selected message changes
   useEffect(() => {
@@ -180,26 +202,39 @@ export default function Dashboard() {
     }
   }, [selectedMessageId]);
 
+  // Active vs Archived categories
+  const activeMessages = messages.filter((m) => !m.archived);
+  const archivedMessages = messages.filter((m) => m.archived);
+  const activeUnreadCount = activeMessages.filter((m) => m.status === 'unread').length;
+  const activeStarredCount = activeMessages.filter((m) => m.starred).length;
+  const activeRepliedCount = activeMessages.filter((m) => m.status === 'replied').length;
+
   // Filter messages
   const filteredMessages = messages.filter((msg) => {
-    if (messageFilter === 'unread' && msg.status !== 'unread') return false;
-    if (messageFilter === 'starred' && !msg.starred) return false;
-    if (messageFilter === 'replied' && msg.status !== 'replied') return false;
+    if (messageFilter === 'archived') {
+      if (!msg.archived) return false;
+    } else {
+      // Active views exclude archived messages
+      if (msg.archived) return false;
+      if (messageFilter === 'unread' && msg.status !== 'unread') return false;
+      if (messageFilter === 'starred' && !msg.starred) return false;
+      if (messageFilter === 'replied' && msg.status !== 'replied') return false;
+    }
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
+      const idStr = getReadableDisplayId(msg).toLowerCase();
+      const matchId = idStr.includes(q);
       const matchName = msg.name?.toLowerCase().includes(q);
       const matchEmail = msg.email?.toLowerCase().includes(q);
       const matchSubject = msg.subject?.toLowerCase().includes(q);
       const matchMessage = msg.message?.toLowerCase().includes(q);
       const matchType = msg.inquiryType?.toLowerCase().includes(q);
-      return matchName || matchEmail || matchSubject || matchMessage || matchType;
+      return matchId || matchName || matchEmail || matchSubject || matchMessage || matchType;
     }
 
     return true;
   });
-
-  const unreadCount = messages.filter((m) => m.status === 'unread').length;
 
   const handleToggleStar = (id) => {
     try { playSoundEffect('click'); } catch { /* ignore */ }
@@ -213,6 +248,29 @@ export default function Dashboard() {
     } else {
       markAsUnread(id);
     }
+  };
+
+  const handleArchive = (id) => {
+    try { playSoundEffect('click'); } catch { /* ignore */ }
+    archiveMessage(id);
+    if (selectedMessageId === id && messageFilter !== 'archived') {
+      setSelectedMessageId(null);
+    }
+  };
+
+  const handleUnarchive = (id) => {
+    try { playSoundEffect('click'); } catch { /* ignore */ }
+    unarchiveMessage(id);
+    if (selectedMessageId === id && messageFilter === 'archived') {
+      setSelectedMessageId(null);
+    }
+  };
+
+  const handleToggleBackupMode = () => {
+    try { playSoundEffect('switch'); } catch { /* ignore */ }
+    const next = !isBackupEnabled;
+    setBackupActive(next);
+    setIsBackupEnabled(next);
   };
 
   const handleDelete = (id) => {
@@ -474,7 +532,7 @@ export default function Dashboard() {
                   Inquiries & Messages
                 </h2>
                 <p className="text-xs text-neutral-500 font-sans mt-0.5">
-                  {messages.length} total inquiries logged across portfolio touchpoints
+                  {activeMessages.length} active inquiries, {archivedMessages.length} archived
                 </p>
               </div>
 
@@ -498,6 +556,61 @@ export default function Dashboard() {
               </div>
             </div>
 
+            {/* Analytics Backup Vault Banner */}
+            <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+              isDark ? 'bg-[#121318] border-white/10' : 'bg-neutral-50 border-black/10'
+            }`}>
+              <div className="flex items-center gap-3">
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                  isBackupEnabled ? 'bg-green-500/10 text-green-500 border border-green-500/20' : 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
+                }`}>
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                    <line x1="12" y1="22.08" x2="12" y2="12" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold font-sans">Analytics Backup Vault</span>
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-sans font-bold uppercase tracking-wider ${
+                      isBackupEnabled ? 'bg-green-500/15 text-green-500' : 'bg-amber-500/15 text-amber-500'
+                    }`}>
+                      {isBackupEnabled ? 'Active Live Recording' : 'Testing Mode (Skipping)'}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-neutral-500 font-sans mt-0.5">
+                    {isBackupEnabled 
+                      ? `Live recording is active. ${backupCount} inquiries backed up with analytics tracking.`
+                      : 'Testing mode is active. Current test submissions are skipped from the backup vault.'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleToggleBackupMode}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-sans font-bold transition-all border ${
+                    isBackupEnabled
+                      ? 'border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20'
+                      : 'border-green-500/30 bg-green-500/10 text-green-500 hover:bg-green-500/20'
+                  }`}
+                >
+                  {isBackupEnabled ? 'Switch to Testing Mode' : 'Activate Live Backup'}
+                </button>
+                {backupCount > 0 && (
+                  <button
+                    onClick={exportBackupJSON}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-sans font-bold border transition-all ${
+                      isDark ? 'border-white/15 bg-white/5 text-neutral-300 hover:border-[#ff5e1a]' : 'border-black/15 bg-black/5 text-neutral-800 hover:border-[#ff5e1a]'
+                    }`}
+                  >
+                    Export Vault JSON ({backupCount})
+                  </button>
+                )}
+              </div>
+            </div>
+
             {/* Master-Detail Split Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
               
@@ -512,7 +625,7 @@ export default function Dashboard() {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search sender, inquiry or message..."
+                    placeholder="Search by ID, sender, subject or inquiry type..."
                     className={`w-full px-3.5 py-2 rounded-xl text-xs border outline-none font-sans ${
                       isDark 
                         ? 'border-white/15 bg-black/40 text-white placeholder-neutral-500 focus:border-[#ff5e1a]' 
@@ -523,10 +636,11 @@ export default function Dashboard() {
                   {/* Filter Tabs */}
                   <div className="flex items-center gap-1.5 mt-3 overflow-x-auto pb-1 text-xs font-sans font-bold">
                     {[
-                      { key: 'all', label: `All (${messages.length})` },
-                      { key: 'unread', label: `Unread (${unreadCount})` },
-                      { key: 'starred', label: `Starred (${messages.filter(m => m.starred).length})` },
-                      { key: 'replied', label: `Replied (${messages.filter(m => m.status === 'replied').length})` }
+                      { key: 'all', label: `Active (${activeMessages.length})` },
+                      { key: 'unread', label: `Unread (${activeUnreadCount})` },
+                      { key: 'starred', label: `Starred (${activeStarredCount})` },
+                      { key: 'replied', label: `Replied (${activeRepliedCount})` },
+                      { key: 'archived', label: `Archived (${archivedMessages.length})` }
                     ].map((f) => (
                       <button
                         key={f.key}
@@ -552,8 +666,9 @@ export default function Dashboard() {
                       No inquiries match your current filter.
                     </div>
                   ) : (
-                    filteredMessages.map((msg) => {
+                    filteredMessages.map((msg, idx) => {
                       const isSelected = msg.id === selectedMessageId;
+                      const readableId = getReadableDisplayId(msg, idx, messages.length);
                       return (
                         <div
                           key={msg.id}
@@ -572,11 +687,16 @@ export default function Dashboard() {
                           )}
 
                           <div className="flex items-start justify-between gap-2 mb-1">
-                            <span className={`text-xs font-bold truncate ${
-                              msg.status === 'unread' ? 'text-[#ff5e1a]' : ''
-                            }`}>
-                              {msg.name}
-                            </span>
+                            <div className="flex items-center gap-1.5 truncate">
+                              <span className="text-[11px] font-sans font-bold text-[#ff5e1a] shrink-0">
+                                #{readableId}
+                              </span>
+                              <span className={`text-xs font-bold truncate ${
+                                msg.status === 'unread' ? 'text-[#ff5e1a]' : ''
+                              }`}>
+                                {msg.name}
+                              </span>
+                            </div>
                             <span className="text-[10px] font-sans text-neutral-400 shrink-0">
                               {formatTimeAgo(msg.createdAt)}
                             </span>
@@ -608,6 +728,12 @@ export default function Dashboard() {
                                 Starred
                               </span>
                             )}
+
+                            {msg.archived && (
+                              <span className="px-2 py-0.5 rounded text-[10px] font-sans font-bold bg-neutral-500/10 text-neutral-400 border border-neutral-500/20">
+                                Archived
+                              </span>
+                            )}
                           </div>
                         </div>
                       );
@@ -629,8 +755,8 @@ export default function Dashboard() {
                           <span className="px-2.5 py-1 rounded-md text-[11px] font-sans font-bold uppercase tracking-wider text-[#ff5e1a] bg-[#ff5e1a]/10 border border-[#ff5e1a]/25">
                             {selectedMessage.inquiryType}
                           </span>
-                          <span className="text-xs font-sans text-neutral-500">
-                            Ref: #{selectedMessage.id.slice(-6).toUpperCase()}
+                          <span className="text-xs font-sans text-neutral-500 font-bold">
+                            Ref: #{getReadableDisplayId(selectedMessage)}
                           </span>
                         </div>
                         <h3 className="text-2xl font-black tracking-tight">
@@ -667,7 +793,7 @@ export default function Dashboard() {
                         )}
                       </div>
 
-                      <div className="flex items-center gap-1.5 shrink-0">
+                      <div className="flex flex-wrap items-center gap-1.5 shrink-0">
                         <button
                           onClick={() => handleToggleStar(selectedMessage.id)}
                           className={`px-3 py-1.5 rounded-lg text-xs font-sans font-bold border transition-all ${
@@ -687,6 +813,27 @@ export default function Dashboard() {
                         >
                           {selectedMessage.status === 'unread' ? 'Mark Read' : 'Mark Unread'}
                         </button>
+
+                        {/* Archive / Unarchive Action */}
+                        {selectedMessage.archived ? (
+                          <button
+                            onClick={() => handleUnarchive(selectedMessage.id)}
+                            className="px-3 py-1.5 rounded-lg text-xs font-sans font-bold border border-[#ff5e1a]/30 bg-[#ff5e1a]/10 text-[#ff5e1a] hover:bg-[#ff5e1a]/20 transition-all"
+                            title="Restore inquiry back to active inbox"
+                          >
+                            Restore to Active
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleArchive(selectedMessage.id)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-sans font-bold border transition-all ${
+                              isDark ? 'border-white/10 hover:border-white/25 text-neutral-300' : 'border-black/10 hover:border-black/25 text-neutral-700'
+                            }`}
+                            title="Move inquiry to archive"
+                          >
+                            Archive
+                          </button>
+                        )}
 
                         <button
                           onClick={() => handleDelete(selectedMessage.id)}
@@ -807,14 +954,20 @@ export default function Dashboard() {
                     </div>
                   </>
                 ) : (
-                  <div className="p-16 text-center text-xs font-sans text-neutral-500 space-y-2">
-                    <div className="font-bold text-neutral-400">
-                      {messages.length === 0 ? 'Inbox is clean' : 'Select an inquiry to view details'}
+                  <div className="p-12 sm:p-16 text-center text-xs font-sans text-neutral-500 flex flex-col items-center justify-center my-auto min-h-[380px]">
+                    <div className="w-14 h-14 rounded-2xl bg-[#ff5e1a]/10 border border-[#ff5e1a]/25 flex items-center justify-center text-[#ff5e1a] mb-4">
+                      <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                        <polyline points="22,6 12,13 2,6" />
+                      </svg>
                     </div>
-                    <p className="max-w-md mx-auto leading-relaxed">
+                    <div className="font-bold text-base text-neutral-300 dark:text-neutral-300">
+                      {messages.length === 0 ? 'Inbox is Clean' : 'No Inquiry Selected'}
+                    </div>
+                    <p className="max-w-md mx-auto leading-relaxed mt-2 text-neutral-500">
                       {messages.length === 0 
-                        ? 'When a visitor messages you through the direct contact form on your portfolio, their note and social profile will appear here with direct email reply options.' 
-                        : 'Select an inquiry from the left list to inspect message text and send an email reply.'}
+                        ? 'When a visitor messages you through the contact form, their note will appear here with direct email reply options.' 
+                        : 'Click on any inquiry from the list on the left to read its contents and send an email reply.'}
                     </p>
                   </div>
                 )}
