@@ -47,7 +47,7 @@ export default function PortfolioSummary() {
       
       {/* 1. MAIN RESUME CONTENT CONTAINER */}
       {/* Generous top clearance (pt-28 sm:pt-32 md:pt-36) keeps content safely below the fixed name bulb on the top-left and music button on the top-right */}
-      <main className="max-w-[1440px] xl:max-w-[1520px] mx-auto px-4 sm:px-6 md:px-8 lg:px-10 pt-28 sm:pt-32 md:pt-36 pb-16 md:pb-24 flex flex-col gap-14 md:gap-18">
+      <main className="max-w-[1240px] xl:max-w-[1300px] mx-auto px-5 sm:px-8 md:px-10 lg:px-12 pt-28 sm:pt-32 md:pt-36 pb-16 md:pb-24 flex flex-col gap-14 md:gap-18">
         
         {/* Navigation & Action Bar: Positioned safely within page flow away from fixed header corners */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-8 border-b border-black/10 dark:border-white/10">
@@ -154,10 +154,10 @@ export default function PortfolioSummary() {
 
           <div className="flex flex-col gap-6">
             {/* Project 1: OtakuCircle */}
-            <div className={`group p-6 sm:p-8 rounded-2xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-6 sm:gap-8 ${
+            <div className={`group p-6 sm:p-8 rounded-2xl border flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 sm:gap-8 lg:gap-10 ${
               isDark ? 'bg-[#101115] border-white/10' : 'bg-white border-black/10 shadow-xs'
             }`}>
-              <div className="flex flex-col gap-2 max-w-xl">
+              <div className="flex flex-col gap-2.5 w-full lg:w-[38%] xl:w-[36%] shrink-0">
                 <h3 className="text-2xl font-bold tracking-tight">OtakuCircle</h3>
                 <div className="flex items-center gap-2">
                   <span className="px-2.5 py-0.5 rounded-md text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
@@ -184,21 +184,21 @@ export default function PortfolioSummary() {
                 </Link>
               </div>
 
-              <div className="w-full md:w-80 lg:w-[440px] xl:w-[500px] shrink-0">
+              <div className="w-full lg:w-[62%] xl:w-[64%]">
                 <AppleBrowserMockup
                   src="/images/otakucircle/landing.webp"
                   alt="OtakuCircle desktop experience"
-                  className="transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+                  className="transition-transform duration-300 ease-out group-hover:scale-[1.015]"
                   loading="lazy"
                 />
               </div>
             </div>
 
             {/* Project 2: SquadSync */}
-            <div className={`group p-6 sm:p-8 rounded-2xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-6 sm:gap-8 ${
+            <div className={`group p-6 sm:p-8 rounded-2xl border flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 sm:gap-8 lg:gap-10 ${
               isDark ? 'bg-[#101115] border-white/10' : 'bg-white border-black/10 shadow-xs'
             }`}>
-              <div className="flex flex-col gap-2 max-w-xl">
+              <div className="flex flex-col gap-2.5 w-full lg:w-[38%] xl:w-[36%] shrink-0">
                 <h3 className="text-2xl font-bold tracking-tight">SquadSync</h3>
                 <div className="flex items-center gap-2">
                   <span className="px-2.5 py-0.5 rounded-md text-[10px] font-mono font-bold uppercase tracking-wider bg-pink-500/15 text-pink-600 dark:text-pink-400 border border-pink-500/30">
@@ -222,21 +222,21 @@ export default function PortfolioSummary() {
                 </div>
               </div>
 
-              <div className="w-full md:w-80 lg:w-[440px] xl:w-[500px] shrink-0">
+              <div className="w-full lg:w-[62%] xl:w-[64%]">
                 <AppleBrowserMockup
                   src="/images/squadsync_cover.jpg"
                   alt="SquadSync desktop experience"
-                  className="transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+                  className="transition-transform duration-300 ease-out group-hover:scale-[1.015]"
                   loading="lazy"
                 />
               </div>
             </div>
 
             {/* Project 3: Ledgerly */}
-            <div className={`group p-6 sm:p-8 rounded-2xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-6 sm:gap-8 ${
+            <div className={`group p-6 sm:p-8 rounded-2xl border flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 sm:gap-8 lg:gap-10 ${
               isDark ? 'bg-[#101115] border-white/10' : 'bg-white border-black/10 shadow-xs'
             }`}>
-              <div className="flex flex-col gap-2 max-w-xl">
+              <div className="flex flex-col gap-2.5 w-full lg:w-[38%] xl:w-[36%] shrink-0">
                 <h3 className="text-2xl font-bold tracking-tight">Ledgerly</h3>
                 <div className="flex items-center gap-2">
                   <span className="px-2.5 py-0.5 rounded-md text-[10px] font-mono font-bold uppercase tracking-wider bg-orange-500/15 text-orange-600 dark:text-orange-400 border border-orange-500/30">
@@ -260,11 +260,11 @@ export default function PortfolioSummary() {
                 </div>
               </div>
 
-              <div className="w-full md:w-80 lg:w-[440px] xl:w-[500px] shrink-0">
+              <div className="w-full lg:w-[62%] xl:w-[64%]">
                 <AppleBrowserMockup
                   src="/images/ledgerly_cover.jpg"
                   alt="Ledgerly desktop experience"
-                  className="transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+                  className="transition-transform duration-300 ease-out group-hover:scale-[1.015]"
                   loading="lazy"
                 />
               </div>
