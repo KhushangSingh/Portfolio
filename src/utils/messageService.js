@@ -1,60 +1,21 @@
 // Message Service Utility
 // Handles direct portfolio contact inquiries, inbox storage and email reply delivery.
 
-const MESSAGES_STORAGE_KEY = 'khushang_portfolio_messages_v1';
+const MESSAGES_STORAGE_KEY = 'khushang_portfolio_messages_v2';
+const OLD_MESSAGES_KEY = 'khushang_portfolio_messages_v1';
 
-// Sample inquiries so Khushang can immediately evaluate inbox workflows
-const getInitialMessages = () => [
-  {
-    id: 'inq_101',
-    name: 'Aarav Mehta',
-    email: 'aarav.mehta@designcraft.studio',
-    socialUrl: 'https://www.linkedin.com/in/aarav-mehta-design',
-    inquiryType: 'Freelance Project',
-    subject: 'Design engineering for fintech SaaS platform',
-    message: 'Hey Khushang, came across your OtakuCircle case study and the interactive component architecture. We are designing a multi-tenant dashboard and need a design engineer who can bridge Figma token architectures and production React components. Are you available for a 4-week engagement?',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(), // 3 hours ago
-    status: 'unread',
-    starred: true,
-    reply: null
-  },
-  {
-    id: 'inq_102',
-    name: 'Sarah Jenkins',
-    email: 'sjenkins@techpulse.io',
-    socialUrl: 'https://github.com/sjenkins-dev',
-    inquiryType: 'Internship / Full-time',
-    subject: 'Product Design & Frontend Engineering Internship',
-    message: 'Hello Khushang, I lead product hiring at TechPulse. Your focus on user empathy, WCAG compliance and tactile micro-interactions is impressive. We would love to discuss a Summer 2026 Product Design & Engineering internship with our team.',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 26).toISOString(), // yesterday
-    status: 'read',
-    starred: false,
-    reply: {
-      text: 'Hi Sarah, thank you for reaching out! I would love to connect and learn more about the challenges TechPulse is tackling this summer. I am available this Thursday afternoon for a quick conversation.',
-      sentAt: new Date(Date.now() - 1000 * 60 * 60 * 18).toISOString(),
-      subject: 'Re: Product Design & Frontend Engineering Internship',
-      method: 'direct_email'
-    }
-  },
-  {
-    id: 'inq_103',
-    name: 'Rohan Verma',
-    email: 'rohan@creativeengine.co',
-    socialUrl: 'https://x.com/rohan_design',
-    inquiryType: 'Collaboration',
-    subject: 'Open-source interactive music player component',
-    message: 'Hi Khushang! Really loved the physical vinyl player and arm drag physics on your portfolio. Would love to collaborate on open-sourcing a generalized audio visualizer package for React developers.',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString(), // 3 days ago
-    status: 'read',
-    starred: false,
-    reply: null
-  }
-];
+// Initial state: Clean zero baseline. No dummy inquiries.
+const getInitialMessages = () => [];
 
-// Retrieve all messages from storage or initialize with sample messages
+// Retrieve all messages from storage
 export const getMessages = () => {
   if (typeof window === 'undefined') return getInitialMessages();
   try {
+    // Purge old dummy messages key if present
+    if (localStorage.getItem(OLD_MESSAGES_KEY)) {
+      localStorage.removeItem(OLD_MESSAGES_KEY);
+    }
+
     const raw = localStorage.getItem(MESSAGES_STORAGE_KEY);
     if (!raw) {
       const initial = getInitialMessages();
@@ -110,7 +71,6 @@ export const addMessage = async ({ name, email, socialUrl = '', inquiryType = 'G
         body: JSON.stringify(newMessage)
       });
     } catch (err) {
-      // Graceful fallback: local store holds the record even if remote fails
       console.warn('Remote contact API notice:', err);
     }
   }
@@ -214,7 +174,7 @@ export const generateMailtoLink = (message, replyText = '', customSubject = '') 
   return `mailto:${encodeURIComponent(message.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText)}`;
 };
 
-// Reset messages back to initial sample state
+// Reset messages back to clean zero state
 export const resetMessages = () => {
   const initial = getInitialMessages();
   saveMessages(initial);

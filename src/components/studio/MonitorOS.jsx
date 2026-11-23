@@ -556,6 +556,7 @@ export default function MonitorOS({ onCloseZone }) {
                     {/* APP 11: TELEMETRY OS (Option 1: In-Studio Live Stats) */}
                     {activeApp === 'analytics' && (() => {
                       const stats = getStoredAnalytics();
+                      const topRef = Object.entries(stats.referrerBreakdown || {}).sort((a, b) => b[1] - a[1])[0]?.[0] || 'Awaiting visits';
                       return (
                         <div className="h-full flex flex-col gap-3 font-mono text-xs">
                           <div className="flex items-center justify-between border-b pb-2 border-white/10">
@@ -577,19 +578,25 @@ export default function MonitorOS({ onCloseZone }) {
                             </div>
                             <div className="p-2.5 rounded-lg bg-black/40 border border-white/10 col-span-2 sm:col-span-1">
                               <span className="text-[10px] text-neutral-400 block uppercase">Top Referral</span>
-                              <span className="text-sm font-bold text-emerald-400 mt-1 block truncate">LinkedIn</span>
+                              <span className="text-sm font-bold text-emerald-400 mt-1 block truncate">{topRef}</span>
                             </div>
                           </div>
 
                           <div className="flex-1 p-3 rounded-lg bg-black/30 border border-white/10 overflow-y-auto space-y-1.5 text-[11px]">
                             <div className="text-[10px] text-neutral-400 font-bold uppercase mb-1">Recent Anonymous Feed</div>
-                            {stats.recentVisits?.slice(0, 4).map((v) => (
-                              <div key={v.id} className="flex justify-between items-center text-neutral-300 py-0.5">
-                                <span className="text-[#ff5e1a]">{v.path}</span>
-                                <span className="text-neutral-500">{v.device}</span>
-                                <span className="text-neutral-400">{v.referrer}</span>
+                            {(!stats.recentVisits || stats.recentVisits.length === 0) ? (
+                              <div className="text-neutral-500 py-4 text-center">
+                                Awaiting external visitor traffic...
                               </div>
-                            ))}
+                            ) : (
+                              stats.recentVisits.slice(0, 4).map((v) => (
+                                <div key={v.id} className="flex justify-between items-center text-neutral-300 py-0.5">
+                                  <span className="text-[#ff5e1a]">{v.path}</span>
+                                  <span className="text-neutral-500">{v.device}</span>
+                                  <span className="text-neutral-400">{v.referrer}</span>
+                                </div>
+                              ))
+                            )}
                           </div>
                         </div>
                       );

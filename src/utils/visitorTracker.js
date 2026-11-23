@@ -1,9 +1,39 @@
 // Visitor & Pageview Tracker Utility
-// Implements Option 1: Anonymous rotated client-side hash, Upstash Redis telemetry sync and local fallback.
+// Real-time zero-baseline visitor telemetry with owner/admin filtering.
 
-const STORAGE_KEY = 'khushang_portfolio_analytics_v1';
+const STORAGE_KEY = 'khushang_portfolio_analytics_v2';
+const OLD_STORAGE_KEY = 'khushang_portfolio_analytics_v1';
 const VISITOR_ID_KEY = 'khushang_visitor_id';
 const SESSION_ID_KEY = 'khushang_session_id';
+
+// Clean empty baseline: Zero dummy data. Only genuine visitor metrics.
+export const getZeroBaseline = () => ({
+  totalPageViews: 0,
+  uniqueVisitors: 0,
+  pageBreakdown: {},
+  referrerBreakdown: {},
+  deviceBreakdown: {},
+  dailyTimeline: [],
+  recentVisits: [],
+  lastUpdated: new Date().toISOString()
+});
+
+// Detect whether current session belongs to portfolio owner/admin
+export const isOwnerOrAdmin = () => {
+  if (typeof window === 'undefined') return false;
+  try {
+    const host = window.location.hostname;
+    // Localhost or loopback is development
+    if (host === 'localhost' || host === '127.0.0.1') return true;
+    // Owner authenticated via dashboard
+    if (localStorage.getItem('khushang_is_admin') === 'true') return true;
+    if (localStorage.getItem('khushang_studio_auth') === 'unlocked') return true;
+    if (sessionStorage.getItem('khushang_studio_auth') === 'unlocked') return true;
+    return false;
+  } catch {
+    return false;
+  }
+};
 
 // Generate lightweight unique anonymous identifier
 const generateUUID = () => {
@@ -34,7 +64,7 @@ export const getRotatedVisitorHash = () => {
   }
 };
 
-// Detect device category from screen width and user agent
+// Detect device hardware category
 const detectDevice = () => {
   if (typeof window === 'undefined') return 'Desktop';
   const width = window.innerWidth;
@@ -49,85 +79,62 @@ const detectDevice = () => {
   return 'Desktop';
 };
 
-// Normalize referrer source
-const detectReferrer = () => {
+// Detect referral origin from document.referrer and URL query parameters
+export const detectReferrer = () => {
+  if (typeof window === 'undefined') return 'Direct';
+
+  // Check URL parameters first (e.g. ?ref=linkedin or ?utm_source=github)
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const refParam = (params.get('ref') || params.get('utm_source') || '').toLowerCase();
+    if (refParam.includes('linkedin')) return 'LinkedIn';
+    if (refParam.includes('github')) return 'GitHub';
+    if (refParam.includes('twitter') || refParam.includes('x')) return 'X (Twitter)';
+    if (refParam.includes('instagram')) return 'Instagram';
+    if (refParam.includes('behance')) return 'Behance';
+    if (refParam.includes('dribbble')) return 'Dribbble';
+  } catch {
+    // Ignore query parsing errors
+  }
+
+  // Check HTTP document.referrer
   if (typeof document === 'undefined') return 'Direct';
   const ref = document.referrer.toLowerCase();
   if (!ref) return 'Direct';
-  if (ref.includes('linkedin.com')) return 'LinkedIn';
+  
+  if (ref.includes('linkedin.com') || ref.includes('lnkd.in')) return 'LinkedIn';
   if (ref.includes('github.com')) return 'GitHub';
-  if (ref.includes('twitter.com') || ref.includes('x.com')) return 'X (Twitter)';
+  if (ref.includes('twitter.com') || ref.includes('t.co') || ref.includes('x.com')) return 'X (Twitter)';
+  if (ref.includes('instagram.com')) return 'Instagram';
   if (ref.includes('behance.net')) return 'Behance';
   if (ref.includes('dribbble.com')) return 'Dribbble';
-  if (ref.includes('google.com') || ref.includes('bing.com') || ref.includes('duckduckgo.com')) return 'Search';
-  return 'Other Website';
-};
-
-// Create realistic baseline analytics for initial display
-const getInitialBaseline = () => {
-  const today = new Date();
-  const dailyTimeline = [];
+  if (ref.includes('google.') || ref.includes('bing.') || ref.includes('duckduckgo.') || ref.includes('yahoo.')) return 'Search Engine';
   
-  for (let i = 13; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(d.getDate() - i);
-    const dateStr = d.toISOString().split('T')[0];
-    const baseViews = 18 + Math.floor(Math.sin(i * 1.5) * 8) + (i === 0 ? 6 : 0);
-    const baseUniques = Math.max(6, Math.floor(baseViews * 0.65));
-    dailyTimeline.push({
-      date: dateStr,
-      label: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      views: baseViews,
-      uniques: baseUniques
-    });
-  }
-
-  return {
-    totalPageViews: 384,
-    uniqueVisitors: 168,
-    pageBreakdown: {
-      '/': 246,
-      '/summary': 98,
-      '/otaku-circle-case-study': 40
-    },
-    referrerBreakdown: {
-      'LinkedIn': 142,
-      'Direct': 118,
-      'GitHub': 64,
-      'Search': 38,
-      'X (Twitter)': 22
-    },
-    deviceBreakdown: {
-      'Desktop': 234,
-      'Mobile': 128,
-      'Tablet': 22
-    },
-    dailyTimeline,
-    recentVisits: [
-      { id: 'v_init_1', path: '/', device: 'Desktop', referrer: 'LinkedIn', timestamp: new Date(Date.now() - 1000 * 60 * 18).toISOString() },
-      { id: 'v_init_2', path: '/summary', device: 'Mobile', referrer: 'Direct', timestamp: new Date(Date.now() - 1000 * 60 * 45).toISOString() },
-      { id: 'v_init_3', path: '/', device: 'Desktop', referrer: 'GitHub', timestamp: new Date(Date.now() - 1000 * 60 * 120).toISOString() },
-      { id: 'v_init_4', path: '/otaku-circle-case-study', device: 'Desktop', referrer: 'LinkedIn', timestamp: new Date(Date.now() - 1000 * 60 * 190).toISOString() },
-      { id: 'v_init_5', path: '/', device: 'Mobile', referrer: 'X (Twitter)', timestamp: new Date(Date.now() - 1000 * 60 * 310).toISOString() }
-    ],
-    lastUpdated: new Date().toISOString()
-  };
+  // If referred by own domain, treat as Direct
+  if (ref.includes(window.location.hostname)) return 'Direct';
+  
+  return 'External Website';
 };
 
-// Retrieve stored analytics data or load initial baseline
+// Retrieve stored analytics data or initialize clean zero baseline
 export const getStoredAnalytics = () => {
-  if (typeof window === 'undefined') return getInitialBaseline();
+  if (typeof window === 'undefined') return getZeroBaseline();
   try {
+    // Purge legacy dummy storage key if present
+    if (localStorage.getItem(OLD_STORAGE_KEY)) {
+      localStorage.removeItem(OLD_STORAGE_KEY);
+    }
+
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      const initial = getInitialBaseline();
+      const initial = getZeroBaseline();
       localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
       return initial;
     }
     return JSON.parse(raw);
   } catch (err) {
     console.error('Failed to load analytics storage:', err);
-    return getInitialBaseline();
+    return getZeroBaseline();
   }
 };
 
@@ -145,8 +152,24 @@ const saveAnalytics = (data) => {
 // Track a page view
 export const logPageView = (path = '/') => {
   if (typeof window === 'undefined') return;
+
+  // 1. Exclude owner/admin visits completely
+  if (isOwnerOrAdmin()) {
+    return;
+  }
+
+  // 2. Exclude internal studio and admin routes
+  const normalizedPath = path || '/';
+  if (
+    normalizedPath.startsWith('/dashboard') ||
+    normalizedPath.startsWith('/analytics') ||
+    normalizedPath.startsWith('/inbox')
+  ) {
+    return;
+  }
+
   try {
-    // 1. Identify or register Unique Visitor
+    // 3. Identify or register Unique Visitor
     let visitorId = localStorage.getItem(VISITOR_ID_KEY);
     let isNewUniqueVisitor = false;
     if (!visitorId) {
@@ -155,7 +178,7 @@ export const logPageView = (path = '/') => {
       isNewUniqueVisitor = true;
     }
 
-    // 2. Identify or register Session
+    // 4. Identify or register Session
     let sessionId = sessionStorage.getItem(SESSION_ID_KEY);
     let isNewSession = false;
     if (!sessionId) {
@@ -164,7 +187,7 @@ export const logPageView = (path = '/') => {
       isNewSession = true;
     }
 
-    // 3. Update aggregated analytics
+    // 5. Update aggregated analytics
     const data = getStoredAnalytics();
     data.totalPageViews = (data.totalPageViews || 0) + 1;
     if (isNewUniqueVisitor) {
@@ -172,7 +195,6 @@ export const logPageView = (path = '/') => {
     }
 
     // Update page breakdown
-    const normalizedPath = path || '/';
     data.pageBreakdown[normalizedPath] = (data.pageBreakdown[normalizedPath] || 0) + 1;
 
     // Update referrer breakdown on new session
@@ -258,9 +280,9 @@ export const fetchCloudStats = async () => {
   }
 };
 
-// Reset analytics data back to baseline
+// Reset analytics data back to real zero baseline
 export const resetAnalyticsData = () => {
-  const fresh = getInitialBaseline();
+  const fresh = getZeroBaseline();
   saveAnalytics(fresh);
   return fresh;
 };

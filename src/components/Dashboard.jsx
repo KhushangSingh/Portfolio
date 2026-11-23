@@ -59,6 +59,15 @@ export default function Dashboard() {
   const [analytics, setAnalytics] = useState(getStoredAnalytics());
   const [cloudStats, setCloudStats] = useState(null);
 
+  const displayPageviews = cloudStats?.totalPageviews ?? analytics.totalPageViews ?? 0;
+  const displayUniques = cloudStats?.uniqueVisitors ?? analytics.uniqueVisitors ?? 0;
+
+  const topReferralEntry = Object.entries(cloudStats?.referrers || analytics.referrerBreakdown || {}).sort((a, b) => b[1] - a[1])[0];
+  const topReferral = topReferralEntry ? topReferralEntry[0] : 'Awaiting visits';
+
+  const topPageEntry = Object.entries(cloudStats?.pages || analytics.pageBreakdown || {}).sort((a, b) => b[1] - a[1])[0];
+  const topPage = topPageEntry ? topPageEntry[0] : 'Awaiting visits';
+
   // Copy notification state
   const [copiedKey, setCopiedKey] = useState(null);
 
@@ -78,6 +87,7 @@ export default function Dashboard() {
       try { playSoundEffect('click'); } catch { /* ignore */ }
       setIsAuthenticated(true);
       setPinError('');
+      localStorage.setItem('khushang_is_admin', 'true');
       if (rememberDevice) {
         localStorage.setItem('khushang_studio_auth', 'unlocked');
       } else {
@@ -114,6 +124,7 @@ export default function Dashboard() {
   // Load messages & setup listeners when authenticated
   useEffect(() => {
     if (!isAuthenticated) return;
+    localStorage.setItem('khushang_is_admin', 'true');
 
     const refreshData = () => {
       const list = getMessages();
@@ -244,17 +255,18 @@ export default function Dashboard() {
   };
 
   const handleResetAnalytics = () => {
-    if (window.confirm('Reset analytics tracking data back to baseline?')) {
+    if (window.confirm('Reset all analytics tracking data back to 0?')) {
       const fresh = resetAnalyticsData();
       setAnalytics(fresh);
+      setCloudStats(null);
     }
   };
 
   const handleResetMessages = () => {
-    if (window.confirm('Reset message inbox back to initial sample state?')) {
+    if (window.confirm('Clear all messages and inquiries?')) {
       const fresh = resetMessages();
       setMessages(fresh);
-      setSelectedMessageId(fresh[0]?.id || null);
+      setSelectedMessageId(null);
     }
   };
 
@@ -365,12 +377,12 @@ export default function Dashboard() {
         {/* 1. MAIN PAGE HEADING & TOP CONTROLS */}
         <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-black/10 dark:border-white/10">
           <div>
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex flex-wrap items-center gap-2 mb-2">
               <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#ff5e1a] bg-[#ff5e1a]/10 px-2.5 py-1 rounded-md border border-[#ff5e1a]/25">
                 Private Studio Terminal
               </span>
-              <span className="text-xs font-mono text-neutral-500">
-                Authorized: Khushang Singh
+              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/25">
+                Admin Filter Active: Your visits are excluded from analytics
               </span>
             </div>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight">
@@ -495,7 +507,7 @@ export default function Dashboard() {
                     isDark ? 'hover:bg-white/5' : 'hover:bg-black/5'
                   }`}
                 >
-                  Reset Sample Inquiries
+                  Clear Inquiries
                 </button>
               </div>
             </div>
@@ -809,8 +821,15 @@ export default function Dashboard() {
                     </div>
                   </>
                 ) : (
-                  <div className="p-16 text-center text-xs font-mono text-neutral-500">
-                    Select an inquiry from the list to view complete details and compose your reply.
+                  <div className="p-16 text-center text-xs font-mono text-neutral-500 space-y-2">
+                    <div className="font-bold text-neutral-400">
+                      {messages.length === 0 ? 'Inbox is clean' : 'Select an inquiry to view details'}
+                    </div>
+                    <p className="max-w-md mx-auto leading-relaxed">
+                      {messages.length === 0 
+                        ? 'When a visitor messages you through the direct contact form on your portfolio, their note and social profile will appear here with direct email reply options.' 
+                        : 'Select an inquiry from the left list to inspect message text and send an email reply.'}
+                    </p>
                   </div>
                 )}
               </div>
@@ -909,7 +928,7 @@ export default function Dashboard() {
                       Total Pageviews
                     </span>
                     <div className="text-3xl sm:text-4xl font-black mt-2 tracking-tight">
-                      {cloudStats?.totalPageviews || analytics.totalPageViews}
+                      {displayPageviews}
                     </div>
                     <span className="text-[11px] font-mono text-[#ff5e1a] mt-1 block">
                       INCR total_pageviews
@@ -923,7 +942,7 @@ export default function Dashboard() {
                       Unique Visitors
                     </span>
                     <div className="text-3xl sm:text-4xl font-black mt-2 tracking-tight text-[#ff5e1a]">
-                      {cloudStats?.uniqueVisitors || analytics.uniqueVisitors}
+                      {displayUniques}
                     </div>
                     <span className="text-[11px] font-mono text-neutral-500 mt-1 block">
                       HyperLogLog PFADD
@@ -937,7 +956,7 @@ export default function Dashboard() {
                       Top Referral Channel
                     </span>
                     <div className="text-2xl sm:text-3xl font-black mt-2 tracking-tight truncate">
-                      LinkedIn
+                      {topReferral}
                     </div>
                     <span className="text-[11px] font-mono text-green-500 mt-1 block">
                       HINCRBY referrers
@@ -951,7 +970,7 @@ export default function Dashboard() {
                       Top Visited Page
                     </span>
                     <div className="text-2xl sm:text-3xl font-black mt-2 tracking-tight truncate font-mono">
-                      /
+                      {topPage}
                     </div>
                     <span className="text-[11px] font-mono text-neutral-500 mt-1 block">
                       ZINCRBY pages
@@ -985,36 +1004,43 @@ export default function Dashboard() {
                   </div>
 
                   <div className="pt-6 pb-2 overflow-x-auto">
-                    <div className="min-w-[600px] h-48 flex items-end justify-between gap-3 border-b border-black/10 dark:border-white/10 pb-2">
-                      {analytics.dailyTimeline?.map((item) => {
-                        const maxDaily = Math.max(...analytics.dailyTimeline.map((d) => d.views), 30);
-                        const viewHeightPct = Math.min(100, Math.max(12, Math.round((item.views / maxDaily) * 100)));
-                        const uniqueHeightPct = Math.min(100, Math.max(8, Math.round((item.uniques / maxDaily) * 100)));
+                    {(!analytics.dailyTimeline || analytics.dailyTimeline.length === 0) ? (
+                      <div className="h-40 flex flex-col items-center justify-center text-neutral-500 font-mono text-xs gap-1">
+                        <span>Awaiting external visitor traffic...</span>
+                        <span className="text-[11px] opacity-75">Daily pageviews and unique visits will map here automatically as external visits arrive.</span>
+                      </div>
+                    ) : (
+                      <div className="min-w-[600px] h-48 flex items-end justify-between gap-3 border-b border-black/10 dark:border-white/10 pb-2">
+                        {analytics.dailyTimeline.map((item) => {
+                          const maxDaily = Math.max(...analytics.dailyTimeline.map((d) => d.views), 10);
+                          const viewHeightPct = Math.min(100, Math.max(12, Math.round((item.views / maxDaily) * 100)));
+                          const uniqueHeightPct = Math.min(100, Math.max(8, Math.round((item.uniques / maxDaily) * 100)));
 
-                        return (
-                          <div key={item.date} className="flex-1 flex flex-col items-center gap-2 group h-full justify-end">
-                            <div className="text-[10px] font-mono text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                              {item.views}v / {item.uniques}u
+                          return (
+                            <div key={item.date} className="flex-1 flex flex-col items-center gap-2 group h-full justify-end">
+                              <div className="text-[10px] font-mono text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                                {item.views}v / {item.uniques}u
+                              </div>
+                              <div className="w-full flex items-end justify-center gap-1.5 h-36">
+                                <div
+                                  style={{ height: `${viewHeightPct}%` }}
+                                  className="w-1/2 max-w-[14px] rounded-t-sm bg-[#ff5e1a] transition-all group-hover:brightness-110"
+                                  title={`${item.label}: ${item.views} pageviews`}
+                                />
+                                <div
+                                  style={{ height: `${uniqueHeightPct}%` }}
+                                  className="w-1/2 max-w-[14px] rounded-t-sm bg-neutral-300 dark:bg-neutral-700 transition-all group-hover:brightness-110"
+                                  title={`${item.label}: ${item.uniques} unique visitors`}
+                                />
+                              </div>
+                              <span className="text-[10px] font-mono text-neutral-500 whitespace-nowrap">
+                                {item.label}
+                              </span>
                             </div>
-                            <div className="w-full flex items-end justify-center gap-1.5 h-36">
-                              <div
-                                style={{ height: `${viewHeightPct}%` }}
-                                className="w-1/2 max-w-[14px] rounded-t-sm bg-[#ff5e1a] transition-all group-hover:brightness-110"
-                                title={`${item.label}: ${item.views} pageviews`}
-                              />
-                              <div
-                                style={{ height: `${uniqueHeightPct}%` }}
-                                className="w-1/2 max-w-[14px] rounded-t-sm bg-neutral-300 dark:bg-neutral-700 transition-all group-hover:brightness-110"
-                                title={`${item.label}: ${item.uniques} unique visitors`}
-                              />
-                            </div>
-                            <span className="text-[10px] font-mono text-neutral-500 whitespace-nowrap">
-                              {item.label}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -1028,21 +1054,27 @@ export default function Dashboard() {
                       Pages (ZINCRBY)
                     </h3>
                     <div className="space-y-3 font-mono text-xs">
-                      {Object.entries(cloudStats?.pages || analytics.pageBreakdown || {}).map(([path, count]) => {
-                        const total = cloudStats?.totalPageviews || analytics.totalPageViews || 1;
-                        const pct = Math.round((count / total) * 100);
-                        return (
-                          <div key={path} className="space-y-1">
-                            <div className="flex justify-between">
-                              <span className="font-bold text-neutral-200 dark:text-neutral-200 truncate">{path}</span>
-                              <span className="text-neutral-400">{count} ({pct}%)</span>
+                      {Object.keys(cloudStats?.pages || analytics.pageBreakdown || {}).length === 0 ? (
+                        <div className="text-neutral-500 text-xs font-mono py-4 text-center">
+                          No page traffic recorded yet.
+                        </div>
+                      ) : (
+                        Object.entries(cloudStats?.pages || analytics.pageBreakdown || {}).map(([path, count]) => {
+                          const total = displayPageviews || 1;
+                          const pct = Math.round((count / total) * 100);
+                          return (
+                            <div key={path} className="space-y-1">
+                              <div className="flex justify-between">
+                                <span className="font-bold text-neutral-200 dark:text-neutral-200 truncate">{path}</span>
+                                <span className="text-neutral-400">{count} ({pct}%)</span>
+                              </div>
+                              <div className="w-full h-1.5 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
+                                <div style={{ width: `${pct}%` }} className="h-full bg-[#ff5e1a]" />
+                              </div>
                             </div>
-                            <div className="w-full h-1.5 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
-                              <div style={{ width: `${pct}%` }} className="h-full bg-[#ff5e1a]" />
-                            </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })
+                      )}
                     </div>
                   </div>
 
@@ -1054,21 +1086,27 @@ export default function Dashboard() {
                       Referrers (HINCRBY)
                     </h3>
                     <div className="space-y-3 font-mono text-xs">
-                      {Object.entries(cloudStats?.referrers || analytics.referrerBreakdown || {}).map(([channel, count]) => {
-                        const total = Object.values(cloudStats?.referrers || analytics.referrerBreakdown || {}).reduce((a, b) => a + b, 0) || 1;
-                        const pct = Math.round((count / total) * 100);
-                        return (
-                          <div key={channel} className="space-y-1">
-                            <div className="flex justify-between">
-                              <span className="font-bold text-neutral-200 dark:text-neutral-200">{channel}</span>
-                              <span className="text-neutral-400">{count} ({pct}%)</span>
+                      {Object.keys(cloudStats?.referrers || analytics.referrerBreakdown || {}).length === 0 ? (
+                        <div className="text-neutral-500 text-xs font-mono py-4 text-center">
+                          No external referrers recorded yet.
+                        </div>
+                      ) : (
+                        Object.entries(cloudStats?.referrers || analytics.referrerBreakdown || {}).map(([channel, count]) => {
+                          const total = Object.values(cloudStats?.referrers || analytics.referrerBreakdown || {}).reduce((a, b) => a + b, 0) || 1;
+                          const pct = Math.round((count / total) * 100);
+                          return (
+                            <div key={channel} className="space-y-1">
+                              <div className="flex justify-between">
+                                <span className="font-bold text-neutral-200 dark:text-neutral-200">{channel}</span>
+                                <span className="text-neutral-400">{count} ({pct}%)</span>
+                              </div>
+                              <div className="w-full h-1.5 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
+                                <div style={{ width: `${pct}%` }} className="h-full bg-[#ff5e1a]" />
+                              </div>
                             </div>
-                            <div className="w-full h-1.5 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
-                              <div style={{ width: `${pct}%` }} className="h-full bg-[#ff5e1a]" />
-                            </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })
+                      )}
                     </div>
                   </div>
 
@@ -1080,21 +1118,27 @@ export default function Dashboard() {
                       Devices (HINCRBY)
                     </h3>
                     <div className="space-y-3 font-mono text-xs">
-                      {Object.entries(cloudStats?.devices || analytics.deviceBreakdown || {}).map(([dev, count]) => {
-                        const total = Object.values(cloudStats?.devices || analytics.deviceBreakdown || {}).reduce((a, b) => a + b, 0) || 1;
-                        const pct = Math.round((count / total) * 100);
-                        return (
-                          <div key={dev} className="space-y-1">
-                            <div className="flex justify-between">
-                              <span className="font-bold text-neutral-200 dark:text-neutral-200">{dev}</span>
-                              <span className="text-neutral-400">{count} ({pct}%)</span>
+                      {Object.keys(cloudStats?.devices || analytics.deviceBreakdown || {}).length === 0 ? (
+                        <div className="text-neutral-500 text-xs font-mono py-4 text-center">
+                          No device data recorded yet.
+                        </div>
+                      ) : (
+                        Object.entries(cloudStats?.devices || analytics.deviceBreakdown || {}).map(([dev, count]) => {
+                          const total = Object.values(cloudStats?.devices || analytics.deviceBreakdown || {}).reduce((a, b) => a + b, 0) || 1;
+                          const pct = Math.round((count / total) * 100);
+                          return (
+                            <div key={dev} className="space-y-1">
+                              <div className="flex justify-between">
+                                <span className="font-bold text-neutral-200 dark:text-neutral-200">{dev}</span>
+                                <span className="text-neutral-400">{count} ({pct}%)</span>
+                              </div>
+                              <div className="w-full h-1.5 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
+                                <div style={{ width: `${pct}%` }} className="h-full bg-[#ff5e1a]" />
+                              </div>
                             </div>
-                            <div className="w-full h-1.5 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
-                              <div style={{ width: `${pct}%` }} className="h-full bg-[#ff5e1a]" />
-                            </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })
+                      )}
                     </div>
                   </div>
                 </div>

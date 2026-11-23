@@ -20,6 +20,16 @@ export default async function handler(req, res) {
     const { path = '/', device = 'Desktop', referrer = 'Direct', visitorHash = 'anon' } = req.body || {};
 
     const normalizedPath = path || '/';
+
+    // Ignore admin and studio dashboard paths
+    if (
+      normalizedPath.startsWith('/dashboard') ||
+      normalizedPath.startsWith('/analytics') ||
+      normalizedPath.startsWith('/inbox')
+    ) {
+      return res.status(200).json({ tracked: false, reason: 'admin_route_ignored' });
+    }
+
     const redisUrl = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
     const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
 
