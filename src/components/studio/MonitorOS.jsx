@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import BrandMark from '../BrandMark';
+import MacAppIcon from './MacAppIcon';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../../context/ThemeContext';
 import { playSoundEffect } from '../../utils/soundEffects';
@@ -20,6 +21,7 @@ export default function MonitorOS({ onCloseZone }) {
     vscode: false,
     spotify: false,
     figma: false,
+    terminal: false,
   });
   const [minimizedWindows, setMinimizedWindows] = useState({
     maps: false,
@@ -28,6 +30,7 @@ export default function MonitorOS({ onCloseZone }) {
     vscode: false,
     spotify: false,
     figma: false,
+    terminal: false,
   });
   const [maximizedWindows, setMaximizedWindows] = useState({});
 
@@ -41,7 +44,6 @@ export default function MonitorOS({ onCloseZone }) {
   const [soundVolume, setSoundVolume] = useState(82);
   const [wifiEnabled, setWifiEnabled] = useState(true);
   const [bluetoothEnabled, setBluetoothEnabled] = useState(true);
-  const [airdropEnabled, setAirdropEnabled] = useState(true);
   const [focusModeEnabled, setFocusModeEnabled] = useState(false);
 
   // Messages App State
@@ -76,7 +78,6 @@ export default function MonitorOS({ onCloseZone }) {
 
   // Safari State
   const [safariUrl, setSafariUrl] = useState('khushang.design');
-  const [safariActiveTab, setSafariActiveTab] = useState('favorites');
 
   // VS Code State
   const [codeFile, setCodeFile] = useState('Hero.jsx');
@@ -193,6 +194,14 @@ export default function MonitorOS({ onCloseZone }) {
   // Dock App Click Handler
   const handleDockClick = (id) => {
     playSoundEffect('open');
+    if (id === 'trash') {
+      playSoundEffect('select');
+      return;
+    }
+    if (id === 'settings') {
+      setIsControlCenterOpen(prev => !prev);
+      return;
+    }
     if (!openWindows[id]) {
       setOpenWindows(prev => ({ ...prev, [id]: true }));
       setMinimizedWindows(prev => ({ ...prev, [id]: false }));
@@ -250,17 +259,18 @@ export default function MonitorOS({ onCloseZone }) {
     }, 700);
   };
 
-  // Dock items definition
+  // Standard macOS Dock Application Roster
   const dockApps = [
-    { id: 'finder', name: 'Finder', iconType: 'finder' },
-    { id: 'safari', name: 'Safari', iconType: 'safari' },
-    { id: 'messages', name: 'Messages', iconType: 'messages', badge: 1 },
-    { id: 'maps', name: 'Maps', iconType: 'maps' },
-    { id: 'figma', name: 'Figma', brand: 'figma' },
-    { id: 'vscode', name: 'VS Code', brand: 'vscode' },
-    { id: 'spotify', name: 'Spotify', brand: 'spotify' },
-    { id: 'settings', name: 'System Settings', iconType: 'settings' },
-    { id: 'trash', name: 'Trash', iconType: 'trash' },
+    { id: 'finder', name: 'Finder' },
+    { id: 'safari', name: 'Safari' },
+    { id: 'messages', name: 'Messages', badge: 1 },
+    { id: 'maps', name: 'Maps' },
+    { id: 'figma', name: 'Figma' },
+    { id: 'vscode', name: 'VS Code' },
+    { id: 'spotify', name: 'Spotify' },
+    { id: 'terminal', name: 'Terminal' },
+    { id: 'settings', name: 'System Settings' },
+    { id: 'trash', name: 'Trash' },
   ];
 
   const appDisplayName = {
@@ -271,6 +281,7 @@ export default function MonitorOS({ onCloseZone }) {
     figma: 'Figma',
     vscode: 'Code',
     spotify: 'Spotify',
+    terminal: 'Terminal',
     settings: 'Settings',
   }[activeApp] || 'Studio';
 
@@ -286,84 +297,22 @@ export default function MonitorOS({ onCloseZone }) {
       }}
     >
       {/* ==============================================================
-          AUTHENTIC MACOS BIG SUR LAYERED DUNE WALLPAPER (VECTOR SVG)
+          USER-ATTACHED MACOS MOUNTAIN MIST DESKTOP WALLPAPER
+          High-resolution misty mountain ridges floating over a sea of clouds
           ============================================================== */}
       <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden">
-        {isDark ? (
-          // Night Mode Wallpaper: Midnight Aurora & Indigo Slopes
-          <svg className="w-full h-full object-cover" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" fill="none">
-            <defs>
-              <linearGradient id="nightSky" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#04060c" />
-                <stop offset="40%" stopColor="#0c1122" />
-                <stop offset="100%" stopColor="#171330" />
-              </linearGradient>
-              <linearGradient id="nightRidge1" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#1e1b4b" />
-                <stop offset="100%" stopColor="#090d16" />
-              </linearGradient>
-              <linearGradient id="nightRidge2" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#2e1065" />
-                <stop offset="50%" stopColor="#1e1b4b" />
-                <stop offset="100%" stopColor="#080c14" />
-              </linearGradient>
-              <linearGradient id="nightRimOrange" x1="0%" y1="0%" x2="100%" y2="50%">
-                <stop offset="0%" stopColor="#ff5e1a" />
-                <stop offset="60%" stopColor="#ea580c" />
-                <stop offset="100%" stopColor="#121319" />
-              </linearGradient>
-            </defs>
-            <rect width="1920" height="1080" fill="url(#nightSky)" />
-            {/* Distant Ridge */}
-            <path d="M-100 480 Q 420 360 880 430 T 1940 380 L 1940 1100 L -100 1100 Z" fill="url(#nightRidge1)" opacity="0.8" />
-            {/* Mid Mountain Sweep */}
-            <path d="M-100 620 Q 360 480 840 560 T 1940 490 L 1940 1100 L -100 1100 Z" fill="url(#nightRidge2)" />
-            {/* Glowing Orange Twilight Rim */}
-            <path d="M-50 780 Q 480 580 1020 680 T 2020 620" stroke="url(#nightRimOrange)" strokeWidth="6" opacity="0.85" />
-            {/* Foreground Obsidian Dune */}
-            <path d="M-50 780 Q 480 580 1020 680 T 2020 620 L 2020 1100 L -50 1100 Z" fill="#090b10" />
-          </svg>
-        ) : (
-          // Daylight Mode Wallpaper: Iconic Big Sur Golden Amber & Coral Waves
-          <svg className="w-full h-full object-cover" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" fill="none">
-            <defs>
-              <linearGradient id="daySky" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#38bdf8" />
-                <stop offset="35%" stopColor="#7dd3fc" />
-                <stop offset="70%" stopColor="#fed7aa" />
-                <stop offset="100%" stopColor="#fef08a" />
-              </linearGradient>
-              <linearGradient id="dayBlueRidge" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#3b82f6" />
-                <stop offset="100%" stopColor="#6366f1" />
-              </linearGradient>
-              <linearGradient id="dayCoralDune" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#f43f5e" />
-                <stop offset="50%" stopColor="#e11d48" />
-                <stop offset="100%" stopColor="#be123c" />
-              </linearGradient>
-              <linearGradient id="dayAmberDune" x1="0%" y1="0%" x2="100%" y2="80%">
-                <stop offset="0%" stopColor="#ff7a3d" />
-                <stop offset="45%" stopColor="#ff5e1a" />
-                <stop offset="100%" stopColor="#c2410c" />
-              </linearGradient>
-              <linearGradient id="dayGoldenFront" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#fbbf24" />
-                <stop offset="60%" stopColor="#f59e0b" />
-                <stop offset="100%" stopColor="#d97706" />
-              </linearGradient>
-            </defs>
-            <rect width="1920" height="1080" fill="url(#daySky)" />
-            {/* Distant Cyan Ridge */}
-            <path d="M-100 440 Q 400 320 920 400 T 1980 340 L 1980 1100 L -100 1100 Z" fill="url(#dayBlueRidge)" opacity="0.75" />
-            {/* Coral Crimson Mid Ridge */}
-            <path d="M-100 580 Q 380 440 880 540 T 1980 460 L 1980 1100 L -100 1100 Z" fill="url(#dayCoralDune)" opacity="0.9" />
-            {/* Vibrant Plinth Amber Wave */}
-            <path d="M-80 720 Q 460 520 1020 630 T 2020 560 L 2020 1100 L -80 1100 Z" fill="url(#dayAmberDune)" />
-            {/* Golden Honey Dune */}
-            <path d="M-50 860 Q 520 680 1100 790 T 2020 710 L 2020 1100 L -50 1100 Z" fill="url(#dayGoldenFront)" />
-          </svg>
-        )}
+        <img 
+          src="/images/studio/macos_mountain_wallpaper.webp" 
+          alt="macOS Mountain Desktop Wallpaper" 
+          className={`w-full h-full object-cover object-center transition-all duration-700 ${
+            isDark 
+              ? 'brightness-[0.68] contrast-[1.12] saturate-[0.88] hue-rotate-[8deg]' 
+              : 'brightness-[0.98] contrast-[1.02]'
+          }`}
+          loading="eager"
+        />
+        {/* Soft edge vignetting for edge-to-edge UI contrast */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/35 pointer-events-none" />
       </div>
 
       {/* ==============================================================
@@ -458,7 +407,7 @@ export default function MonitorOS({ onCloseZone }) {
           </nav>
         </div>
 
-        {/* Right Side: Battery, Wi-Fi, Spotlight, Control Center, Time, Power Off */}
+        {/* Right Side: Battery, Wi-Fi, Control Center, Time, Power Off */}
         <div className="flex items-center gap-3 sm:gap-3.5">
           {/* Battery */}
           <div className="hidden sm:flex items-center gap-1.5 opacity-85">
@@ -545,7 +494,7 @@ export default function MonitorOS({ onCloseZone }) {
                   className="flex items-center gap-2 text-left cursor-pointer group"
                 >
                   <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
-                    wifiEnabled ? 'bg-[#ff5e1a] text-white' : 'bg-neutral-500/30 text-neutral-400'
+                    wifiEnabled ? 'bg-[#007AFF] text-white' : 'bg-neutral-500/30 text-neutral-400'
                   }`}>
                     <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-current">
                       <path d="M12 18a2 2 0 100 4 2 2 0 000-4zm-4.95-2.95a7 7 0 019.9 0l-1.41 1.41a5 5 0 00-7.08 0L7.05 15.05z" />
@@ -563,7 +512,7 @@ export default function MonitorOS({ onCloseZone }) {
                   className="flex items-center gap-2 text-left cursor-pointer group"
                 >
                   <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
-                    bluetoothEnabled ? 'bg-[#ff5e1a] text-white' : 'bg-neutral-500/30 text-neutral-400'
+                    bluetoothEnabled ? 'bg-[#007AFF] text-white' : 'bg-neutral-500/30 text-neutral-400'
                   }`}>
                     <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-current">
                       <path d="M14.5 7.5L10 3v7.5L6.5 8 5 9.5 9.5 14 5 18.5 6.5 20l3.5-2.5V25l4.5-4.5-3.5-3.5 3.5-3.5zM12 6.5l1.5 1.5L12 9.5V6.5zm0 11.5l1.5-1.5L12 15v3z" />
@@ -583,7 +532,7 @@ export default function MonitorOS({ onCloseZone }) {
                   onClick={() => setFocusModeEnabled(!focusModeEnabled)}
                   className={`p-2.5 rounded-xl border flex items-center gap-2 transition-colors cursor-pointer ${
                     focusModeEnabled 
-                      ? 'bg-[#ff5e1a] text-white border-transparent' 
+                      ? 'bg-[#5856D6] text-white border-transparent' 
                       : isDark ? 'bg-white/5 border-white/10' : 'bg-black/5 border-black/10'
                   }`}
                 >
@@ -644,9 +593,7 @@ export default function MonitorOS({ onCloseZone }) {
               isDark ? 'bg-white/5 border-white/10' : 'bg-black/5 border-black/10'
             }`}>
               <div className="flex items-center gap-2.5 truncate">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#ff5e1a] to-black flex items-center justify-center text-white shrink-0 shadow-md">
-                  <BrandMark brand="spotify" className="w-5 h-5" />
-                </div>
+                <MacAppIcon name="spotify" className="w-9 h-9" />
                 <div className="truncate">
                   <div className="font-bold text-[11px] truncate">Tokyo Twilight Chill Beats</div>
                   <div className="text-[10px] opacity-60 truncate">Khushang Sharma</div>
@@ -684,11 +631,7 @@ export default function MonitorOS({ onCloseZone }) {
               }`}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="w-16 h-16 rounded-2xl bg-neutral-200 dark:bg-neutral-800 flex items-center justify-center shadow-lg mb-3">
-                <svg viewBox="0 0 170 170" className="w-10 h-10 fill-current">
-                  <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.7-3.04-7.58-7.74-11.64-14.1-6.19-9.8-10.89-20.73-14.1-32.8-3.21-12.06-4.82-23.49-4.82-34.28 0-16.14 4.17-29.43 12.52-39.87 8.35-10.43 18.7-15.75 31.05-15.96 4.79 0 10.15 1.25 16.08 3.76 5.93 2.51 9.77 3.86 11.52 4.06 1.76-.2 5.7-1.55 11.83-4.06 6.13-2.51 11.41-3.71 15.86-3.6 13.91.54 24.87 5.75 32.87 15.64-12.4 7.51-18.49 17.84-18.28 31 0 11.32 4.39 21.1 13.17 29.35 4.13 3.91 8.87 6.8 14.22 8.68-2.61 7.73-5.76 15.24-9.47 22.52zM119.22 33.15c0-7.39 2.67-14.41 8.01-21.06 5.34-6.65 11.96-10.74 19.86-12.28.32 1.41.48 2.61.48 3.6 0 7.49-2.8 14.57-8.41 21.23-5.61 6.66-12.39 10.66-20.34 12-0.21-1.09-.32-2.26-.32-3.49z" />
-                </svg>
-              </div>
+              <MacAppIcon name="finder" className="w-16 h-16 mb-3" />
               <h2 className="text-base font-bold">MacBook Pro 16-inch</h2>
               <div className="text-xs opacity-60 mb-3">Studio Edition · 2026</div>
               <div className="w-full text-left text-xs space-y-1.5 py-2.5 border-y border-black/10 dark:border-white/10 mb-4">
@@ -702,7 +645,7 @@ export default function MonitorOS({ onCloseZone }) {
                 </div>
                 <div className="flex justify-between">
                   <span className="opacity-60">macOS</span>
-                  <span className="font-medium">Big Sur 14.2.1</span>
+                  <span className="font-medium">Sonoma 14.4</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="opacity-60">Host</span>
@@ -722,7 +665,6 @@ export default function MonitorOS({ onCloseZone }) {
 
       {/* ==============================================================
           CONCURRENT MULTI-WINDOW WORKSPACE
-          Three simultaneous windows open just like the reference photo:
           - Maps Window (Upper Left)
           - Safari Browser (Center / Upper Right)
           - Messages iMessage (Foreground Left, Overlapping)
@@ -787,7 +729,10 @@ export default function MonitorOS({ onCloseZone }) {
                 <span className="truncate font-medium">Vellore, Tamil Nadu · Working Globally</span>
               </div>
 
-              <div className="text-[10px] opacity-60 font-medium">Maps</div>
+              <div className="flex items-center gap-1.5 text-[10px] opacity-75 font-medium">
+                <MacAppIcon name="maps" className="w-3.5 h-3.5" />
+                <span>Maps</span>
+              </div>
             </div>
 
             {/* Maps Window Content */}
@@ -799,7 +744,7 @@ export default function MonitorOS({ onCloseZone }) {
                 <div>
                   <div className="text-[10px] uppercase font-bold opacity-50 mb-1">Favorites</div>
                   <div className="space-y-0.5">
-                    <div className="px-2 py-1 rounded-md bg-[#ff5e1a] text-white font-medium">Studio Lab</div>
+                    <div className="px-2 py-1 rounded-md bg-[#007AFF] text-white font-medium">Studio Lab</div>
                     <div className="px-2 py-1 rounded-md opacity-75 hover:opacity-100 cursor-pointer">VIT Campus</div>
                     <div className="px-2 py-1 rounded-md opacity-75 hover:opacity-100 cursor-pointer">Bangalore Hub</div>
                     <div className="px-2 py-1 rounded-md opacity-75 hover:opacity-100 cursor-pointer">Tokyo Vault</div>
@@ -912,9 +857,9 @@ export default function MonitorOS({ onCloseZone }) {
               </div>
 
               {/* Safari Right Action Tools */}
-              <div className="flex items-center gap-2 opacity-70 text-xs">
-                <span title="Share" className="cursor-pointer">Share</span>
-                <span title="New Tab" className="cursor-pointer font-bold">+</span>
+              <div className="flex items-center gap-2 text-xs">
+                <MacAppIcon name="safari" className="w-4 h-4" />
+                <span title="New Tab" className="cursor-pointer font-bold opacity-70">+</span>
               </div>
             </div>
 
@@ -923,45 +868,33 @@ export default function MonitorOS({ onCloseZone }) {
               {/* Favorites Title */}
               <div>
                 <h3 className="text-xs sm:text-sm font-bold tracking-tight text-neutral-800 dark:text-neutral-100">Favorites</h3>
-                <div className="text-[10px] opacity-50">Quick access to tools and work</div>
+                <div className="text-[10px] opacity-50">Curated tools and engineering suites</div>
               </div>
 
-              {/* Grid of Favorites Tiles (Matching Reference Image) */}
+              {/* Grid of Favorites Tiles With macOS Icons */}
               <div className="grid grid-cols-4 sm:grid-cols-8 gap-2.5 sm:gap-3">
                 {[
-                  { name: 'Apple', brand: 'apple' },
-                  { name: 'Figma', brand: 'figma' },
-                  { name: 'GitHub', brand: 'git' },
-                  { name: 'LinkedIn', iconText: 'in', color: '#0A66C2' },
-                  { name: 'OtakuCircle', brand: 'otakucircle' },
-                  { name: 'Spotify', brand: 'spotify' },
-                  { name: 'VS Code', brand: 'vscode' },
-                  { name: 'Google', iconText: 'G', color: '#EA4335' },
+                  { name: 'Apple', iconKey: 'apple' },
+                  { name: 'Figma', iconKey: 'figma' },
+                  { name: 'GitHub', iconKey: 'github' },
+                  { name: 'LinkedIn', iconKey: 'linkedin' },
+                  { name: 'OtakuCircle', iconKey: 'otakucircle' },
+                  { name: 'Spotify', iconKey: 'spotify' },
+                  { name: 'VS Code', iconKey: 'vscode' },
+                  { name: 'Google', iconKey: 'google' },
                 ].map((fav) => (
                   <button
                     key={fav.name}
                     onClick={() => {
                       playSoundEffect('select');
-                      if (fav.brand === 'figma' || fav.brand === 'vscode' || fav.brand === 'spotify') {
-                        handleDockClick(fav.brand);
+                      if (fav.iconKey === 'figma' || fav.iconKey === 'vscode' || fav.iconKey === 'spotify') {
+                        handleDockClick(fav.iconKey);
                       }
                     }}
                     className="flex flex-col items-center gap-1.5 group cursor-pointer"
                   >
-                    <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shadow-md border border-black/10 dark:border-white/10 bg-white/10 dark:bg-black/30 group-hover:scale-105 transition-transform">
-                      {fav.brand === 'apple' ? (
-                        <svg viewBox="0 0 170 170" className="w-5 h-5 fill-current">
-                          <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.7-3.04-7.58-7.74-11.64-14.1-6.19-9.8-10.89-20.73-14.1-32.8-3.21-12.06-4.82-23.49-4.82-34.28 0-16.14 4.17-29.43 12.52-39.87 8.35-10.43 18.7-15.75 31.05-15.96 4.79 0 10.15 1.25 16.08 3.76 5.93 2.51 9.77 3.86 11.52 4.06 1.76-.2 5.7-1.55 11.83-4.06 6.13-2.51 11.41-3.71 15.86-3.6 13.91.54 24.87 5.75 32.87 15.64-12.4 7.51-18.49 17.84-18.28 31 0 11.32 4.39 21.1 13.17 29.35 4.13 3.91 8.87 6.8 14.22 8.68-2.61 7.73-5.76 15.24-9.47 22.52zM119.22 33.15c0-7.39 2.67-14.41 8.01-21.06 5.34-6.65 11.96-10.74 19.86-12.28.32 1.41.48 2.61.48 3.6 0 7.49-2.8 14.57-8.41 21.23-5.61 6.66-12.39 10.66-20.34 12-0.21-1.09-.32-2.26-.32-3.49z" />
-                        </svg>
-                      ) : fav.brand ? (
-                        <BrandMark brand={fav.brand} className="w-6 h-6 object-contain" />
-                      ) : (
-                        <span className="font-bold text-sm text-white px-2 py-0.5 rounded" style={{ backgroundColor: fav.color }}>
-                          {fav.iconText}
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-[10px] font-medium truncate max-w-[60px] opacity-80">{fav.name}</span>
+                    <MacAppIcon name={fav.iconKey} className="w-11 h-11 sm:w-12 sm:h-12 group-hover:scale-105 transition-transform" />
+                    <span className="text-[10px] font-medium truncate max-w-[64px] opacity-80">{fav.name}</span>
                   </button>
                 ))}
               </div>
@@ -974,9 +907,7 @@ export default function MonitorOS({ onCloseZone }) {
                   <div className={`p-3 rounded-xl border flex gap-3 items-center ${
                     isDark ? 'bg-white/5 border-white/10' : 'bg-black/5 border-black/10'
                   }`}>
-                    <div className="w-16 h-16 rounded-lg bg-[#ff5e1a] flex items-center justify-center shrink-0 shadow-md">
-                      <BrandMark brand="otakucircle" className="w-10 h-10 object-contain" />
-                    </div>
+                    <MacAppIcon name="otakucircle" className="w-14 h-14 shrink-0" />
                     <div className="truncate">
                       <div className="font-bold text-xs truncate">OtakuCircle Manga Vault</div>
                       <div className="text-[10px] opacity-60 mt-0.5">120k+ Readers Worldwide</div>
@@ -988,9 +919,7 @@ export default function MonitorOS({ onCloseZone }) {
                   <div className={`p-3 rounded-xl border flex gap-3 items-center ${
                     isDark ? 'bg-white/5 border-white/10' : 'bg-black/5 border-black/10'
                   }`}>
-                    <div className="w-16 h-16 rounded-lg bg-neutral-900 border border-white/20 flex items-center justify-center shrink-0 shadow-md">
-                      <BrandMark brand="figma" className="w-8 h-8 object-contain" />
-                    </div>
+                    <MacAppIcon name="figma" className="w-14 h-14 shrink-0" />
                     <div className="truncate">
                       <div className="font-bold text-xs truncate">Velosa Studio Design Tokens</div>
                       <div className="text-[10px] opacity-60 mt-0.5">High-Contrast Master System</div>
@@ -1059,7 +988,10 @@ export default function MonitorOS({ onCloseZone }) {
                 <span>Design Recruiter / Hiring Lead</span>
               </div>
 
-              <div className="text-[10px] opacity-60 font-medium">Messages</div>
+              <div className="flex items-center gap-1.5 text-[10px] opacity-75 font-medium">
+                <MacAppIcon name="messages" className="w-3.5 h-3.5" />
+                <span>Messages</span>
+              </div>
             </div>
 
             {/* Messages Body */}
@@ -1077,7 +1009,7 @@ export default function MonitorOS({ onCloseZone }) {
 
                 {/* Avatar Circles List */}
                 <div className="space-y-1 mt-1">
-                  <div className="p-1.5 rounded-lg bg-[#ff5e1a] text-white flex items-center gap-2 cursor-pointer shadow-sm">
+                  <div className="p-1.5 rounded-lg bg-[#007AFF] text-white flex items-center gap-2 cursor-pointer shadow-sm">
                     <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center font-bold text-[10px]">
                       DR
                     </div>
@@ -1183,7 +1115,10 @@ export default function MonitorOS({ onCloseZone }) {
                 <button onClick={(e) => handleMinimizeWindow('vscode', e)} className="w-3 h-3 rounded-full bg-[#FFBD2E] cursor-pointer" />
                 <button onClick={(e) => handleMaximizeWindow('vscode', e)} className="w-3 h-3 rounded-full bg-[#27C93F] cursor-pointer" />
               </div>
-              <div className="text-xs font-mono opacity-60">Visual Studio Code · Khushang Sharma</div>
+              <div className="flex items-center gap-1.5 text-xs font-mono opacity-80">
+                <MacAppIcon name="vscode" className="w-3.5 h-3.5" />
+                <span>Visual Studio Code · Khushang Sharma</span>
+              </div>
               <div className="w-12 text-right text-[10px] text-emerald-400">React</div>
             </div>
 
@@ -1246,15 +1181,16 @@ export default function MonitorOS({ onCloseZone }) {
                 <button onClick={(e) => handleMinimizeWindow('spotify', e)} className="w-3 h-3 rounded-full bg-[#FFBD2E] cursor-pointer" />
                 <button onClick={(e) => handleMaximizeWindow('spotify', e)} className="w-3 h-3 rounded-full bg-[#27C93F] cursor-pointer" />
               </div>
-              <div className="text-xs font-semibold text-[#1DB954]">Spotify Premium</div>
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-[#1DB954]">
+                <MacAppIcon name="spotify" className="w-3.5 h-3.5" />
+                <span>Spotify Premium</span>
+              </div>
               <div className="w-12 text-right text-[10px] opacity-60">Lossless</div>
             </div>
 
             <div className="flex-1 p-5 flex flex-col justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#1DB954] to-black flex items-center justify-center text-white shadow-xl">
-                  <BrandMark brand="spotify" className="w-12 h-12" />
-                </div>
+                <MacAppIcon name="spotify" className="w-20 h-20" />
                 <div>
                   <div className="text-[10px] uppercase font-bold text-[#1DB954] tracking-wider">Flow State Audio</div>
                   <h3 className="text-base font-bold text-white mt-0.5">Tokyo Twilight Chill Beats</h3>
@@ -1287,6 +1223,58 @@ export default function MonitorOS({ onCloseZone }) {
           </motion.div>
         )}
 
+        {/* ------------------------------------------------------------
+            OPTIONAL WINDOW 6: TERMINAL (ZSH SHELL)
+            ------------------------------------------------------------ */}
+        {openWindows.terminal && !minimizedWindows.terminal && (
+          <motion.div
+            drag
+            dragMomentum={false}
+            onMouseDown={() => bringToFront('terminal')}
+            style={{
+              zIndex: 10 + windowOrder.indexOf('terminal'),
+            }}
+            initial={{ opacity: 0, scale: 0.94, y: 15 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96 }}
+            className={`absolute transition-shadow duration-200 rounded-xl border shadow-2xl backdrop-blur-2xl overflow-hidden flex flex-col ${
+              maximizedWindows.terminal 
+                ? 'inset-2 sm:inset-4 w-auto h-auto' 
+                : 'left-10 sm:left-48 top-10 sm:top-16 w-[92%] sm:w-[520px] h-[330px] sm:h-[370px]'
+            } bg-[#141417]/95 border-white/15 text-white shadow-black/85`}
+          >
+            <div className="h-8 px-3 flex items-center justify-between border-b border-white/10 bg-white/5 cursor-move">
+              <div className="flex items-center gap-1.5">
+                <button onClick={(e) => handleCloseWindow('terminal', e)} className="w-3 h-3 rounded-full bg-[#FF5F56] cursor-pointer" />
+                <button onClick={(e) => handleMinimizeWindow('terminal', e)} className="w-3 h-3 rounded-full bg-[#FFBD2E] cursor-pointer" />
+                <button onClick={(e) => handleMaximizeWindow('terminal', e)} className="w-3 h-3 rounded-full bg-[#27C93F] cursor-pointer" />
+              </div>
+              <div className="flex items-center gap-1.5 text-xs font-mono opacity-80">
+                <MacAppIcon name="terminal" className="w-3.5 h-3.5" />
+                <span>khushang@macbook-pro: ~ (zsh)</span>
+              </div>
+              <div className="w-12 text-right text-[10px] text-emerald-400">80x24</div>
+            </div>
+
+            <div className="flex-1 p-3.5 font-mono text-xs text-neutral-200 leading-relaxed overflow-y-auto space-y-1.5">
+              <div className="text-neutral-400">Last login: Tue Nov 23 09:41:22 on ttys002</div>
+              <div>
+                <span className="text-emerald-400 font-bold">khushang@macbook-pro</span>:<span className="text-[#38bdf8]">~/portfolio</span>$ git status
+              </div>
+              <div className="text-neutral-300">On branch main. Working tree clean. Zero lint errors.</div>
+              <div className="pt-1">
+                <span className="text-emerald-400 font-bold">khushang@macbook-pro</span>:<span className="text-[#38bdf8]">~/portfolio</span>$ pnpm build
+              </div>
+              <div className="text-neutral-300">vite v7.3.0 building client environment for production...</div>
+              <div className="text-emerald-400 font-semibold">✓ built in 10.48s with zero warnings.</div>
+              <div className="flex items-center gap-1 pt-1">
+                <span className="text-emerald-400 font-bold">khushang@macbook-pro</span>:<span className="text-[#38bdf8]">~/portfolio</span>${' '}
+                <span className="w-2 h-4 bg-emerald-400 inline-block animate-pulse" />
+              </div>
+            </div>
+          </motion.div>
+        )}
+
       </main>
 
       {/* ==============================================================
@@ -1312,81 +1300,8 @@ export default function MonitorOS({ onCloseZone }) {
                 title={app.name}
                 aria-label={app.name}
               >
-                {/* App Squircle Icon */}
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shadow-md transition-all overflow-hidden bg-white/10 dark:bg-black/30 border border-black/10 dark:border-white/10">
-                  {/* Finder Icon */}
-                  {app.iconType === 'finder' && (
-                    <div className="w-full h-full bg-gradient-to-b from-[#2E86DE] to-[#54A0FF] flex items-center justify-center text-white">
-                      <svg viewBox="0 0 100 100" className="w-6 h-6 fill-white">
-                        <path d="M20 20 h60 a10 10 0 0 1 10 10 v40 a10 10 0 0 1 -10 10 h-60 a10 10 0 0 1 -10 -10 v-40 a10 10 0 0 1 10 -10 z" fill="#2E86DE" />
-                        <path d="M35 45 Q 50 65 65 45" stroke="#FFFFFF" strokeWidth="6" fill="none" strokeLinecap="round" />
-                        <circle cx="36" cy="38" r="4" fill="#FFFFFF" />
-                        <circle cx="64" cy="38" r="4" fill="#FFFFFF" />
-                        <path d="M50 20 L50 48" stroke="#FFFFFF" strokeWidth="5" strokeLinecap="round" />
-                      </svg>
-                    </div>
-                  )}
-
-                  {/* Safari Icon */}
-                  {app.iconType === 'safari' && (
-                    <div className="w-full h-full bg-gradient-to-b from-[#00D2D3] to-[#01a3a4] flex items-center justify-center">
-                      <div className="w-6 h-6 rounded-full border-2 border-white flex items-center justify-center relative">
-                        <div className="w-0.5 h-full bg-red-500 rotate-45 transform origin-center shadow-xs" />
-                        <div className="w-1.5 h-1.5 rounded-full bg-white absolute" />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Messages Icon */}
-                  {app.iconType === 'messages' && (
-                    <div className="w-full h-full bg-gradient-to-b from-[#10B981] to-[#059669] flex items-center justify-center text-white">
-                      <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
-                        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
-                      </svg>
-                    </div>
-                  )}
-
-                  {/* Maps Icon */}
-                  {app.iconType === 'maps' && (
-                    <div className="w-full h-full bg-gradient-to-br from-[#F59E0B] to-[#EF4444] flex items-center justify-center text-white">
-                      <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
-                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-                      </svg>
-                    </div>
-                  )}
-
-                  {/* Brand Apps */}
-                  {app.brand && (
-                    <div className="w-full h-full p-1.5 flex items-center justify-center bg-white/90 dark:bg-black/60">
-                      <BrandMark brand={app.brand} className="w-5 h-5 object-contain" />
-                    </div>
-                  )}
-
-                  {/* Settings Icon */}
-                  {app.iconType === 'settings' && (
-                    <div className="w-full h-full bg-gradient-to-b from-neutral-400 to-neutral-600 flex items-center justify-center text-white">
-                      <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
-                        <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" />
-                      </svg>
-                    </div>
-                  )}
-
-                  {/* Trash Icon */}
-                  {app.iconType === 'trash' && (
-                    <div className="w-full h-full bg-gradient-to-b from-neutral-300 to-neutral-400 flex items-center justify-center text-neutral-800">
-                      <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
-                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
-                      </svg>
-                    </div>
-                  )}
-                </div>
-
-                {/* Red Unread Notification Badge */}
-                {app.badge && (
-                  <span className="absolute top-0 right-0 w-3.5 h-3.5 rounded-full bg-red-500 text-white font-bold text-[8.5px] flex items-center justify-center shadow-xs">
-                    {app.badge}
-                  </span>
-                )}
+                {/* Genuine macOS App Squircle Icon */}
+                <MacAppIcon name={app.id} className="w-8 h-8 sm:w-10 sm:h-10" badge={app.badge} />
 
                 {/* Active Indicator Dot Beneath App */}
                 <span className={`w-1 h-1 rounded-full mt-0.5 transition-all ${
