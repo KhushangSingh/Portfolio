@@ -3,12 +3,12 @@ import { motion } from 'framer-motion';
 
 /**
  * HangingSpiderman Component
- * A photorealistic, high-craft Spider-Man hanging upside down on a web line.
+ * A photorealistic Spider-Man hanging upside down on a web line.
  *
  * Entrance Animation:
  * - Starts tucked behind the right-side anchor circle.
- * - Smoothly slides down on an extending tensile web line, descending to overlap the form card below.
- * - Settles with a gentle, realistic silk-spring rebound.
+ * - Waits for an intentional 1-second delay after entering viewport before descending.
+ * - Smoothly slides down on an extending tensile web line, hovering gracefully over the top border of the form.
  *
  * Micro-interactions:
  * - Natural ambient pendulum sway once settled.
@@ -26,18 +26,18 @@ export default function HangingSpiderman({ isDark, shouldDescend = false }) {
     <div 
       className="absolute left-1/2 -translate-x-1/2 top-[82%] z-30 pointer-events-auto select-none"
       style={{ 
-        width: '140px',
-        // Generous clipping box ensuring Spider-Man emerges cleanly from behind the circle and extends down over the form
-        clipPath: 'inset(0px -140px -520px -140px)'
+        width: '135px',
+        // Generous clipping box ensuring Spider-Man emerges cleanly from behind the circle
+        clipPath: 'inset(0px -140px -420px -140px)'
       }}
       onMouseEnter={triggerSway}
       onClick={triggerSway}
     >
-      {/* 1. WEB ANCHOR NODE (Sticks to the circle rim right before Spider-Man descends) */}
+      {/* 1. WEB ANCHOR NODE (Sticks to circle rim after 1-second delay) */}
       <motion.div
         initial={{ scale: 0, opacity: 0 }}
         animate={shouldDescend ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
-        transition={{ duration: 0.28, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.28, delay: 1.05, ease: [0.16, 1, 0.3, 1] }}
         className="relative z-20"
       >
         <svg 
@@ -54,20 +54,20 @@ export default function HangingSpiderman({ isDark, shouldDescend = false }) {
         </svg>
       </motion.div>
 
-      {/* 2. RAPPELLING DESCENT WRAPPER: Slides smoothly down from behind the anchor circle */}
+      {/* 2. RAPPELLING DESCENT WRAPPER: Slides smoothly down 1 second after section is in view */}
       <motion.div
-        initial={{ y: -220, opacity: 0 }}
-        animate={shouldDescend ? { y: 0, opacity: 1 } : { y: -220, opacity: 0 }}
+        initial={{ y: -160, opacity: 0 }}
+        animate={shouldDescend ? { y: 0, opacity: 1 } : { y: -160, opacity: 0 }}
         transition={{
           type: 'spring',
           stiffness: 55,
           damping: 13,
           mass: 0.95,
-          delay: 0.12
+          delay: 1.15
         }}
         className="relative w-full flex flex-col items-center will-change-transform"
       >
-        {/* Tensile silk web line extending downwards from the anchor to overlap the form card */}
+        {/* Tensile silk web line: calibrated shorter length so Spider-Man sits above the form inputs */}
         <motion.div 
           initial={{ scaleY: 0.15 }}
           animate={shouldDescend ? { scaleY: 1 } : { scaleY: 0.15 }}
@@ -76,10 +76,10 @@ export default function HangingSpiderman({ isDark, shouldDescend = false }) {
             stiffness: 55,
             damping: 13,
             mass: 0.95,
-            delay: 0.12
+            delay: 1.15
           }}
           style={{ transformOrigin: 'top center' }}
-          className="w-[1.5px] h-28 sm:h-36 md:h-40 bg-gradient-to-b from-white via-white/90 to-white/65 shadow-[0_0_3px_rgba(255,255,255,0.75)]" 
+          className="w-[1.5px] h-10 sm:h-12 lg:h-14 bg-gradient-to-b from-white via-white/90 to-white/65 shadow-[0_0_3px_rgba(255,255,255,0.75)]" 
         />
 
         {/* 3. PENDULUM SWINGING SPIDER-MAN CONTAINER */}
@@ -96,7 +96,7 @@ export default function HangingSpiderman({ isDark, shouldDescend = false }) {
           whileHover={{ scale: 1.04 }}
           whileTap={{ scale: 0.96, y: -2 }}
         >
-          {/* SPIDER-MAN IMAGE WITH MATTE FABRIC COLOR GRADING AND SOFT DROP SHADOW ON THE FORM */}
+          {/* SPIDER-MAN IMAGE WITH MATTE COLOR GRADING AND SOFT DROP SHADOW */}
           <div className="relative w-full">
             <img
               src="/images/spiderman_upside_down.png"
