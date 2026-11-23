@@ -290,7 +290,7 @@ export default function Dashboard() {
   // ==============================================================
   if (!isAuthenticated) {
     return (
-      <div className={`min-h-screen flex items-center justify-center p-6 transition-colors duration-500 ${
+      <div className={`min-h-screen flex items-center justify-center p-6 transition-colors duration-500 font-sans ${
         isDark ? 'bg-[#060608] text-white' : 'bg-[#F9F9F6] text-neutral-900'
       }`}>
         <div className={`w-full max-w-md p-8 sm:p-10 rounded-3xl border shadow-2xl ${
@@ -307,13 +307,13 @@ export default function Dashboard() {
 
           <form onSubmit={handleUnlock} className="space-y-4">
             {pinError && (
-              <div className="p-3 rounded-xl border border-red-500/30 bg-red-500/10 text-red-400 text-xs font-mono font-bold text-center">
+              <div className="p-3 rounded-xl border border-red-500/30 bg-red-500/10 text-red-400 text-xs font-sans font-bold text-center">
                 {pinError}
               </div>
             )}
 
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="studio-pin" className="text-xs font-mono font-bold uppercase tracking-wider text-neutral-400">
+              <label htmlFor="studio-pin" className="text-xs font-sans font-bold uppercase tracking-wider text-neutral-400">
                 Passcode
               </label>
               <input
@@ -323,7 +323,7 @@ export default function Dashboard() {
                 onChange={(e) => setEnteredPin(e.target.value)}
                 placeholder="Enter private studio passcode"
                 autoFocus
-                className={`w-full px-4 py-3 rounded-xl text-sm font-mono border outline-none text-center tracking-widest ${
+                className={`w-full px-4 py-3 rounded-xl text-sm font-sans border outline-none text-center tracking-widest ${
                   isDark 
                     ? 'border-white/15 bg-black/40 text-white focus:border-[#ff5e1a]' 
                     : 'border-black/15 bg-neutral-50 text-neutral-900 focus:border-[#ff5e1a]'
@@ -331,7 +331,7 @@ export default function Dashboard() {
               />
             </div>
 
-            <div className="flex items-center justify-between text-xs font-mono text-neutral-500 pt-1">
+            <div className="flex items-center justify-between text-xs font-sans text-neutral-500 pt-1">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
@@ -345,7 +345,7 @@ export default function Dashboard() {
 
             <button
               type="submit"
-              className="w-full py-3 rounded-xl text-xs font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all shadow-md cursor-pointer mt-2"
+              className="w-full py-3 rounded-xl text-xs font-sans font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all shadow-md cursor-pointer mt-2"
             >
               Unlock Dashboard
             </button>
@@ -354,7 +354,7 @@ export default function Dashboard() {
           <div className="mt-8 pt-6 border-t border-black/10 dark:border-white/10 text-center">
             <Link
               to="/"
-              className="text-xs font-mono text-neutral-500 hover:text-[#ff5e1a] transition-colors"
+              className="text-xs font-sans text-neutral-500 hover:text-[#ff5e1a] transition-colors"
             >
               Return to Public Portfolio
             </Link>
@@ -368,21 +368,21 @@ export default function Dashboard() {
   // AUTHENTICATED DASHBOARD VIEW
   // ==============================================================
   return (
-    <div className={`min-h-screen transition-colors duration-500 pt-28 sm:pt-32 pb-16 px-4 sm:px-6 lg:px-10 ${
+    <div className={`min-h-screen transition-colors duration-500 pt-28 sm:pt-32 pb-16 px-4 sm:px-6 lg:px-10 font-sans ${
       isDark ? 'bg-[#060608] text-white' : 'bg-[#F9F9F6] text-neutral-900'
     }`}>
       <div className="max-w-[1500px] mx-auto">
         <div className="flex flex-col lg:flex-row gap-8 items-start">
           
           {/* LEFT SIDEBAR: Navigation tabs, Portfolio Home link and Lock Dashboard button */}
-          <aside className={`w-full lg:w-64 lg:sticky lg:top-28 shrink-0 rounded-2xl border p-4 sm:p-5 flex flex-col gap-6 ${
+          <aside className={`w-full lg:w-64 lg:sticky lg:top-36 lg:mt-6 shrink-0 rounded-2xl border p-4 sm:p-5 flex flex-col gap-6 ${
             isDark ? 'bg-[#0e0f14] border-white/10' : 'bg-white border-black/10 shadow-sm'
           }`}>
             <div>
               <h1 className="text-xl sm:text-2xl font-black tracking-tight">
                 Studio Dashboard
               </h1>
-              <p className="text-xs text-neutral-500 font-mono mt-1">
+              <p className="text-xs text-neutral-500 font-sans mt-1">
                 Management Terminal
               </p>
             </div>
@@ -391,7 +391,7 @@ export default function Dashboard() {
             <nav aria-label="Dashboard views" className="flex flex-col gap-1.5">
               <button
                 onClick={() => setActiveTab('messages')}
-                className={`w-full px-4 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition-all flex items-center justify-between text-left cursor-pointer ${
+                className={`w-full px-4 py-2.5 rounded-xl text-xs font-sans font-bold uppercase tracking-wider transition-all flex items-center justify-between text-left cursor-pointer ${
                   activeTab === 'messages'
                     ? 'bg-[#ff5e1a] text-white shadow-md'
                     : isDark
@@ -411,7 +411,7 @@ export default function Dashboard() {
 
               <button
                 onClick={() => setActiveTab('analytics')}
-                className={`w-full px-4 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition-all flex items-center justify-between text-left cursor-pointer ${
+                className={`w-full px-4 py-2.5 rounded-xl text-xs font-sans font-bold uppercase tracking-wider transition-all flex items-center justify-between text-left cursor-pointer ${
                   activeTab === 'analytics'
                     ? 'bg-[#ff5e1a] text-white shadow-md'
                     : isDark
@@ -427,7 +427,7 @@ export default function Dashboard() {
 
               <button
                 onClick={() => setActiveTab('architecture')}
-                className={`w-full px-4 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition-all text-left cursor-pointer ${
+                className={`w-full px-4 py-2.5 rounded-xl text-xs font-sans font-bold uppercase tracking-wider transition-all text-left cursor-pointer ${
                   activeTab === 'architecture'
                     ? 'bg-[#ff5e1a] text-white shadow-md'
                     : isDark
@@ -443,7 +443,7 @@ export default function Dashboard() {
             <div className="pt-4 border-t border-black/10 dark:border-white/10 flex flex-col gap-2">
               <Link
                 to="/"
-                className={`w-full px-4 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider border text-center transition-all ${
+                className={`w-full px-4 py-2.5 rounded-xl text-xs font-sans font-bold uppercase tracking-wider border text-center transition-all ${
                   isDark 
                     ? 'border-white/15 bg-white/5 text-neutral-300 hover:border-[#ff5e1a] hover:text-[#ff5e1a]' 
                     : 'border-black/15 bg-black/5 text-neutral-800 hover:border-[#ff5e1a] hover:text-[#ff5e1a]'
@@ -454,7 +454,7 @@ export default function Dashboard() {
 
               <button
                 onClick={handleLockDashboard}
-                className="w-full px-4 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider border border-red-500/25 text-red-400 hover:bg-red-500/10 transition-all cursor-pointer text-center"
+                className="w-full px-4 py-2.5 rounded-xl text-xs font-sans font-bold uppercase tracking-wider border border-red-500/25 text-red-400 hover:bg-red-500/10 transition-all cursor-pointer text-center"
                 title="Lock dashboard and end session"
               >
                 Lock Dashboard
@@ -473,7 +473,7 @@ export default function Dashboard() {
                 <h2 id="inbox-heading" className="text-xl sm:text-2xl font-black tracking-tight">
                   Inquiries & Messages
                 </h2>
-                <p className="text-xs text-neutral-500 font-mono mt-0.5">
+                <p className="text-xs text-neutral-500 font-sans mt-0.5">
                   {messages.length} total inquiries logged across portfolio touchpoints
                 </p>
               </div>
@@ -481,7 +481,7 @@ export default function Dashboard() {
               <div className="flex flex-wrap items-center gap-2">
                 <button
                   onClick={exportMessagesJSON}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider border transition-all ${
+                  className={`px-3.5 py-2 rounded-xl text-xs font-sans font-bold uppercase tracking-wider border transition-all ${
                     isDark ? 'border-white/15 bg-white/5 text-neutral-300 hover:border-[#ff5e1a]' : 'border-black/15 bg-black/5 text-neutral-800 hover:border-[#ff5e1a]'
                   }`}
                 >
@@ -489,7 +489,7 @@ export default function Dashboard() {
                 </button>
                 <button
                   onClick={handleResetMessages}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-mono text-neutral-500 hover:text-red-400 transition-colors ${
+                  className={`px-3.5 py-2 rounded-xl text-xs font-sans text-neutral-500 hover:text-red-400 transition-colors ${
                     isDark ? 'hover:bg-white/5' : 'hover:bg-black/5'
                   }`}
                 >
@@ -513,7 +513,7 @@ export default function Dashboard() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search sender, inquiry or message..."
-                    className={`w-full px-3.5 py-2 rounded-xl text-xs border outline-none font-mono ${
+                    className={`w-full px-3.5 py-2 rounded-xl text-xs border outline-none font-sans ${
                       isDark 
                         ? 'border-white/15 bg-black/40 text-white placeholder-neutral-500 focus:border-[#ff5e1a]' 
                         : 'border-black/15 bg-neutral-50 text-neutral-900 placeholder-neutral-400 focus:border-[#ff5e1a]'
@@ -521,7 +521,7 @@ export default function Dashboard() {
                   />
 
                   {/* Filter Tabs */}
-                  <div className="flex items-center gap-1.5 mt-3 overflow-x-auto pb-1 text-xs font-mono font-bold">
+                  <div className="flex items-center gap-1.5 mt-3 overflow-x-auto pb-1 text-xs font-sans font-bold">
                     {[
                       { key: 'all', label: `All (${messages.length})` },
                       { key: 'unread', label: `Unread (${unreadCount})` },
@@ -548,7 +548,7 @@ export default function Dashboard() {
                 {/* List Items Container */}
                 <div className="divide-y divide-black/5 dark:divide-white/5 max-h-[640px] overflow-y-auto">
                   {filteredMessages.length === 0 ? (
-                    <div className="p-8 text-center text-xs font-mono text-neutral-500">
+                    <div className="p-8 text-center text-xs font-sans text-neutral-500">
                       No inquiries match your current filter.
                     </div>
                   ) : (
@@ -577,12 +577,12 @@ export default function Dashboard() {
                             }`}>
                               {msg.name}
                             </span>
-                            <span className="text-[10px] font-mono text-neutral-400 shrink-0">
+                            <span className="text-[10px] font-sans text-neutral-400 shrink-0">
                               {formatTimeAgo(msg.createdAt)}
                             </span>
                           </div>
 
-                          <div className="text-[11px] font-mono text-neutral-500 truncate mb-1.5">
+                          <div className="text-[11px] font-sans text-neutral-500 truncate mb-1.5">
                             {msg.subject || msg.inquiryType}
                           </div>
 
@@ -593,18 +593,18 @@ export default function Dashboard() {
                           </p>
 
                           <div className="flex items-center gap-2 mt-2.5">
-                            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#ff5e1a]/10 text-[#ff5e1a] border border-[#ff5e1a]/20">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-sans font-bold bg-[#ff5e1a]/10 text-[#ff5e1a] border border-[#ff5e1a]/20">
                               {msg.inquiryType}
                             </span>
 
                             {msg.status === 'replied' && (
-                              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-green-500/10 text-green-500 border border-green-500/20">
+                              <span className="px-2 py-0.5 rounded text-[10px] font-sans font-bold bg-green-500/10 text-green-500 border border-green-500/20">
                                 Replied
                               </span>
                             )}
 
                             {msg.starred && (
-                              <span className="text-[10px] font-mono font-bold text-amber-500">
+                              <span className="text-[10px] font-sans font-bold text-amber-500">
                                 Starred
                               </span>
                             )}
@@ -626,10 +626,10 @@ export default function Dashboard() {
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-6 border-b border-black/10 dark:border-white/10">
                       <div>
                         <div className="flex items-center gap-2 mb-1.5">
-                          <span className="px-2.5 py-1 rounded-md text-[11px] font-mono font-bold uppercase tracking-wider text-[#ff5e1a] bg-[#ff5e1a]/10 border border-[#ff5e1a]/25">
+                          <span className="px-2.5 py-1 rounded-md text-[11px] font-sans font-bold uppercase tracking-wider text-[#ff5e1a] bg-[#ff5e1a]/10 border border-[#ff5e1a]/25">
                             {selectedMessage.inquiryType}
                           </span>
-                          <span className="text-xs font-mono text-neutral-500">
+                          <span className="text-xs font-sans text-neutral-500">
                             Ref: #{selectedMessage.id.slice(-6).toUpperCase()}
                           </span>
                         </div>
@@ -641,19 +641,19 @@ export default function Dashboard() {
                           <span className="text-neutral-500">•</span>
                           <button
                             onClick={() => handleCopy(selectedMessage.email, 'email')}
-                            className="font-mono text-[#ff5e1a] hover:underline"
+                            className="font-sans text-[#ff5e1a] hover:underline"
                             title="Click to copy email"
                           >
                             {selectedMessage.email} {copiedKey === 'email' ? '(Copied!)' : ''}
                           </button>
                           <span className="text-neutral-500">•</span>
-                          <span className="font-mono text-neutral-400">
+                          <span className="font-sans text-neutral-400">
                             {new Date(selectedMessage.createdAt).toLocaleString()}
                           </span>
                         </div>
 
                         {selectedMessage.socialUrl && (
-                          <div className="mt-3 flex items-center gap-2 text-xs font-mono">
+                          <div className="mt-3 flex items-center gap-2 text-xs font-sans">
                             <span className="text-neutral-500">Sender Social Profile:</span>
                             <a
                               href={selectedMessage.socialUrl.startsWith('http') ? selectedMessage.socialUrl : `https://${selectedMessage.socialUrl}`}
@@ -670,7 +670,7 @@ export default function Dashboard() {
                       <div className="flex items-center gap-1.5 shrink-0">
                         <button
                           onClick={() => handleToggleStar(selectedMessage.id)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold border transition-all ${
+                          className={`px-3 py-1.5 rounded-lg text-xs font-sans font-bold border transition-all ${
                             selectedMessage.starred 
                               ? 'bg-amber-500/10 border-amber-500/30 text-amber-500' 
                               : isDark ? 'border-white/10 hover:border-white/25' : 'border-black/10 hover:border-black/25'
@@ -681,7 +681,7 @@ export default function Dashboard() {
 
                         <button
                           onClick={() => handleToggleReadStatus(selectedMessage.id, selectedMessage.status)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold border transition-all ${
+                          className={`px-3 py-1.5 rounded-lg text-xs font-sans font-bold border transition-all ${
                             isDark ? 'border-white/10 hover:border-white/25' : 'border-black/10 hover:border-black/25'
                           }`}
                         >
@@ -690,7 +690,7 @@ export default function Dashboard() {
 
                         <button
                           onClick={() => handleDelete(selectedMessage.id)}
-                          className="px-3 py-1.5 rounded-lg text-xs font-mono font-bold border border-red-500/20 text-red-400 hover:bg-red-500/10 transition-all"
+                          className="px-3 py-1.5 rounded-lg text-xs font-sans font-bold border border-red-500/20 text-red-400 hover:bg-red-500/10 transition-all"
                         >
                           Delete
                         </button>
@@ -705,7 +705,7 @@ export default function Dashboard() {
 
                     {selectedMessage.reply && (
                       <div className="p-4 rounded-xl border border-green-500/20 bg-green-500/5 space-y-2">
-                        <div className="flex items-center justify-between text-xs font-mono">
+                        <div className="flex items-center justify-between text-xs font-sans">
                           <span className="font-bold text-green-500">
                             Reply Delivered on {new Date(selectedMessage.reply.sentAt).toLocaleString()}
                           </span>
@@ -743,14 +743,14 @@ export default function Dashboard() {
                       )}
 
                       <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-mono font-bold uppercase tracking-wider text-neutral-400">
+                        <label className="text-xs font-sans font-bold uppercase tracking-wider text-neutral-400">
                           Subject Line
                         </label>
                         <input
                           type="text"
                           value={replySubject}
                           onChange={(e) => setReplySubject(e.target.value)}
-                          className={`px-3.5 py-2 rounded-xl text-xs font-mono border outline-none ${
+                          className={`px-3.5 py-2 rounded-xl text-xs font-sans border outline-none ${
                             isDark 
                               ? 'border-white/15 bg-black/40 text-white focus:border-[#ff5e1a]' 
                               : 'border-black/15 bg-neutral-50 text-neutral-900 focus:border-[#ff5e1a]'
@@ -759,7 +759,7 @@ export default function Dashboard() {
                       </div>
 
                       <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-mono font-bold uppercase tracking-wider text-neutral-400">
+                        <label className="text-xs font-sans font-bold uppercase tracking-wider text-neutral-400">
                           Your Reply Message
                         </label>
                         <textarea
@@ -781,14 +781,14 @@ export default function Dashboard() {
                             type="button"
                             onClick={handleSendReply}
                             disabled={isSendingReply || !replyText.trim()}
-                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all disabled:opacity-50 shadow-md cursor-pointer"
+                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-sans font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all disabled:opacity-50 shadow-md cursor-pointer"
                           >
                             <span>{isSendingReply ? 'Sending to Mailbox...' : 'Send Email Reply'}</span>
                           </button>
 
                           <a
                             href={generateMailtoLink(selectedMessage, replyText, replySubject)}
-                            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider border transition-all ${
+                            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-sans font-bold uppercase tracking-wider border transition-all ${
                               isDark 
                                 ? 'border-white/15 bg-white/5 text-neutral-200 hover:border-[#ff5e1a] hover:text-[#ff5e1a]' 
                                 : 'border-black/15 bg-black/5 text-neutral-800 hover:border-[#ff5e1a] hover:text-[#ff5e1a]'
@@ -799,7 +799,7 @@ export default function Dashboard() {
                           </a>
                         </div>
 
-                        <span className="text-[11px] font-mono text-neutral-500">
+                        <span className="text-[11px] font-sans text-neutral-500">
                           Direct recipient: {selectedMessage.email}
                         </span>
                       </div>
@@ -807,7 +807,7 @@ export default function Dashboard() {
                     </div>
                   </>
                 ) : (
-                  <div className="p-16 text-center text-xs font-mono text-neutral-500 space-y-2">
+                  <div className="p-16 text-center text-xs font-sans text-neutral-500 space-y-2">
                     <div className="font-bold text-neutral-400">
                       {messages.length === 0 ? 'Inbox is clean' : 'Select an inquiry to view details'}
                     </div>
@@ -832,13 +832,13 @@ export default function Dashboard() {
                 <h2 id="analytics-heading" className="text-xl sm:text-2xl font-black tracking-tight">
                   Multi-Tier Telemetry Hub
                 </h2>
-                <p className="text-xs text-neutral-500 font-mono mt-0.5">
+                <p className="text-xs text-neutral-500 font-sans mt-0.5">
                   Three privacy-first analytics engines working concurrently for maximum accuracy and redundancy
                 </p>
               </div>
 
               {/* Engine Switcher */}
-              <div className="flex items-center gap-1.5 p-1 rounded-xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 text-xs font-mono font-bold">
+              <div className="flex items-center gap-1.5 p-1 rounded-xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 text-xs font-sans font-bold">
                 <button
                   onClick={() => setAnalyticsOption('bespoke')}
                   className={`px-3 py-1.5 rounded-lg transition-all ${
@@ -877,10 +877,10 @@ export default function Dashboard() {
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#ff5e1a] bg-[#ff5e1a]/10 px-2.5 py-1 rounded-md border border-[#ff5e1a]/25">
+                    <span className="text-[11px] font-sans font-bold uppercase tracking-wider text-[#ff5e1a] bg-[#ff5e1a]/10 px-2.5 py-1 rounded-md border border-[#ff5e1a]/25">
                       Engine 1: Bespoke In-Portfolio
                     </span>
-                    <span className="text-xs font-mono text-neutral-400">
+                    <span className="text-xs font-sans text-neutral-400">
                       {cloudStats?.configured ? 'Connected to Upstash Redis (HyperLogLog active)' : 'Local + Edge Storage Engine'}
                     </span>
                   </div>
@@ -888,7 +888,7 @@ export default function Dashboard() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={exportAnalyticsJSON}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold border transition-all ${
+                      className={`px-3 py-1.5 rounded-lg text-xs font-sans font-bold border transition-all ${
                         isDark ? 'border-white/15 bg-white/5 text-neutral-300 hover:border-[#ff5e1a]' : 'border-black/15 bg-black/5 text-neutral-800 hover:border-[#ff5e1a]'
                       }`}
                     >
@@ -896,7 +896,7 @@ export default function Dashboard() {
                     </button>
                     <button
                       onClick={handleResetAnalytics}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-mono text-neutral-500 hover:text-red-400 transition-colors ${
+                      className={`px-3 py-1.5 rounded-lg text-xs font-sans text-neutral-500 hover:text-red-400 transition-colors ${
                         isDark ? 'hover:bg-white/5' : 'hover:bg-black/5'
                       }`}
                     >
@@ -910,13 +910,13 @@ export default function Dashboard() {
                   <div className={`p-5 rounded-2xl border ${
                     isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
                   }`}>
-                    <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-neutral-400">
+                    <span className="text-[11px] font-sans font-bold uppercase tracking-wider text-neutral-400">
                       Total Pageviews
                     </span>
                     <div className="text-3xl sm:text-4xl font-black mt-2 tracking-tight">
                       {displayPageviews}
                     </div>
-                    <span className="text-[11px] font-mono text-[#ff5e1a] mt-1 block">
+                    <span className="text-[11px] font-sans text-[#ff5e1a] mt-1 block">
                       INCR total_pageviews
                     </span>
                   </div>
@@ -924,13 +924,13 @@ export default function Dashboard() {
                   <div className={`p-5 rounded-2xl border ${
                     isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
                   }`}>
-                    <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-neutral-400">
+                    <span className="text-[11px] font-sans font-bold uppercase tracking-wider text-neutral-400">
                       Unique Visitors
                     </span>
                     <div className="text-3xl sm:text-4xl font-black mt-2 tracking-tight text-[#ff5e1a]">
                       {displayUniques}
                     </div>
-                    <span className="text-[11px] font-mono text-neutral-500 mt-1 block">
+                    <span className="text-[11px] font-sans text-neutral-500 mt-1 block">
                       HyperLogLog PFADD
                     </span>
                   </div>
@@ -938,13 +938,13 @@ export default function Dashboard() {
                   <div className={`p-5 rounded-2xl border ${
                     isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
                   }`}>
-                    <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-neutral-400">
+                    <span className="text-[11px] font-sans font-bold uppercase tracking-wider text-neutral-400">
                       Top Referral Channel
                     </span>
                     <div className="text-2xl sm:text-3xl font-black mt-2 tracking-tight truncate">
                       {topReferral}
                     </div>
-                    <span className="text-[11px] font-mono text-green-500 mt-1 block">
+                    <span className="text-[11px] font-sans text-green-500 mt-1 block">
                       HINCRBY referrers
                     </span>
                   </div>
@@ -952,13 +952,13 @@ export default function Dashboard() {
                   <div className={`p-5 rounded-2xl border ${
                     isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
                   }`}>
-                    <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-neutral-400">
+                    <span className="text-[11px] font-sans font-bold uppercase tracking-wider text-neutral-400">
                       Top Visited Page
                     </span>
-                    <div className="text-2xl sm:text-3xl font-black mt-2 tracking-tight truncate font-mono">
+                    <div className="text-2xl sm:text-3xl font-black mt-2 tracking-tight truncate font-sans">
                       {topPage}
                     </div>
-                    <span className="text-[11px] font-mono text-neutral-500 mt-1 block">
+                    <span className="text-[11px] font-sans text-neutral-500 mt-1 block">
                       ZINCRBY pages
                     </span>
                   </div>
@@ -973,11 +973,11 @@ export default function Dashboard() {
                       <h3 className="text-base sm:text-lg font-bold tracking-tight">
                         Daily Traffic Velocity (Last 14 Days)
                       </h3>
-                      <p className="text-xs text-neutral-500 font-mono">
+                      <p className="text-xs text-neutral-500 font-sans">
                         Pageviews and unique visits mapped by day
                       </p>
                     </div>
-                    <div className="flex items-center gap-4 text-xs font-mono">
+                    <div className="flex items-center gap-4 text-xs font-sans">
                       <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded-xs bg-[#ff5e1a]" />
                         <span className="text-neutral-400">Pageviews</span>
@@ -991,7 +991,7 @@ export default function Dashboard() {
 
                   <div className="pt-6 pb-2 overflow-x-auto">
                     {(!analytics.dailyTimeline || analytics.dailyTimeline.length === 0) ? (
-                      <div className="h-40 flex flex-col items-center justify-center text-neutral-500 font-mono text-xs gap-1">
+                      <div className="h-40 flex flex-col items-center justify-center text-neutral-500 font-sans text-xs gap-1">
                         <span>Awaiting external visitor traffic...</span>
                         <span className="text-[11px] opacity-75">Daily pageviews and unique visits will map here automatically as external visits arrive.</span>
                       </div>
@@ -1004,7 +1004,7 @@ export default function Dashboard() {
 
                           return (
                             <div key={item.date} className="flex-1 flex flex-col items-center gap-2 group h-full justify-end">
-                              <div className="text-[10px] font-mono text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <div className="text-[10px] font-sans text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity">
                                 {item.views}v / {item.uniques}u
                               </div>
                               <div className="w-full flex items-end justify-center gap-1.5 h-36">
@@ -1019,7 +1019,7 @@ export default function Dashboard() {
                                   title={`${item.label}: ${item.uniques} unique visitors`}
                                 />
                               </div>
-                              <span className="text-[10px] font-mono text-neutral-500 whitespace-nowrap">
+                              <span className="text-[10px] font-sans text-neutral-500 whitespace-nowrap">
                                 {item.label}
                               </span>
                             </div>
@@ -1036,12 +1036,12 @@ export default function Dashboard() {
                   <div className={`p-6 rounded-2xl border space-y-4 ${
                     isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
                   }`}>
-                    <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-neutral-400">
+                    <h3 className="text-sm font-bold font-sans uppercase tracking-wider text-neutral-400">
                       Pages (ZINCRBY)
                     </h3>
-                    <div className="space-y-3 font-mono text-xs">
+                    <div className="space-y-3 font-sans text-xs">
                       {Object.keys(cloudStats?.pages || analytics.pageBreakdown || {}).length === 0 ? (
-                        <div className="text-neutral-500 text-xs font-mono py-4 text-center">
+                        <div className="text-neutral-500 text-xs font-sans py-4 text-center">
                           No page traffic recorded yet.
                         </div>
                       ) : (
@@ -1068,12 +1068,12 @@ export default function Dashboard() {
                   <div className={`p-6 rounded-2xl border space-y-4 ${
                     isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
                   }`}>
-                    <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-neutral-400">
+                    <h3 className="text-sm font-bold font-sans uppercase tracking-wider text-neutral-400">
                       Referrers (HINCRBY)
                     </h3>
-                    <div className="space-y-3 font-mono text-xs">
+                    <div className="space-y-3 font-sans text-xs">
                       {Object.keys(cloudStats?.referrers || analytics.referrerBreakdown || {}).length === 0 ? (
-                        <div className="text-neutral-500 text-xs font-mono py-4 text-center">
+                        <div className="text-neutral-500 text-xs font-sans py-4 text-center">
                           No external referrers recorded yet.
                         </div>
                       ) : (
@@ -1100,12 +1100,12 @@ export default function Dashboard() {
                   <div className={`p-6 rounded-2xl border space-y-4 ${
                     isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
                   }`}>
-                    <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-neutral-400">
+                    <h3 className="text-sm font-bold font-sans uppercase tracking-wider text-neutral-400">
                       Devices (HINCRBY)
                     </h3>
-                    <div className="space-y-3 font-mono text-xs">
+                    <div className="space-y-3 font-sans text-xs">
                       {Object.keys(cloudStats?.devices || analytics.deviceBreakdown || {}).length === 0 ? (
-                        <div className="text-neutral-500 text-xs font-mono py-4 text-center">
+                        <div className="text-neutral-500 text-xs font-sans py-4 text-center">
                           No device data recorded yet.
                         </div>
                       ) : (
@@ -1138,13 +1138,13 @@ export default function Dashboard() {
               }`}>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#ff5e1a] bg-[#ff5e1a]/10 px-2.5 py-1 rounded-md border border-[#ff5e1a]/25">
+                    <span className="text-[11px] font-sans font-bold uppercase tracking-wider text-[#ff5e1a] bg-[#ff5e1a]/10 px-2.5 py-1 rounded-md border border-[#ff5e1a]/25">
                       Engine 2: GoatCounter Analytics
                     </span>
                     <h3 className="text-xl sm:text-2xl font-black tracking-tight mt-2">
                       GoatCounter Zero-Maintenance Tracking
                     </h3>
-                    <p className="text-xs text-neutral-500 font-mono mt-1">
+                    <p className="text-xs text-neutral-500 font-sans mt-1">
                       100% Free, GDPR compliant, under 3 KB and zero cookies.
                     </p>
                   </div>
@@ -1153,21 +1153,21 @@ export default function Dashboard() {
                     href="https://khushang.goatcounter.com"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all shadow-md shrink-0"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-sans font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all shadow-md shrink-0"
                   >
                     <span>Open GoatCounter Dashboard</span>
                   </a>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-4 rounded-xl border border-black/10 dark:border-white/10 text-xs font-mono space-y-2">
+                  <div className="p-4 rounded-xl border border-black/10 dark:border-white/10 text-xs font-sans space-y-2">
                     <span className="font-bold text-neutral-200 dark:text-neutral-200 block">Status: Script Embedded</span>
                     <p className="text-neutral-400 leading-relaxed">
                       Tracking code is embedded in <code className="text-[#ff5e1a]">index.html</code> pointed to <code className="text-[#ff5e1a]">khushang.goatcounter.com</code>.
                     </p>
                   </div>
 
-                  <div className="p-4 rounded-xl border border-black/10 dark:border-white/10 text-xs font-mono space-y-2">
+                  <div className="p-4 rounded-xl border border-black/10 dark:border-white/10 text-xs font-sans space-y-2">
                     <span className="font-bold text-neutral-200 dark:text-neutral-200 block">How to Activate Your Account</span>
                     <p className="text-neutral-400 leading-relaxed">
                       Register your free code <span className="text-[#ff5e1a] font-bold">khushang</span> at <a href="https://www.goatcounter.com" target="_blank" rel="noreferrer" className="underline text-[#ff5e1a]">goatcounter.com</a>. Set your dashboard privacy to private or public.
@@ -1184,13 +1184,13 @@ export default function Dashboard() {
               }`}>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#ff5e1a] bg-[#ff5e1a]/10 px-2.5 py-1 rounded-md border border-[#ff5e1a]/25">
+                    <span className="text-[11px] font-sans font-bold uppercase tracking-wider text-[#ff5e1a] bg-[#ff5e1a]/10 px-2.5 py-1 rounded-md border border-[#ff5e1a]/25">
                       Engine 3: Vercel Web Analytics
                     </span>
                     <h3 className="text-xl sm:text-2xl font-black tracking-tight mt-2">
                       Native Edge Telemetry
                     </h3>
-                    <p className="text-xs text-neutral-500 font-mono mt-1">
+                    <p className="text-xs text-neutral-500 font-sans mt-1">
                       Directly integrated via @vercel/analytics/react without client overhead.
                     </p>
                   </div>
@@ -1199,13 +1199,13 @@ export default function Dashboard() {
                     href="https://vercel.com/dashboard"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all shadow-md shrink-0"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-sans font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all shadow-md shrink-0"
                   >
                     <span>Open Vercel Analytics Console</span>
                   </a>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-sans">
                   <div className="p-4 rounded-xl border border-black/10 dark:border-white/10 space-y-1">
                     <span className="font-bold text-neutral-200 dark:text-neutral-200 block">Package Status</span>
                     <span className="text-green-500 font-bold">@vercel/analytics Installed</span>
@@ -1232,18 +1232,18 @@ export default function Dashboard() {
               <h2 id="architecture-heading" className="text-xl sm:text-2xl font-black tracking-tight">
                 Studio Settings & Security
               </h2>
-              <p className="text-xs text-neutral-500 font-mono mt-0.5">
-                Manage your private passcode, review cloud connection credentials and configure serverless email delivery
+              <p className="text-xs text-neutral-500 font-sans mt-0.5">
+                Manage your private passcode and security access settings
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="max-w-xl">
               
               {/* Passcode Management Card */}
               <div className={`p-6 sm:p-8 rounded-2xl border space-y-4 ${
                 isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
               }`}>
-                <div className="inline-block px-2.5 py-1 rounded-md text-[11px] font-mono font-bold uppercase tracking-wider text-[#ff5e1a] bg-[#ff5e1a]/10 border border-[#ff5e1a]/25">
+                <div className="inline-block px-2.5 py-1 rounded-md text-[11px] font-sans font-bold uppercase tracking-wider text-[#ff5e1a] bg-[#ff5e1a]/10 border border-[#ff5e1a]/25">
                   Security Access Gate
                 </div>
                 <h3 className="text-xl font-bold tracking-tight">
@@ -1254,7 +1254,7 @@ export default function Dashboard() {
                 </p>
 
                 {passcodeSuccessMsg && (
-                  <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/25 text-green-400 text-xs font-mono font-bold">
+                  <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/25 text-green-400 text-xs font-sans font-bold">
                     {passcodeSuccessMsg}
                   </div>
                 )}
@@ -1265,7 +1265,7 @@ export default function Dashboard() {
                     value={newPasscodeInput}
                     onChange={(e) => setNewPasscodeInput(e.target.value)}
                     placeholder="Enter new 4+ character passcode"
-                    className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-mono border outline-none ${
+                    className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-sans border outline-none ${
                       isDark 
                         ? 'border-white/15 bg-black/40 text-white focus:border-[#ff5e1a]' 
                         : 'border-black/15 bg-neutral-50 text-neutral-900 focus:border-[#ff5e1a]'
@@ -1273,34 +1273,11 @@ export default function Dashboard() {
                   />
                   <button
                     type="submit"
-                    className="px-4 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all cursor-pointer"
+                    className="px-4 py-2 rounded-xl text-xs font-sans font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all cursor-pointer"
                   >
                     Save New Passcode
                   </button>
                 </form>
-              </div>
-
-              {/* Upstash Redis (Option 1) Cloud Setup Card */}
-              <div className={`p-6 sm:p-8 rounded-2xl border space-y-4 ${
-                isDark ? 'bg-[#0e0f12] border-white/10' : 'bg-white border-black/10 shadow-sm'
-              }`}>
-                <div className="inline-block px-2.5 py-1 rounded-md text-[11px] font-mono font-bold uppercase tracking-wider text-[#ff5e1a] bg-[#ff5e1a]/10 border border-[#ff5e1a]/25">
-                  Option 1: Upstash Redis
-                </div>
-                <h3 className="text-xl font-bold tracking-tight">
-                  Free Global Cloud Database
-                </h3>
-                <p className="text-xs sm:text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
-                  To sync visitor counts across all worldwide devices via Upstash Redis free tier, set these in Vercel Project Environment Variables:
-                </p>
-                <div className="space-y-2 text-xs font-mono text-neutral-400">
-                  <div className="p-3 rounded-lg border border-black/10 dark:border-white/10 bg-black/20">
-                    <span className="text-[#ff5e1a] font-bold">UPSTASH_REDIS_REST_URL</span>=https://...
-                  </div>
-                  <div className="p-3 rounded-lg border border-black/10 dark:border-white/10 bg-black/20">
-                    <span className="text-[#ff5e1a] font-bold">UPSTASH_REDIS_REST_TOKEN</span>=...
-                  </div>
-                </div>
               </div>
 
             </div>
