@@ -53,7 +53,7 @@ export default function PortfolioSummary() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-8 border-b border-black/10 dark:border-white/10">
           <Link
             to="/"
-            className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400 hover:text-[#ff5e1a] dark:hover:text-[#ff5e1a] transition-colors"
+            className="inline-flex items-center gap-2 text-xs font-sans font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400 hover:text-[#ff5e1a] dark:hover:text-[#ff5e1a] transition-colors"
           >
             <span>← Back to Interactive Portfolio</span>
           </Link>
@@ -63,7 +63,7 @@ export default function PortfolioSummary() {
               href={resumeUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all duration-300 shadow-sm hover:scale-[1.02] active:scale-[0.98]"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-sans font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all duration-300 shadow-sm hover:scale-[1.02] active:scale-[0.98]"
             >
               <span>Download PDF Resume</span>
             </a>

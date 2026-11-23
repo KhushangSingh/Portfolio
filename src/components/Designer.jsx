@@ -404,14 +404,23 @@ const HeroSection = () => {
             <div className="absolute top-6 sm:top-8 right-6 md:right-12 z-20">
                 <Link
                     to="/summary"
-                    className={`inline-flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider border transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] cursor-pointer shadow-sm ${
+                    data-cursor="SUMMARY"
+                    className={`group relative inline-flex items-center gap-2.5 px-3.5 py-2 sm:px-4.5 sm:py-2.5 rounded-2xl border text-xs sm:text-sm font-sans font-bold tracking-tight transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] cursor-pointer shadow-md select-none overflow-hidden ${
                         isDark
-                            ? 'border-white/15 bg-white/5 hover:bg-white/10 text-neutral-200 hover:border-[#ff5e1a] hover:text-[#ff5e1a]'
-                            : 'border-black/15 bg-black/5 hover:bg-black/10 text-neutral-800 hover:border-[#ff5e1a] hover:text-[#ff5e1a]'
-                    } backdrop-blur-md`}
+                            ? 'bg-[#0e0f14]/85 hover:bg-[#151722] border-white/15 hover:border-[#ff5e1a] text-white shadow-black/40'
+                            : 'bg-white/90 hover:bg-white border-black/15 hover:border-[#ff5e1a] text-neutral-900 shadow-black/8'
+                    } backdrop-blur-xl`}
                     title="Quick 5-minute portfolio overview and executive summary"
                 >
-                    <span>Have 5 Mins?</span>
+                    <span className="px-2 py-0.5 rounded-md text-[10px] font-sans font-black bg-[#ff5e1a] text-white uppercase tracking-wider shrink-0 shadow-xs">
+                        5 Min
+                    </span>
+                    <span className="font-sans font-extrabold tracking-tight">
+                        Have 5 Mins?
+                    </span>
+                    <span className="text-[#ff5e1a] text-xs font-bold transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden="true">
+                        →
+                    </span>
                 </Link>
             </div>
 
@@ -767,7 +776,7 @@ const Footer = () => {
 
                                     <Link
                                         to="/summary"
-                                        className={`inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider border transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer ${
+                                        className={`inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs font-sans font-bold uppercase tracking-wider border transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer ${
                                             isDark 
                                                 ? 'border-white/15 bg-white/5 text-neutral-200 hover:border-[#ff5e1a] hover:text-[#ff5e1a]' 
                                                 : 'border-black/15 bg-black/5 text-neutral-800 hover:border-[#ff5e1a] hover:text-[#ff5e1a]'
