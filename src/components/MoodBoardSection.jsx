@@ -382,7 +382,7 @@ function CardRenderer({ card, isDark }) {
 
           {/* Swinging Spider-Man Dynamic Motion Layer (In front of single-line title) */}
           <motion.div 
-            className="absolute right-0 top-[-16px] sm:top-[-20px] w-[125px] sm:w-[140px] aspect-square pointer-events-none z-20 select-none"
+            className="absolute right-0 top-[6px] sm:top-[4px] w-[125px] sm:w-[140px] aspect-square pointer-events-none z-20 select-none"
             style={{ transformOrigin: '100% 35%' }}
             animate={{
               rotate: [-1.4, 1.8, -1.4],
