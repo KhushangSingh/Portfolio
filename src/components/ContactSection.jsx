@@ -87,24 +87,22 @@ export default function ContactSection() {
           </div>
           
           <motion.div 
-            initial={{ opacity: 0, scale: 0.6, rotate: -45, filter: 'blur(10px)' }}
+            initial={{ opacity: 0, scale: 0.6, rotate: -25, filter: 'blur(10px)' }}
             whileInView={{ opacity: 1, scale: 1, rotate: 0, filter: 'blur(0px)' }}
             viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.9, delay: 0.15, type: 'spring', stiffness: 200, damping: 20 }}
-            className="absolute right-0 top-1/2 -translate-y-1/2 hidden md:block will-change-[transform,opacity,filter]"
+            className="absolute right-6 sm:right-10 lg:right-16 -top-4 sm:-top-6 lg:-top-10 z-30 hidden md:block will-change-[transform,opacity,filter]"
           >
             <div className="relative group">
-              <a 
-                href={linkedInUrl} 
-                target="_blank" 
-                rel="noreferrer" 
-                data-cursor="CONNECT"
-                className="relative z-10 w-24 h-24 lg:w-28 lg:h-28 rounded-full bg-[#ff4d00] flex items-center justify-center text-black transition-all duration-500 hover:scale-110 shadow-[0_0_25px_rgba(255,77,0,0.45)] cursor-pointer"
+              {/* Tactile orange anchor disc without text or external link */}
+              <div 
+                className="relative z-10 w-20 h-20 sm:w-22 sm:h-22 lg:w-24 lg:h-24 rounded-full bg-gradient-to-br from-[#ff5e1a] to-[#d9480f] shadow-[0_0_28px_rgba(255,94,26,0.45)] border border-white/25 flex items-center justify-center select-none"
+                aria-hidden="true"
               >
-                <span className="text-sm font-bold">LinkedIn</span>
-              </a>
+                <div className="w-14 h-14 rounded-full border border-white/30 opacity-60" />
+              </div>
 
-              {/* Spiderman hanging upside down stuck to the circle */}
+              {/* Spider-Man hanging upside down and descending to overlap the form card */}
               <HangingSpiderman isDark={isDark} shouldDescend={isContactVisible} />
             </div>
           </motion.div>

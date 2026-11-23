@@ -6,13 +6,13 @@ import { motion } from 'framer-motion';
  * A photorealistic, high-craft Spider-Man hanging upside down on a web line.
  *
  * Entrance Animation:
- * - Starts tucked behind the right-side arrow circle.
- * - Smoothly slides down on an extending tensile web line from behind the circle,
- *   settling with a gentle, realistic silk-spring rebound.
+ * - Starts tucked behind the right-side anchor circle.
+ * - Smoothly slides down on an extending tensile web line, descending to overlap the form card below.
+ * - Settles with a gentle, realistic silk-spring rebound.
  *
  * Micro-interactions:
  * - Natural ambient pendulum sway once settled.
- * - Dynamic reactive pendulum swing on user click / hover.
+ * - Dynamic reactive pendulum swing on user click or hover.
  */
 export default function HangingSpiderman({ isDark, shouldDescend = false }) {
   const [isSwinging, setIsSwinging] = useState(false);
@@ -24,11 +24,11 @@ export default function HangingSpiderman({ isDark, shouldDescend = false }) {
 
   return (
     <div 
-      className="absolute left-1/2 -translate-x-1/2 top-[82%] z-0 pointer-events-auto select-none"
+      className="absolute left-1/2 -translate-x-1/2 top-[82%] z-30 pointer-events-auto select-none"
       style={{ 
         width: '140px',
-        // Clips any element sliding down above the bottom rim of the circle so he emerges cleanly from behind
-        clipPath: 'inset(0px -120px -380px -120px)'
+        // Generous clipping box ensuring Spider-Man emerges cleanly from behind the circle and extends down over the form
+        clipPath: 'inset(0px -140px -520px -140px)'
       }}
       onMouseEnter={triggerSway}
       onClick={triggerSway}
@@ -54,10 +54,10 @@ export default function HangingSpiderman({ isDark, shouldDescend = false }) {
         </svg>
       </motion.div>
 
-      {/* 2. RAPPELLING DESCENT WRAPPER: Slides smoothly down from behind the arrow circle */}
+      {/* 2. RAPPELLING DESCENT WRAPPER: Slides smoothly down from behind the anchor circle */}
       <motion.div
-        initial={{ y: -130, opacity: 0 }}
-        animate={shouldDescend ? { y: 0, opacity: 1 } : { y: -130, opacity: 0 }}
+        initial={{ y: -220, opacity: 0 }}
+        animate={shouldDescend ? { y: 0, opacity: 1 } : { y: -220, opacity: 0 }}
         transition={{
           type: 'spring',
           stiffness: 55,
@@ -67,7 +67,7 @@ export default function HangingSpiderman({ isDark, shouldDescend = false }) {
         }}
         className="relative w-full flex flex-col items-center will-change-transform"
       >
-        {/* Tensile silk web line extending downwards from the anchor */}
+        {/* Tensile silk web line extending downwards from the anchor to overlap the form card */}
         <motion.div 
           initial={{ scaleY: 0.15 }}
           animate={shouldDescend ? { scaleY: 1 } : { scaleY: 0.15 }}
@@ -79,7 +79,7 @@ export default function HangingSpiderman({ isDark, shouldDescend = false }) {
             delay: 0.12
           }}
           style={{ transformOrigin: 'top center' }}
-          className="w-[1.5px] h-8 sm:h-9 bg-gradient-to-b from-white via-white/90 to-white/65 shadow-[0_0_3px_rgba(255,255,255,0.75)]" 
+          className="w-[1.5px] h-28 sm:h-36 md:h-40 bg-gradient-to-b from-white via-white/90 to-white/65 shadow-[0_0_3px_rgba(255,255,255,0.75)]" 
         />
 
         {/* 3. PENDULUM SWINGING SPIDER-MAN CONTAINER */}
@@ -96,15 +96,15 @@ export default function HangingSpiderman({ isDark, shouldDescend = false }) {
           whileHover={{ scale: 1.04 }}
           whileTap={{ scale: 0.96, y: -2 }}
         >
-          {/* SPIDER-MAN IMAGE WITH MATTE FABRIC COLOR GRADING */}
+          {/* SPIDER-MAN IMAGE WITH MATTE FABRIC COLOR GRADING AND SOFT DROP SHADOW ON THE FORM */}
           <div className="relative w-full">
             <img
               src="/images/spiderman_upside_down.png"
               alt="Spider-Man hanging upside down"
               className="w-full h-auto object-contain pointer-events-none"
               style={{
-                filter: `brightness(1.03) saturate(0.96) contrast(0.93) drop-shadow(0 6px 14px ${
-                  isDark ? 'rgba(0, 0, 0, 0.55)' : 'rgba(0, 0, 0, 0.28)'
+                filter: `brightness(1.03) saturate(0.96) contrast(0.93) drop-shadow(0 10px 20px ${
+                  isDark ? 'rgba(0, 0, 0, 0.75)' : 'rgba(0, 0, 0, 0.35)'
                 })`,
               }}
               draggable={false}
