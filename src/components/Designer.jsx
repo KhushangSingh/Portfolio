@@ -16,6 +16,7 @@ import { ScrollWordReveal } from './ScrollWordReveal';
 import LiquidPortraitReveal from './LiquidPortraitReveal';
 import HangingSpiderman from './HangingSpiderman';
 import { VinylPlayer } from './VinylPlayer';
+import ContactSection from './ContactSection';
 
 // --- ANIMATION VARIANTS ---
 const containerVariants = {
@@ -831,11 +832,23 @@ const Footer = () => {
                                     Open for freelance projects and internships. Based in India, working globally.
                                 </p>
 
-                                {/* Action Buttons: Visual Summary Brief & PDF Resume */}
+                                {/* Action Buttons: Direct Message, Visual Summary Brief & PDF Resume */}
                                 <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+                                    <a
+                                        href="#contact"
+                                        className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all duration-300 shadow-md hover:shadow-[#ff5e1a]/25 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                                        title="Send a direct message through website form"
+                                    >
+                                        <span>Direct Message</span>
+                                    </a>
+
                                     <Link
                                         to="/summary"
-                                        className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all duration-300 shadow-md hover:shadow-[#ff5e1a]/25 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                                        className={`inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider border transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer ${
+                                            isDark 
+                                                ? 'border-white/15 bg-white/5 text-neutral-200 hover:border-[#ff5e1a] hover:text-[#ff5e1a]' 
+                                                : 'border-black/15 bg-black/5 text-neutral-800 hover:border-[#ff5e1a] hover:text-[#ff5e1a]'
+                                        }`}
                                         title="View condensed portfolio summary & visual resume"
                                     >
                                         <span>Visual Summary</span>
@@ -902,7 +915,9 @@ const Footer = () => {
                             <li><a href="#" onClick={(e) => { e.preventDefault(); scrollToTop(); }} className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>Home</a></li>
                             <li><a href="#projects" className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>Projects</a></li>
                             <li><a href="#about" className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>About</a></li>
+                            <li><a href="#contact" className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>Contact Form</a></li>
                             <li><Link to="/summary" className="inline-block w-fit text-xs sm:text-sm text-[#ff5e1a] font-medium hover:underline">Visual Summary</Link></li>
+                            <li><Link to="/dashboard" className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>Dashboard</Link></li>
                             <li><a href={resumeUrl} target="_blank" rel="noreferrer" className={`inline-block w-fit text-xs sm:text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-neutral-950'}`}>Resume (PDF)</a></li>
                         </ul>
                     </motion.div>
@@ -1196,6 +1211,9 @@ const Designer = () => {
 
       {/* STUDIO WORKSPACE SECTION */}
       <StudioSection />
+
+      {/* DIRECT CONTACT FORM SECTION */}
+      <ContactSection />
 
       {/* FOOTER */}
       <Footer />

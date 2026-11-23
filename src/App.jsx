@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
 import Designer from './components/Designer';
@@ -11,11 +11,19 @@ import { MusicProvider } from './context/MusicContext';
 import { LoadingProvider } from './context/LoadingContext';
 import RubiksLoader from './components/RubiksLoader';
 import { OTAKU_CIRCLE_CASE_STUDY } from './constants/otakuCircle';
+import { logPageView } from './utils/visitorTracker';
 
 const OtakuCircleCaseStudy = lazy(() => import('./components/otakucircle/OtakuCircleCaseStudy'));
+const Dashboard = lazy(() => import('./components/Dashboard'));
 
 function AppContent() {
   const { isDark } = useTheme();
+  const location = useLocation();
+
+  // Log anonymous visitor pageview on route change
+  useEffect(() => {
+    logPageView(location.pathname);
+  }, [location.pathname]);
 
   // Initialize smooth momentum scrolling throughout the entire website via Lenis
   useEffect(() => {
@@ -52,6 +60,14 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<Designer />} />
           <Route path="/summary" element={<PortfolioSummary />} />
+          <Route path="/dashboard" element={(
+            <Suspense fallback={<p className="sr-only" role="status">Opening studio dashboard</p>}>
+              <Dashboard />
+            </Suspense>
+          )} />
+          <Route path="/analytics" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/inbox" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/contact" element={<Navigate to="/#contact" replace />} />
           <Route path={OTAKU_CIRCLE_CASE_STUDY} element={(
             <Suspense fallback={<p className="sr-only" role="status">Opening the OtakuCircle case study</p>}>
               <OtakuCircleCaseStudy />

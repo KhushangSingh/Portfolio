@@ -410,11 +410,18 @@ export default function PortfolioSummary() {
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-3 shrink-0">
-            <a
-              href={`mailto:${email}`}
+            <Link
+              to="/#contact"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-mono font-bold uppercase tracking-wider bg-[#ff5e1a] text-white hover:bg-[#e0480a] transition-all shadow-md hover:scale-[1.02] active:scale-[0.98]"
             >
-              <span>Get In Touch</span>
+              <span>Send Direct Message</span>
+            </Link>
+
+            <a
+              href={`mailto:${email}`}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-mono font-bold uppercase tracking-wider border border-black/15 dark:border-white/15 hover:border-[#ff5e1a] text-neutral-800 dark:text-neutral-200 hover:text-[#ff5e1a] transition-all"
+            >
+              <span>Email Directly</span>
             </a>
 
             <Link
@@ -437,12 +444,21 @@ export default function PortfolioSummary() {
             © 2026 Khushang Singh. Designed and developed with care.
           </p>
 
-          <button
-            onClick={scrollToTop}
-            className="inline-flex items-center gap-1.5 hover:text-[#ff5e1a] transition-colors cursor-pointer font-mono font-bold uppercase text-[11px]"
-          >
-            <span>Back to Top</span>
-          </button>
+          <div className="flex items-center gap-4">
+            <Link
+              to="/dashboard"
+              className="hover:text-[#ff5e1a] transition-colors font-mono font-bold uppercase text-[11px]"
+            >
+              Studio Dashboard
+            </Link>
+
+            <button
+              onClick={scrollToTop}
+              className="inline-flex items-center gap-1.5 hover:text-[#ff5e1a] transition-colors cursor-pointer font-mono font-bold uppercase text-[11px]"
+            >
+              <span>Back to Top</span>
+            </button>
+          </div>
         </div>
       </footer>
 
